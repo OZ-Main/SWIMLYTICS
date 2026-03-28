@@ -1,0 +1,328 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 207 32% 97%;
+    --foreground: 216 28% 14%;
+
+    --card: 210 45% 99%;
+    --card-foreground: 216 28% 14%;
+
+    --popover: 210 45% 99%;
+    --popover-foreground: 216 28% 14%;
+
+    --primary: 197 55% 34%;
+    --primary-foreground: 195 55% 98%;
+
+    --secondary: 206 26% 92%;
+    --secondary-foreground: 216 24% 22%;
+
+    --muted: 210 22% 93%;
+    --muted-foreground: 215 16% 40%;
+
+    --accent: 189 48% 40%;
+    --accent-foreground: 195 60% 98%;
+
+    --destructive: 0 65% 46%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 156 42% 36%;
+    --success-foreground: 152 50% 97%;
+
+    --warning: 36 88% 44%;
+    --warning-foreground: 38 100% 11%;
+
+    --border: 210 18% 88%;
+    --input: 210 18% 88%;
+    --ring: 197 55% 38%;
+
+    --chart-1: 197 55% 38%;
+    --chart-2: 189 48% 42%;
+    --chart-3: 216 20% 48%;
+    --chart-4: 158 38% 38%;
+    --chart-5: 265 38% 52%;
+
+    --chart-grid: 210 18% 88%;
+    --chart-axis: 215 14% 42%;
+
+    --stroke-freestyle: 197 55% 42%;
+    --stroke-backstroke: 216 28% 48%;
+    --stroke-breaststroke: 158 36% 36%;
+    --stroke-butterfly: 278 38% 50%;
+    --stroke-im: 189 44% 38%;
+    --stroke-drill: 38 76% 46%;
+    --stroke-kick: 14 68% 50%;
+
+    --sidebar: 212 36% 15%;
+    --sidebar-foreground: 210 28% 94%;
+    --sidebar-border: 212 28% 22%;
+    --sidebar-accent: 197 48% 26%;
+    --sidebar-accent-foreground: 195 55% 98%;
+    --sidebar-muted: 210 22% 70%;
+
+    --overlay-scrim: 216 28% 14%;
+
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-button: 0.5rem;
+    --radius-input: 0.5rem;
+    --radius-card: 0.75rem;
+    --radius-dialog: 0.75rem;
+    --radius-chart-bar: 0.25rem;
+
+    --shadow-card:
+      0 1px 0 hsl(var(--border) / 0.85), 0 1px 2px hsl(var(--foreground) / 0.04),
+      0 6px 20px hsl(var(--foreground) / 0.05);
+    --shadow-card-hover:
+      0 1px 0 hsl(var(--border) / 0.9), 0 4px 12px hsl(var(--foreground) / 0.06),
+      0 16px 40px hsl(var(--foreground) / 0.08);
+    --shadow-overlay: 0 24px 48px hsl(var(--foreground) / 0.16);
+
+    --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+
+    --text-display-xl-size: 2.25rem;
+    --text-display-xl-leading: 2.75rem;
+    --text-display-lg-size: 1.875rem;
+    --text-display-lg-leading: 2.25rem;
+    --text-heading-xl-size: 1.5rem;
+    --text-heading-xl-leading: 2rem;
+    --text-heading-lg-size: 1.25rem;
+    --text-heading-lg-leading: 1.75rem;
+    --text-heading-md-size: 1.125rem;
+    --text-heading-md-leading: 1.5rem;
+    --text-heading-sm-size: 1rem;
+    --text-heading-sm-leading: 1.375rem;
+    --text-body-lg-size: 1.0625rem;
+    --text-body-lg-leading: 1.625rem;
+    --text-body-size: 0.9375rem;
+    --text-body-leading: 1.5rem;
+    --text-body-sm-size: 0.8125rem;
+    --text-body-sm-leading: 1.25rem;
+    --text-label-size: 0.8125rem;
+    --text-label-leading: 1.125rem;
+    --text-label-weight: 500;
+    --text-caption-size: 0.75rem;
+    --text-caption-leading: 1rem;
+    --text-chart-tick-size: 0.6875rem;
+
+    --space-section: 2.25rem;
+    --space-section-sm: 1.25rem;
+    --space-card: 1.25rem;
+    --space-form: 1.5rem;
+    --space-form-field: 1rem;
+    --space-list-gap: 0.75rem;
+    --page-padding-x: 1rem;
+    --page-padding-x-sm: 1.25rem;
+    --page-padding-x-lg: 2rem;
+    --page-padding-y: 1.75rem;
+
+    --gap-tight: 0.5rem;
+    --gap-stack: 1rem;
+    --gap-relaxed: 1.5rem;
+
+    --max-page-width: 90rem;
+    --max-content-width: 72rem;
+    --sidebar-width: 15.75rem;
+    --sidebar-header-height: 4rem;
+    --header-height-mobile: 3.5rem;
+    --container-2xl: 90rem;
+
+    --chart-min-height: 17rem;
+    --chart-container-padding: 1.25rem;
+
+    --table-cell-padding-x: 1rem;
+    --table-cell-padding-y: 0.875rem;
+
+    --dialog-padding: 1.5rem;
+    --dialog-gap: 1rem;
+    --popover-padding: 1rem;
+
+    --stat-accent-width: 3px;
+
+    --form-textarea-min-height: 6.25rem;
+    --chart-embed-height: 17.5rem;
+
+    /* Motion system — durations & easing (see `src/lib/motion/tokens.ts`) */
+    --motion-duration-fast: 140ms;
+    --motion-duration-normal: 220ms;
+    --motion-duration-slow: 320ms;
+    --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --motion-ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
+    --motion-ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+    --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --motion-duration-fast: 0.01ms;
+      --motion-duration-normal: 0.01ms;
+      --motion-duration-slow: 0.01ms;
+    }
+  }
+
+  .dark {
+    --background: 216 28% 8%;
+    --foreground: 210 25% 94%;
+
+    --card: 216 26% 11%;
+    --card-foreground: 210 25% 94%;
+
+    --popover: 216 26% 11%;
+    --popover-foreground: 210 25% 94%;
+
+    --primary: 194 58% 52%;
+    --primary-foreground: 216 32% 10%;
+
+    --secondary: 216 22% 17%;
+    --secondary-foreground: 210 20% 90%;
+
+    --muted: 216 20% 15%;
+    --muted-foreground: 210 14% 60%;
+
+    --accent: 189 45% 46%;
+    --accent-foreground: 216 32% 10%;
+
+    --destructive: 0 58% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 156 38% 40%;
+    --success-foreground: 152 50% 97%;
+
+    --warning: 36 82% 48%;
+    --warning-foreground: 38 100% 10%;
+
+    --border: 216 18% 20%;
+    --input: 216 18% 20%;
+    --ring: 194 58% 55%;
+
+    --chart-1: 194 58% 55%;
+    --chart-2: 189 45% 50%;
+    --chart-3: 210 16% 65%;
+    --chart-4: 158 36% 44%;
+    --chart-5: 265 36% 58%;
+
+    --chart-grid: 216 18% 22%;
+    --chart-axis: 210 12% 58%;
+
+    --stroke-freestyle: 194 55% 58%;
+    --stroke-backstroke: 216 24% 58%;
+    --stroke-breaststroke: 158 34% 46%;
+    --stroke-butterfly: 278 34% 58%;
+    --stroke-im: 189 40% 52%;
+    --stroke-drill: 38 70% 52%;
+    --stroke-kick: 14 60% 55%;
+
+    --sidebar: 216 30% 6%;
+    --sidebar-foreground: 210 25% 94%;
+    --sidebar-border: 216 22% 14%;
+    --sidebar-accent: 194 45% 28%;
+    --sidebar-accent-foreground: 195 55% 98%;
+    --sidebar-muted: 210 14% 48%;
+
+    --overlay-scrim: 216 28% 6%;
+
+    --shadow-card:
+      0 1px 0 hsl(0 0% 100% / 0.06), 0 1px 2px hsl(0 0% 0% / 0.35), 0 8px 28px hsl(0 0% 0% / 0.4);
+    --shadow-card-hover:
+      0 1px 0 hsl(0 0% 100% / 0.08), 0 6px 20px hsl(0 0% 0% / 0.45), 0 18px 48px hsl(0 0% 0% / 0.5);
+    --shadow-overlay: 0 24px 64px hsl(0 0% 0% / 0.55);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background font-sans text-body text-foreground antialiased;
+  }
+
+  h1 {
+    @apply font-display text-display-lg font-semibold tracking-tight text-foreground;
+  }
+
+  h2 {
+    @apply font-display text-heading-xl font-semibold tracking-tight text-foreground;
+  }
+
+  h3 {
+    @apply font-display text-heading-lg font-semibold text-foreground;
+  }
+
+  h4 {
+    @apply text-heading-md font-semibold text-foreground;
+  }
+}
+
+@layer components {
+  .page-stack {
+    @apply space-y-section;
+  }
+
+  .page-toolbar {
+    @apply flex flex-col gap-stack sm:flex-row sm:items-end sm:justify-between;
+  }
+
+  .page-lead {
+    @apply mt-2 max-w-2xl text-body text-muted-foreground;
+  }
+
+  .section-label {
+    @apply text-caption font-semibold uppercase tracking-wider text-muted-foreground;
+  }
+
+  .surface-panel {
+    @apply rounded-card border border-border/70 bg-card text-card-foreground shadow-card;
+  }
+
+  .surface-panel-muted {
+    @apply rounded-card border border-border/60 bg-muted/25 shadow-card;
+  }
+
+  .form-filter-panel {
+    @apply grid gap-form-field rounded-card border border-border/70 bg-card p-card shadow-card;
+  }
+
+  .chart-surface {
+    @apply h-chart min-h-chart w-full px-card pb-card pt-section-sm;
+  }
+
+  .chart-surface-flush-left {
+    @apply h-chart min-h-chart w-full pb-card pl-0 pr-card pt-section-sm;
+  }
+
+  .data-row {
+    @apply flex flex-wrap items-center justify-between gap-tight py-3 first:pt-0;
+  }
+
+  .table-density {
+    @apply text-body;
+  }
+
+  .analytics-kpi-grid {
+    @apply grid gap-stack sm:grid-cols-2 xl:grid-cols-5;
+  }
+
+  .analytics-chart-grid {
+    @apply grid gap-section lg:grid-cols-2;
+  }
+
+  .stats-metric-grid {
+    @apply grid gap-stack md:grid-cols-2 xl:grid-cols-3;
+  }
+
+  /**
+   * One-shot mount animations (Tailwind `animate-swim-*`).
+   * Prefer Framer Motion for staggered lists and route transitions.
+   */
+  .motion-mount-surface {
+    @apply animate-swim-surface-in motion-reduce:animate-none;
+  }
+
+  .motion-mount-chart {
+    @apply animate-swim-chart-in motion-reduce:animate-none;
+  }
+}
