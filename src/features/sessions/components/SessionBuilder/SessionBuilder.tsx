@@ -172,7 +172,7 @@ export default function SessionBuilder({ session, onChange }: SessionBuilderProp
   const sortedBlocks = [...session.blocks].sort((left, right) => left.orderIndex - right.orderIndex)
 
   return (
-    <div className="grid gap-form lg:grid-cols-[1fr_minmax(16rem,20rem)] lg:items-start">
+    <div className="grid grid-cols-1 gap-form lg:grid-cols-[1fr_minmax(16rem,20rem)] lg:items-start">
       <div className="space-y-form">
         <Card>
           <CardHeader className="page-section-header pb-card">
@@ -337,7 +337,7 @@ export default function SessionBuilder({ session, onChange }: SessionBuilderProp
         </div>
       </div>
 
-      <Card className="sticky top-4 border-primary/25 bg-gradient-to-b from-card via-card to-primary/5 shadow-card lg:top-24">
+      <Card className="sticky top-2 z-10 border-primary/25 bg-gradient-to-b from-card via-card to-primary/5 shadow-card md:top-4 lg:top-24">
         <CardHeader className="nested-card-header pb-tight">
           <div className="flex items-center gap-tight">
             <Timer className="h-5 w-5 text-primary" aria-hidden />

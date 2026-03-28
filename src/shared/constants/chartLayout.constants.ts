@@ -5,6 +5,13 @@ export const PIE_CHART_LAYOUT = {
   PADDING_ANGLE_DEG: 2,
 } as const
 
+/** Smaller pie for narrow containers (mobile); keeps slice + legend readable. */
+export const PIE_CHART_LAYOUT_COMPACT = {
+  INNER_RADIUS: 44,
+  OUTER_RADIUS: 70,
+  PADDING_ANGLE_DEG: 2,
+} as const
+
 export const LINE_POINT_STYLE = {
   DOT_RADIUS: 3,
   ACTIVE_DOT_RADIUS: 4,

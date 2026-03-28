@@ -15,16 +15,13 @@ import {
 import ChartCard from '@/components/charts/ChartCard'
 import ChartTooltipContent from '@/components/charts/ChartTooltipContent'
 import { useChartTheme } from '@/lib/charts/useChartTheme'
-import {
-  CHART_BAR_RADIUS,
-  CHART_TICK_PX,
-  RECHARTS_MARGIN_TIGHT_LEFT,
-} from '@/shared/constants/chartUi.constants'
+import { useResponsiveChartLayout } from '@/lib/charts/useResponsiveChartLayout'
 import { CHART_DATA_KEY, CHART_SERIES_NAME } from '@/shared/constants/chartData.constants'
-import { STATISTICS_SEARCH_PARAMS } from '@/shared/constants/statisticsUrlSearch.constants'
-import { APP_ROUTE, athleteDetailPath } from '@/shared/constants/routes.constants'
-import { CHART_GRID_DASH } from '@/shared/constants/recharts.constants'
 import { LINE_POINT_STYLE } from '@/shared/constants/chartLayout.constants'
+import { CHART_BAR_RADIUS } from '@/shared/constants/chartUi.constants'
+import { CHART_GRID_DASH } from '@/shared/constants/recharts.constants'
+import { APP_ROUTE, athleteDetailPath } from '@/shared/constants/routes.constants'
+import { STATISTICS_SEARCH_PARAMS } from '@/shared/constants/statisticsUrlSearch.constants'
 import { AthleteTrainingType } from '@/shared/domain'
 import type { NamedChartPoint } from '@/shared/types/domain.types'
 import { cn } from '@/shared/utils/cn'
@@ -55,6 +52,7 @@ export default function GymDashboardCharts({
   const chart = useChartTheme()
   const navigate = useNavigate()
   const volumeGradientId = useId().replace(/:/g, '')
+  const { tickFontSize, marginTight, yAxisWidthBar } = useResponsiveChartLayout()
 
   const weekHas = weeklyDuration.some((durationPoint) => durationPoint.value > 0)
   const monthHas = monthlyDuration.some((durationPoint) => durationPoint.value > 0)
@@ -89,7 +87,7 @@ export default function GymDashboardCharts({
             chartEmptyMessage('No gym time logged in this window.')
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyDuration} margin={{ ...RECHARTS_MARGIN_TIGHT_LEFT }}>
+              <BarChart data={weeklyDuration} margin={{ ...marginTight }}>
                 <CartesianGrid
                   strokeDasharray={CHART_GRID_DASH}
                   stroke={chart.grid}
@@ -97,15 +95,15 @@ export default function GymDashboardCharts({
                 />
                 <XAxis
                   dataKey={CHART_DATA_KEY.NAME}
-                  tick={{ fill: chart.axis, fontSize: CHART_TICK_PX }}
+                  tick={{ fill: chart.axis, fontSize: tickFontSize }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fill: chart.axis, fontSize: CHART_TICK_PX }}
+                  tick={{ fill: chart.axis, fontSize: tickFontSize }}
                   axisLine={false}
                   tickLine={false}
-                  width={44}
+                  width={yAxisWidthBar}
                 />
                 <Tooltip
                   content={<ChartTooltipContent />}
@@ -134,7 +132,7 @@ export default function GymDashboardCharts({
             chartEmptyMessage('No gym time in this window.')
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={monthlyDuration} margin={{ ...RECHARTS_MARGIN_TIGHT_LEFT }}>
+              <AreaChart data={monthlyDuration} margin={{ ...marginTight }}>
                 <defs>
                   <linearGradient id={volumeGradientId} x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor={chart.chart4} stopOpacity={0.35} />
@@ -148,15 +146,15 @@ export default function GymDashboardCharts({
                 />
                 <XAxis
                   dataKey={CHART_DATA_KEY.NAME}
-                  tick={{ fill: chart.axis, fontSize: CHART_TICK_PX }}
+                  tick={{ fill: chart.axis, fontSize: tickFontSize }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fill: chart.axis, fontSize: CHART_TICK_PX }}
+                  tick={{ fill: chart.axis, fontSize: tickFontSize }}
                   axisLine={false}
                   tickLine={false}
-                  width={44}
+                  width={yAxisWidthBar}
                 />
                 <Tooltip content={<ChartTooltipContent />} />
                 <Area

@@ -2,12 +2,17 @@ import { cva } from 'class-variance-authority'
 
 export const mainNavRootVariants = cva('flex flex-col gap-tight', {
   variants: {
+    mode: {
+      sidebar: '',
+      drawer: 'w-full gap-1',
+    },
     collapsed: {
       true: 'items-stretch gap-1',
       false: '',
     },
   },
   defaultVariants: {
+    mode: 'sidebar',
     collapsed: false,
   },
 })
@@ -19,7 +24,7 @@ export const mainNavLinkVariants = cva(
       active: {
         true: 'bg-sidebar-accent text-sidebar-accent-foreground',
         false:
-          'text-sidebar-foreground/90 hover:bg-sidebar-border/50 hover:text-sidebar-foreground',
+          'text-sidebar-foreground/90 hover:bg-sidebar-accent/22 hover:text-sidebar-foreground',
       },
       collapsed: {
         true: 'min-h-11 w-full justify-center gap-0 px-0 py-0 motion-safe:hover:scale-100',
@@ -29,6 +34,23 @@ export const mainNavLinkVariants = cva(
     defaultVariants: {
       active: false,
       collapsed: false,
+    },
+  },
+)
+
+/** Touch-friendly links for the mobile navigation drawer. */
+export const mainNavDrawerLinkVariants = cva(
+  'flex min-h-12 w-full items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-[background-color,color] duration-motion-fast ease-motion-out md:min-h-11 md:text-body',
+  {
+    variants: {
+      active: {
+        true: 'bg-sidebar-accent text-sidebar-accent-foreground',
+        false:
+          'text-sidebar-foreground/90 hover:bg-sidebar-accent/22 hover:text-sidebar-foreground',
+      },
+    },
+    defaultVariants: {
+      active: false,
     },
   },
 )
@@ -44,3 +66,5 @@ export const mainNavIconVariants = cva('shrink-0 opacity-90', {
     collapsed: false,
   },
 })
+
+export const mainNavDrawerIconVariants = cva('h-5 w-5 shrink-0 opacity-90')

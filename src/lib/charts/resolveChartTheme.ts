@@ -20,26 +20,29 @@ function hslFromVar(cssVarName: string, root: HTMLElement): string {
   return `hsl(${raw})`
 }
 
+/** SSR / pre-paint fallback — aligned with `globals.css` chart + stroke tokens. */
+const FALLBACK_THEME: ResolvedChartTheme = {
+  chart1: 'hsl(198 75% 42%)',
+  chart2: 'hsl(186 78% 40%)',
+  chart3: 'hsl(228 58% 52%)',
+  chart4: 'hsl(168 52% 38%)',
+  chart5: 'hsl(268 52% 54%)',
+  grid: 'hsl(210 22% 82%)',
+  axis: 'hsl(215 18% 36%)',
+  stroke: {
+    [Stroke.Freestyle]: 'hsl(198 72% 44%)',
+    [Stroke.Backstroke]: 'hsl(222 42% 48%)',
+    [Stroke.Breaststroke]: 'hsl(162 55% 38%)',
+    [Stroke.Butterfly]: 'hsl(278 58% 52%)',
+    [Stroke.Im]: 'hsl(188 65% 42%)',
+    [Stroke.Drill]: 'hsl(42 88% 48%)',
+    [Stroke.Kick]: 'hsl(18 75% 50%)',
+  },
+}
+
 export function resolveChartTheme(): ResolvedChartTheme {
   if (typeof document === 'undefined') {
-    return {
-      chart1: 'hsl(197 55% 38%)',
-      chart2: 'hsl(189 48% 42%)',
-      chart3: 'hsl(216 20% 48%)',
-      chart4: 'hsl(158 38% 38%)',
-      chart5: 'hsl(265 38% 52%)',
-      grid: 'hsl(210 18% 88%)',
-      axis: 'hsl(215 14% 42%)',
-      stroke: {
-        [Stroke.Freestyle]: 'hsl(197 55% 42%)',
-        [Stroke.Backstroke]: 'hsl(216 28% 48%)',
-        [Stroke.Breaststroke]: 'hsl(158 36% 36%)',
-        [Stroke.Butterfly]: 'hsl(278 38% 50%)',
-        [Stroke.Im]: 'hsl(189 44% 38%)',
-        [Stroke.Drill]: 'hsl(38 76% 46%)',
-        [Stroke.Kick]: 'hsl(14 68% 50%)',
-      },
-    }
+    return FALLBACK_THEME
   }
 
   const root = document.documentElement

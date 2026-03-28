@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority'
 
 /** Static card shell (no hover lift). */
 export const cardRootVariants = cva(
-  'rounded-card border border-border/70 bg-card text-card-foreground shadow-card',
+  'rounded-card border border-border/80 bg-gradient-to-br from-card to-card-subtle text-card-foreground shadow-card',
 )
 
 /** Tappable card affordance (links / KPI cards). */

@@ -2,16 +2,10 @@ import { Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { format, parseISO } from 'date-fns'
 
 import { useTrainingSessionStore } from '@/app/store/trainingSessionStore'
-import { formatSwimmingBlockDistanceSummary } from '@/features/sessions/helpers/sessionTotals.helpers'
-import { buildSwimmingSessionSummary } from '@/features/sessions/helpers/sessionSummary.helpers'
-import { getGymSessionTotalDurationSeconds } from '@/features/sessions/helpers/sessionTotals.helpers'
-import {
-  getSwimmingSessionTotalDistanceMeters,
-  getSwimmingSessionTotalDurationSeconds,
-  getSwimmingSessionWeightedPacePer100Seconds,
-} from '@/features/sessions/helpers/sessionTotals.helpers'
+import PageHeader from '@/components/layout/PageHeader'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,9 +18,18 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
-import PageHeader from '@/components/layout/PageHeader'
+import { buildSwimmingSessionSummary } from '@/features/sessions/helpers/sessionSummary.helpers'
+import {
+  formatSwimmingBlockDistanceSummary,
+  getGymSessionTotalDurationSeconds,
+  getSwimmingSessionTotalDistanceMeters,
+  getSwimmingSessionTotalDurationSeconds,
+  getSwimmingSessionWeightedPacePer100Seconds,
+} from '@/features/sessions/helpers/sessionTotals.helpers'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
 import { EFFORT_LABELS } from '@/shared/constants/effortLabels'
+import { GYM_BLOCK_CATEGORY_LABEL } from '@/shared/constants/gymBlockCategoryLabels'
+import { RESPONSIVE_DEFAULT_BUTTON_STRETCH_CLASS } from '@/shared/constants/responsiveTouchTarget.constants'
 import {
   APP_ROUTE,
   athleteDetailPath,
@@ -35,14 +38,12 @@ import {
 } from '@/shared/constants/routes.constants'
 import { STROKE_LABELS } from '@/shared/constants/strokeLabels'
 import { SWIMMING_BLOCK_CATEGORY_LABEL } from '@/shared/constants/swimmingBlockCategoryLabels'
-import { GYM_BLOCK_CATEGORY_LABEL } from '@/shared/constants/gymBlockCategoryLabels'
 import {
   formatDistanceMeters,
   formatDurationSeconds,
   formatPacePer100,
 } from '@/shared/helpers/formatters'
 import { isGymTrainingSession, isSwimmingTrainingSession } from '@/shared/helpers/sessionType.helpers'
-import { format, parseISO } from 'date-fns'
 
 export default function SessionDetailPage() {
   const params = useParams()
@@ -103,7 +104,7 @@ export default function SessionDetailPage() {
         <div className="page-toolbar sm:items-start">
           <div>
             <p className="section-label">Gym session</p>
-            <h1 className="mt-tight text-display-lg">
+            <h1 className="mt-tight text-heading-xl sm:text-display-lg">
               {activeSession.sessionTitle.trim()
                 ? activeSession.sessionTitle
                 : format(parseISO(activeSession.date), DATE_FORMAT.WORKOUT_DETAIL_HEADING)}
@@ -113,14 +114,18 @@ export default function SessionDetailPage() {
               blocks
             </p>
           </div>
-          <div className="flex flex-wrap gap-tight">
-            <Button variant="outline" asChild>
+          <div className="flex w-full min-w-0 flex-col gap-tight sm:w-auto sm:flex-row sm:flex-wrap">
+            <Button variant="outline" asChild className={RESPONSIVE_DEFAULT_BUTTON_STRETCH_CLASS}>
               <Link to={sessionEditPath(athleteId, activeSession.id)}>
                 <Pencil className="h-4 w-4" aria-hidden />
                 Edit
               </Link>
             </Button>
-            <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
+            <Button
+              variant="destructive"
+              className={RESPONSIVE_DEFAULT_BUTTON_STRETCH_CLASS}
+              onClick={() => setConfirmOpen(true)}
+            >
               <Trash2 className="h-4 w-4" aria-hidden />
               Delete
             </Button>
@@ -134,7 +139,7 @@ export default function SessionDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-card">
-            <p className="font-display text-heading-xl font-semibold tabular-nums text-foreground">
+            <p className="font-display text-kpi tabular-nums text-foreground">
               {formatDurationSeconds(totalSeconds)}
             </p>
           </CardContent>
@@ -145,11 +150,13 @@ export default function SessionDetailPage() {
           {sortedBlocks.map((block, index) => (
             <Card key={block.id}>
               <CardHeader className="nested-card-header">
-                <div className="flex flex-wrap items-center justify-between gap-tight">
+                <div className="flex flex-col gap-tight sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                   <CardTitle className="font-display text-heading-sm">
                     {index + 1}. {block.title}
                   </CardTitle>
-                  <Badge variant="secondary">{GYM_BLOCK_CATEGORY_LABEL[block.category]}</Badge>
+                  <Badge variant="secondary" className="w-fit">
+                    {GYM_BLOCK_CATEGORY_LABEL[block.category]}
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-tight pt-card text-body-sm">
@@ -206,7 +213,7 @@ export default function SessionDetailPage() {
       <div className="page-toolbar sm:items-start">
         <div>
           <p className="section-label">Pool session</p>
-          <h1 className="mt-tight text-display-lg">
+          <h1 className="mt-tight text-heading-xl sm:text-display-lg">
             {activeSession.sessionTitle.trim()
               ? activeSession.sessionTitle
               : format(parseISO(activeSession.date), DATE_FORMAT.WORKOUT_DETAIL_HEADING)}
@@ -217,27 +224,31 @@ export default function SessionDetailPage() {
             {sortedSwimBlocks.length} blocks
           </p>
         </div>
-        <div className="flex flex-wrap gap-tight">
-          <Button variant="outline" asChild>
+        <div className="flex w-full min-w-0 flex-col gap-tight sm:w-auto sm:flex-row sm:flex-wrap">
+          <Button variant="outline" asChild className={RESPONSIVE_DEFAULT_BUTTON_STRETCH_CLASS}>
             <Link to={sessionEditPath(athleteId, activeSession.id)}>
               <Pencil className="h-4 w-4" aria-hidden />
               Edit
             </Link>
           </Button>
-          <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
+          <Button
+            variant="destructive"
+            className={RESPONSIVE_DEFAULT_BUTTON_STRETCH_CLASS}
+            onClick={() => setConfirmOpen(true)}
+          >
             <Trash2 className="h-4 w-4" aria-hidden />
             Delete
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-stack md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-stack sm:grid-cols-2 md:grid-cols-3">
         <Card className="overflow-hidden">
           <CardHeader className="page-section-header">
             <CardTitle className="page-section-title text-muted-foreground">Distance</CardTitle>
           </CardHeader>
           <CardContent className="pt-card">
-            <p className="font-display text-heading-xl font-semibold tabular-nums text-foreground">
+            <p className="font-display text-kpi tabular-nums text-foreground">
               {formatDistanceMeters(getSwimmingSessionTotalDistanceMeters(activeSession))}
             </p>
           </CardContent>
@@ -247,7 +258,7 @@ export default function SessionDetailPage() {
             <CardTitle className="page-section-title text-muted-foreground">Duration</CardTitle>
           </CardHeader>
           <CardContent className="pt-card">
-            <p className="font-display text-heading-xl font-semibold tabular-nums text-foreground">
+            <p className="font-display text-kpi tabular-nums text-foreground">
               {formatDurationSeconds(getSwimmingSessionTotalDurationSeconds(activeSession))}
             </p>
           </CardContent>
@@ -257,7 +268,7 @@ export default function SessionDetailPage() {
             <CardTitle className="page-section-title text-muted-foreground">Avg pace</CardTitle>
           </CardHeader>
           <CardContent className="pt-card">
-            <p className="font-display text-heading-xl font-semibold tabular-nums text-foreground">
+            <p className="font-display text-kpi tabular-nums text-foreground">
               {pace > 0 ? formatPacePer100(pace) : '—'}
             </p>
           </CardContent>
@@ -269,7 +280,7 @@ export default function SessionDetailPage() {
         {sortedSwimBlocks.map((block, index) => (
           <Card key={block.id}>
             <CardHeader className="nested-card-header">
-              <div className="flex flex-wrap items-center justify-between gap-tight">
+              <div className="flex flex-col gap-tight sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <CardTitle className="font-display text-heading-sm">
                   {index + 1}. {block.title}
                 </CardTitle>

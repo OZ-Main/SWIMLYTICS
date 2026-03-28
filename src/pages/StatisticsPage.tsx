@@ -35,11 +35,8 @@ import {
 } from '@/features/sessions/helpers/sessionTotals.helpers'
 import type { StatisticsFilters } from '@/features/statistics/types/statistics-filters.types'
 import { useChartTheme } from '@/lib/charts/useChartTheme'
-import {
-  CHART_BAR_RADIUS,
-  CHART_TICK_PX,
-  RECHARTS_MARGIN_TIGHT_LEFT,
-} from '@/shared/constants/chartUi.constants'
+import { useResponsiveChartLayout } from '@/lib/charts/useResponsiveChartLayout'
+import { CHART_BAR_RADIUS } from '@/shared/constants/chartUi.constants'
 import { CHART_DATA_KEY, CHART_SERIES_NAME } from '@/shared/constants/chartData.constants'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
 import { CHART_GRID_DASH } from '@/shared/constants/recharts.constants'
@@ -70,6 +67,7 @@ export default function StatisticsPage() {
   )
   const athletes = useAthleteStore((athleteStore) => athleteStore.athletes)
   const chart = useChartTheme()
+  const { tickFontSize, marginTight, yAxisWidthBar } = useResponsiveChartLayout()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [filters, setFilters] = useState<StatisticsFilters>(() =>
@@ -195,7 +193,7 @@ export default function StatisticsPage() {
             </SelectContent>
           </Select>
         </div>
-        <div className="grid grid-cols-2 gap-stack sm:col-span-2 lg:col-span-1">
+        <div className="grid grid-cols-1 gap-stack sm:col-span-2 sm:grid-cols-2 lg:col-span-1">
           <div className="space-y-tight">
             <Label htmlFor="stats-from">From</Label>
             <Input
@@ -253,7 +251,7 @@ export default function StatisticsPage() {
       ) : (
         <>
           {hasSwim ? (
-            <div className="space-y-section">
+            <div className="space-y-6 sm:space-y-section">
               <p className="section-label">Pool (swimming)</p>
               <div className="stats-metric-grid">
                 <StatBlock label="Sessions" value={String(swimStats.sessionCount)} />
@@ -317,7 +315,7 @@ export default function StatisticsPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
                         data={swimStats.weeklyTotalsMeters}
-                        margin={{ ...RECHARTS_MARGIN_TIGHT_LEFT }}
+                        margin={{ ...marginTight }}
                       >
                         <CartesianGrid
                           strokeDasharray={CHART_GRID_DASH}
@@ -326,15 +324,15 @@ export default function StatisticsPage() {
                         />
                         <XAxis
                           dataKey={CHART_DATA_KEY.WEEK_LABEL}
-                          tick={{ fontSize: CHART_TICK_PX, fill: chart.axis }}
+                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                         />
                         <YAxis
-                          tick={{ fontSize: CHART_TICK_PX, fill: chart.axis }}
+                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
-                          width={44}
+                          width={yAxisWidthBar}
                         />
                         <Tooltip
                           content={<ChartTooltipContent />}
@@ -360,7 +358,7 @@ export default function StatisticsPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
                         data={swimStats.monthlyTotalsMeters}
-                        margin={{ ...RECHARTS_MARGIN_TIGHT_LEFT }}
+                        margin={{ ...marginTight }}
                       >
                         <CartesianGrid
                           strokeDasharray={CHART_GRID_DASH}
@@ -369,15 +367,15 @@ export default function StatisticsPage() {
                         />
                         <XAxis
                           dataKey={CHART_DATA_KEY.MONTH_LABEL}
-                          tick={{ fontSize: CHART_TICK_PX, fill: chart.axis }}
+                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                         />
                         <YAxis
-                          tick={{ fontSize: CHART_TICK_PX, fill: chart.axis }}
+                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
-                          width={44}
+                          width={yAxisWidthBar}
                         />
                         <Tooltip
                           content={<ChartTooltipContent />}
@@ -400,7 +398,7 @@ export default function StatisticsPage() {
           ) : null}
 
           {hasGym ? (
-            <div className="space-y-section">
+            <div className="space-y-6 sm:space-y-section">
               <p className="section-label">Gym / strength</p>
               <div className="stats-metric-grid">
                 <StatBlock label="Sessions" value={String(gymStats.sessionCount)} />
@@ -435,7 +433,7 @@ export default function StatisticsPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
                         data={gymStats.weeklyTotalsSeconds}
-                        margin={{ ...RECHARTS_MARGIN_TIGHT_LEFT }}
+                        margin={{ ...marginTight }}
                       >
                         <CartesianGrid
                           strokeDasharray={CHART_GRID_DASH}
@@ -444,15 +442,15 @@ export default function StatisticsPage() {
                         />
                         <XAxis
                           dataKey={CHART_DATA_KEY.WEEK_LABEL}
-                          tick={{ fontSize: CHART_TICK_PX, fill: chart.axis }}
+                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                         />
                         <YAxis
-                          tick={{ fontSize: CHART_TICK_PX, fill: chart.axis }}
+                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
-                          width={44}
+                          width={yAxisWidthBar}
                         />
                         <Tooltip
                           content={<ChartTooltipContent />}
@@ -475,7 +473,7 @@ export default function StatisticsPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
                         data={gymStats.monthlyTotalsSeconds}
-                        margin={{ ...RECHARTS_MARGIN_TIGHT_LEFT }}
+                        margin={{ ...marginTight }}
                       >
                         <CartesianGrid
                           strokeDasharray={CHART_GRID_DASH}
@@ -484,15 +482,15 @@ export default function StatisticsPage() {
                         />
                         <XAxis
                           dataKey={CHART_DATA_KEY.MONTH_LABEL}
-                          tick={{ fontSize: CHART_TICK_PX, fill: chart.axis }}
+                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                         />
                         <YAxis
-                          tick={{ fontSize: CHART_TICK_PX, fill: chart.axis }}
+                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
-                          width={44}
+                          width={yAxisWidthBar}
                         />
                         <Tooltip
                           content={<ChartTooltipContent />}
