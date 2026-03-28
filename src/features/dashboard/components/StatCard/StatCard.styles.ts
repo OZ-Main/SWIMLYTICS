@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export const statCardLinkVariants = cva(
-  'block border-l-stat border-l-accent/70 text-inherit no-underline',
+  'block touch-manipulation border-l-stat border-l-accent/70 text-inherit no-underline',
 )
 
 export const statCardHeaderRowVariants = cva('flex flex-col gap-1.5 p-card')

@@ -287,7 +287,7 @@
 
 @layer components {
   .page-stack {
-    @apply space-y-section;
+    @apply space-y-6 sm:space-y-8 lg:space-y-section;
   }
 
   .page-toolbar {
@@ -311,19 +311,19 @@
   }
 
   .form-filter-panel {
-    @apply grid gap-form-field rounded-card border border-border/80 bg-gradient-to-br from-card to-card-subtle p-card text-card-foreground shadow-card;
+    @apply grid gap-form-field rounded-card border border-border/80 bg-gradient-to-br from-card to-card-subtle p-4 text-card-foreground shadow-card sm:p-card;
   }
 
   .chart-surface {
-    @apply h-chart min-h-chart w-full px-card pb-card pt-section-sm;
+    @apply h-[min(18rem,48vw)] min-h-[220px] w-full px-2 pb-card pt-section-sm sm:h-chart sm:min-h-chart sm:px-card;
   }
 
   .chart-surface-flush-left {
-    @apply h-chart min-h-chart w-full pb-card pl-0 pr-card pt-section-sm;
+    @apply h-[min(18rem,48vw)] min-h-[220px] w-full pb-card pl-0 pr-2 pt-section-sm sm:h-chart sm:min-h-chart sm:pr-card;
   }
 
   .data-row {
-    @apply flex flex-wrap items-center justify-between gap-tight py-3 first:pt-0;
+    @apply flex flex-col items-stretch gap-tight py-3 first:pt-0 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between;
   }
 
   .table-density {
@@ -331,15 +331,15 @@
   }
 
   .analytics-kpi-grid {
-    @apply grid gap-stack sm:grid-cols-2 xl:grid-cols-5;
+    @apply grid grid-cols-1 gap-3 sm:gap-stack sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5;
   }
 
   .analytics-chart-grid {
-    @apply grid gap-section lg:grid-cols-2;
+    @apply grid grid-cols-1 gap-6 md:gap-section lg:grid-cols-2;
   }
 
   .stats-metric-grid {
-    @apply grid gap-stack md:grid-cols-2 xl:grid-cols-3;
+    @apply grid grid-cols-1 gap-stack sm:grid-cols-2 xl:grid-cols-3;
   }
 
   /**

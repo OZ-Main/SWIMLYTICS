@@ -1,34 +1,71 @@
-import { ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { ChevronsLeft, ChevronsRight, Menu } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { PageTransitionOutlet } from '@/components/motion'
 import MainNav from '@/components/navigation/MainNav'
 import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetCloseButton,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from '@/components/ui/sheet'
+import { useMediaQuery } from '@/lib/hooks/useMediaQuery'
+import { MEDIA_QUERY_MIN_MD } from '@/shared/constants/tailwindBreakpointMedia.constants'
 import { cn } from '@/shared/utils/cn'
 
+import {
+  appShellDesktopAsideVariants,
+  appShellDesktopMainNavVariants,
+  appShellMainColumnVariants,
+  appShellMainContentVariants,
+  appShellMainWidthCapVariants,
+  appShellMobileBrandVariants,
+  appShellMobileHeaderSpacerVariants,
+  appShellMobileHeaderVariants,
+  appShellMobileMenuButtonVariants,
+  appShellMobileNavScrollAreaVariants,
+  appShellMobileNavSheetContentVariants,
+  appShellMobileNavSheetHeaderVariants,
+  appShellMobileNavSheetTitleVariants,
+  appShellOuterFlexVariants,
+  appShellRootVariants,
+  appShellSidebarBrandTextVariants,
+  appShellSidebarFooterInnerVariants,
+  appShellSidebarFooterVariants,
+  appShellSidebarHeaderRowVariants,
+  appShellSidebarToggleButtonVariants,
+  appShellSkipLinkVariants,
+} from './AppShell.styles'
 import { useSidebarExpanded } from './useSidebarExpanded'
 
 export default function AppShell() {
   const { expanded, toggle } = useSidebarExpanded()
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const isMdUp = useMediaQuery(MEDIA_QUERY_MIN_MD)
+
+  const handleOpenMobileNav = useCallback(() => {
+    setMobileNavOpen(true)
+  }, [])
+
+  const handleCloseMobileNav = useCallback(() => {
+    setMobileNavOpen(false)
+  }, [])
+
+  useEffect(() => {
+    if (isMdUp) {
+      setMobileNavOpen(false)
+    }
+  }, [isMdUp])
 
   return (
-    <div className="min-h-dvh min-h-screen">
-      <div className="mx-auto flex w-full">
-        <aside
-          className={cn(
-            'sticky top-0 hidden h-screen shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-motion-normal ease-motion-standard motion-reduce:transition-none md:flex md:flex-col',
-            expanded ? 'w-sidebar' : 'w-sidebar-collapsed',
-          )}
-        >
-          <div
-            className={cn(
-              'flex h-sidebar-header shrink-0 items-center border-b border-sidebar-border',
-              expanded ? 'gap-2 px-card' : 'justify-center px-2',
-            )}
-          >
+    <div className={appShellRootVariants()}>
+      <div className={appShellOuterFlexVariants()}>
+        <aside className={appShellDesktopAsideVariants({ expanded })}>
+          <div className={appShellSidebarHeaderRowVariants({ expanded })}>
             {expanded ? (
-              <span className="min-w-0 flex-1 truncate font-display text-heading-md font-semibold tracking-tight text-sidebar-foreground">
-                SWIMLYTICS
-              </span>
+              <span className={appShellSidebarBrandTextVariants()}>SWIMLYTICS</span>
             ) : (
               <span className="sr-only">SWIMLYTICS</span>
             )}
@@ -36,7 +73,7 @@ export default function AppShell() {
               type="button"
               variant="ghost"
               size="icon"
-              className="shrink-0 text-sidebar-foreground hover:bg-sidebar-border/60 hover:text-sidebar-foreground motion-safe:hover:scale-100 motion-safe:active:scale-100"
+              className={appShellSidebarToggleButtonVariants()}
               aria-expanded={expanded}
               aria-controls="desktop-main-nav"
               aria-label={
@@ -55,40 +92,58 @@ export default function AppShell() {
           <MainNav
             id="desktop-main-nav"
             collapsed={!expanded}
-            className={cn('flex-1 py-section-sm', expanded ? 'px-3' : 'px-2')}
+            className={appShellDesktopMainNavVariants({ expanded })}
           />
 
           <div
-            className={cn('px-3 pb-card', !expanded && 'hidden')}
+            className={cn(appShellSidebarFooterVariants(), !expanded && 'hidden')}
             aria-hidden={!expanded}
           >
-            <div className="px-3">
+            <div className={appShellSidebarFooterInnerVariants()}>
               <span className="h-4 w-4 shrink-0" aria-hidden />
               <p className="text-caption text-sidebar-muted">Coach analytics</p>
             </div>
           </div>
         </aside>
-        <div className="flex min-h-screen min-w-0 flex-1 flex-col">
-          <header className="border-b border-border/80 bg-background/80 px-page-padding-x flex h-header-mobile items-center backdrop-blur-md md:hidden supports-[backdrop-filter]:bg-background/70">
-            <span className="font-display text-heading-sm font-semibold tracking-tight">
-              SWIMLYTICS
-            </span>
+        <div className={appShellMainColumnVariants()}>
+          <header className={appShellMobileHeaderVariants()}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className={appShellMobileMenuButtonVariants()}
+              aria-expanded={mobileNavOpen}
+              aria-controls="mobile-main-nav"
+              aria-label="Open navigation menu"
+              onClick={handleOpenMobileNav}
+            >
+              <Menu className="h-5 w-5" aria-hidden />
+            </Button>
+            <span className={appShellMobileBrandVariants()}>SWIMLYTICS</span>
+            <span className={appShellMobileHeaderSpacerVariants()} aria-hidden />
           </header>
-          <div className="border-b border-border/80 bg-background/70 px-page-padding-x py-tight backdrop-blur-sm md:hidden">
-            <MainNav className="flex flex-row flex-wrap gap-tight" />
-          </div>
-          <a
-            href="#main-content"
-            className="fixed left-4 top-0 z-[100] -translate-y-full rounded-button bg-primary px-3 py-2 text-label font-medium text-primary-foreground shadow-overlay transition-transform duration-motion-fast ease-motion-out focus:translate-y-3 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
-          >
+          <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
+            <SheetContent className={appShellMobileNavSheetContentVariants()}>
+              <SheetDescription className="sr-only">
+                Application sections: dashboard, athletes, statistics, and settings.
+              </SheetDescription>
+              <div className={appShellMobileNavSheetHeaderVariants()}>
+                <SheetTitle className={appShellMobileNavSheetTitleVariants()}>Menu</SheetTitle>
+                <SheetCloseButton label="Close navigation menu" />
+              </div>
+              <MainNav
+                id="mobile-main-nav"
+                mode="drawer"
+                onNavigate={handleCloseMobileNav}
+                className={appShellMobileNavScrollAreaVariants()}
+              />
+            </SheetContent>
+          </Sheet>
+          <a href="#main-content" className={appShellSkipLinkVariants()}>
             Skip to main content
           </a>
-          <main
-            id="main-content"
-            tabIndex={-1}
-            className="px-page-padding-x lg:px-page-padding-x-lg flex-1 py-page-y outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          >
-            <div className="mx-auto w-full max-w-content">
+          <main id="main-content" tabIndex={-1} className={appShellMainContentVariants()}>
+            <div className={appShellMainWidthCapVariants()}>
               <PageTransitionOutlet />
             </div>
           </main>

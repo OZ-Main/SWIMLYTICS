@@ -4,7 +4,13 @@ import { NavLink } from 'react-router-dom'
 import { APP_ROUTE } from '@/shared/constants/routes.constants'
 import { cn } from '@/shared/utils/cn'
 
-import { mainNavIconVariants, mainNavLinkVariants, mainNavRootVariants } from './MainNav.styles'
+import {
+  mainNavDrawerIconVariants,
+  mainNavDrawerLinkVariants,
+  mainNavIconVariants,
+  mainNavLinkVariants,
+  mainNavRootVariants,
+} from './MainNav.styles'
 
 const LINKS = [
   { to: APP_ROUTE.home, label: 'Dashboard', icon: Home },
@@ -17,17 +23,32 @@ type MainNavProps = {
   id?: string
   className?: string
   /**
-   * Desktop sidebar icon rail. Ignored on mobile (horizontal nav always shows labels).
-   * Each link keeps `title` + `aria-label` for tooltips and screen readers.
+   * Desktop sidebar icon rail. Ignored in `drawer` mode.
    */
   collapsed?: boolean
+  /** `drawer` — mobile sheet; `sidebar` — desktop aside. */
+  mode?: 'sidebar' | 'drawer'
+  /** Called after a navigation item is activated (e.g. to close the mobile sheet). */
+  onNavigate?: () => void
 }
 
-export default function MainNav({ id, className, collapsed = false }: MainNavProps) {
+export default function MainNav({
+  id,
+  className,
+  collapsed = false,
+  mode = 'sidebar',
+  onNavigate,
+}: MainNavProps) {
+  const isDrawer = mode === 'drawer'
+
+  function handleNavigate() {
+    onNavigate?.()
+  }
+
   return (
     <nav
       id={id}
-      className={cn(mainNavRootVariants({ collapsed }), className)}
+      className={cn(mainNavRootVariants({ mode, collapsed: isDrawer ? false : collapsed }), className)}
       aria-label="Main navigation"
     >
       {LINKS.map(({ to, label, icon: Icon }) => (
@@ -35,14 +56,20 @@ export default function MainNav({ id, className, collapsed = false }: MainNavPro
           key={to}
           to={to}
           end={to === APP_ROUTE.home}
-          title={collapsed ? label : undefined}
+          title={!isDrawer && collapsed ? label : undefined}
           aria-label={label}
+          onClick={handleNavigate}
           className={({ isActive }) =>
-            mainNavLinkVariants({ active: isActive, collapsed })
+            isDrawer
+              ? mainNavDrawerLinkVariants({ active: isActive })
+              : mainNavLinkVariants({ active: isActive, collapsed })
           }
         >
-          <Icon className={mainNavIconVariants({ collapsed })} aria-hidden />
-          {collapsed ? null : <span>{label}</span>}
+          <Icon
+            className={isDrawer ? mainNavDrawerIconVariants() : mainNavIconVariants({ collapsed })}
+            aria-hidden
+          />
+          {isDrawer || !collapsed ? <span>{label}</span> : null}
         </NavLink>
       ))}
     </nav>

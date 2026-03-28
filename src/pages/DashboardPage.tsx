@@ -25,6 +25,7 @@ import {
 import { buildSwimmingSessionSummary } from '@/features/sessions/helpers/sessionSummary.helpers'
 import { getGymSessionTotalDurationSeconds } from '@/features/sessions/helpers/sessionTotals.helpers'
 import { DASHBOARD_CHART } from '@/shared/constants/chartRanges.constants'
+import { RESPONSIVE_SM_BUTTON_STRETCH_CLASS } from '@/shared/constants/responsiveTouchTarget.constants'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
 import { APP_ROUTE, sessionDetailPath } from '@/shared/constants/routes.constants'
 import { STATISTICS_SEARCH_PARAMS } from '@/shared/constants/statisticsUrlSearch.constants'
@@ -218,7 +219,7 @@ export default function DashboardPage() {
             <CardTitle className="page-section-title">Latest activity</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <StaggerList className="divide-y divide-border px-card">
+            <StaggerList className="divide-y divide-border px-3 sm:px-card">
               {recent.map((recentSession) => {
                 const rosterAthlete = athleteById.get(recentSession.athleteId)
                 const athleteDisplayName = rosterAthlete?.fullName ?? 'Unknown athlete'
@@ -240,7 +241,7 @@ export default function DashboardPage() {
                         {sessionSummary}
                       </p>
                     </div>
-                    <Button variant="ghost" size="sm" asChild>
+                    <Button variant="ghost" asChild className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
                       <Link to={sessionDetailPath(recentSession.athleteId, recentSession.id)}>
                         View
                       </Link>

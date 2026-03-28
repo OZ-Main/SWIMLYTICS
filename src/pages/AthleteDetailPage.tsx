@@ -50,6 +50,7 @@ import type { SessionListFilters } from '@/features/sessions/types/session-filte
 import { ATHLETE_TRAINING_TYPE_LABELS } from '@/shared/constants/athleteTrainingTypeLabels'
 import { DASHBOARD_CHART } from '@/shared/constants/chartRanges.constants'
 import { EFFORT_LABELS, EFFORT_OPTIONS } from '@/shared/constants/effortLabels'
+import { RESPONSIVE_SM_BUTTON_STRETCH_CLASS } from '@/shared/constants/responsiveTouchTarget.constants'
 import {
   APP_ROUTE,
   athleteEditPath,
@@ -209,31 +210,36 @@ export default function AthleteDetailPage() {
       <div className="page-toolbar sm:items-start">
         <div>
           <p className="section-label">Athlete</p>
-          <h1 className="mt-tight text-display-lg">{athlete.fullName}</h1>
+          <h1 className="mt-tight text-heading-xl sm:text-display-lg">{athlete.fullName}</h1>
           <p className="mt-tight text-body text-muted-foreground">
             {ATHLETE_TRAINING_TYPE_LABELS[athlete.trainingType]} · Added{' '}
             {format(parseISO(athlete.createdAt), 'MMM d, yyyy')}
           </p>
         </div>
-        <div className="flex flex-wrap gap-tight">
-          <Button variant="outline" size="sm" asChild>
+        <div className="flex w-full min-w-0 flex-col gap-tight sm:w-auto sm:flex-row sm:flex-wrap">
+          <Button variant="outline" size="sm" asChild className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
             <Link to={athleteEditPath(athlete.id)}>
               <Pencil className="h-4 w-4" aria-hidden />
               Edit
             </Link>
           </Button>
           {athlete.trainingType === AthleteTrainingType.Swimming ? (
-            <Button variant="secondary" size="sm" asChild>
+            <Button variant="secondary" size="sm" asChild className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
               <Link to={athletePersonalBestsPath(athlete.id)}>Personal bests</Link>
             </Button>
           ) : null}
-          <Button size="sm" asChild>
+          <Button size="sm" asChild className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
             <Link to={athleteSessionNewPath(athlete.id)}>
               <Plus className="h-4 w-4" aria-hidden />
               Log session
             </Link>
           </Button>
-          <Button variant="destructive" size="sm" onClick={() => setRemoveOpen(true)}>
+          <Button
+            variant="destructive"
+            size="sm"
+            className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}
+            onClick={() => setRemoveOpen(true)}
+          >
             <Trash2 className="h-4 w-4" aria-hidden />
             Remove
           </Button>
@@ -345,7 +351,7 @@ export default function AthleteDetailPage() {
             {recent.map((recentSession) => (
               <div
                 key={recentSession.id}
-                className="flex items-center justify-between gap-stack px-card py-tight"
+                className="flex flex-col gap-tight px-3 py-tight sm:flex-row sm:items-center sm:justify-between sm:px-card"
               >
                 <div className="min-w-0 text-body-sm">
                   <p className="font-medium text-foreground">
@@ -362,7 +368,7 @@ export default function AthleteDetailPage() {
                         : '—'}
                   </p>
                 </div>
-                <Button variant="ghost" size="sm" asChild>
+                <Button variant="ghost" asChild className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
                   <Link to={sessionDetailPath(athlete.id, recentSession.id)}>View</Link>
                 </Button>
               </div>
@@ -379,7 +385,7 @@ export default function AthleteDetailPage() {
               Filter history by date, stroke, or effort.
             </p>
           </div>
-          <Button asChild size="sm">
+          <Button asChild size="sm" className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
             <Link to={athleteSessionNewPath(athlete.id)}>
               <Plus className="h-4 w-4" aria-hidden />
               New session
@@ -403,7 +409,7 @@ export default function AthleteDetailPage() {
               aria-label="Search sessions"
             />
           </div>
-          <div className="grid grid-cols-2 gap-stack sm:contents">
+          <div className="grid grid-cols-1 gap-stack sm:contents">
             <Input
               type="date"
               aria-label="From date"

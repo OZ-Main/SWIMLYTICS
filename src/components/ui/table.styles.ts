@@ -1,6 +1,8 @@
 import { cva } from 'class-variance-authority'
 
-export const tableWrapperVariants = cva('relative w-full overflow-auto')
+export const tableWrapperVariants = cva(
+  'relative w-full max-w-full overflow-x-auto overflow-y-visible touch-pan-x [-webkit-overflow-scrolling:touch]',
+)
 
 export const tableRootVariants = cva('w-full caption-bottom text-body')
 
