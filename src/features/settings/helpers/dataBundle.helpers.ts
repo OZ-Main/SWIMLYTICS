@@ -1,15 +1,97 @@
 import { z } from 'zod'
 
+import { migrateLegacyWorkoutToTrainingSession } from '@/lib/storage/migrateLegacyWorkoutToSession'
+import { normalizePersistedTrainingSession } from '@/lib/storage/normalizeTrainingSession'
+import { normalizePersistedLegacyWorkout } from '@/lib/storage/normalizeWorkout'
 import {
+  AthleteTrainingType,
   DataExportVersion,
   EffortLevel,
   PersonalBestDistance,
   PoolLength,
   Stroke,
 } from '@/shared/domain'
-import type { PersonalBest, Workout } from '@/shared/types/domain.types'
+import { LEGACY_IMPORT_ATHLETE_ID } from '@/shared/constants/migration.constants'
+import type { Athlete, Coach, PersonalBest, TrainingSession } from '@/shared/types/domain.types'
+import type { LegacyWorkout } from '@/shared/types/legacy-workout.types'
 
-const workoutSchema = z.object({
+const coachSchema = z.object({
+  id: z.string(),
+  displayName: z.string(),
+  createdAt: z.string(),
+})
+
+const athleteSchema = z.object({
+  id: z.string(),
+  fullName: z.string(),
+  trainingType: z.nativeEnum(AthleteTrainingType),
+  notes: z.string(),
+  createdAt: z.string(),
+})
+
+const swimmingWorkoutSchema = z.object({
+  trainingType: z.literal(AthleteTrainingType.Swimming),
+  id: z.string(),
+  athleteId: z.string(),
+  date: z.string(),
+  notes: z.string(),
+  poolLength: z.nativeEnum(PoolLength),
+  stroke: z.nativeEnum(Stroke),
+  distance: z.number(),
+  duration: z.number(),
+  averagePacePer100: z.number(),
+  effortLevel: z.nativeEnum(EffortLevel),
+})
+
+const gymWorkoutSchema = z.object({
+  trainingType: z.literal(AthleteTrainingType.Gym),
+  id: z.string(),
+  athleteId: z.string(),
+  date: z.string(),
+  notes: z.string(),
+  sessionFocus: z.string(),
+  durationSeconds: z.number(),
+  effortLevel: z.nativeEnum(EffortLevel),
+})
+
+const workoutV2Schema = z.discriminatedUnion('trainingType', [swimmingWorkoutSchema, gymWorkoutSchema])
+
+const personalBestV2Schema = z.object({
+  id: z.string(),
+  athleteId: z.string(),
+  stroke: z.nativeEnum(Stroke),
+  distance: z.nativeEnum(PersonalBestDistance),
+  timeSeconds: z.number(),
+  date: z.string(),
+  notes: z.string(),
+})
+
+export const swimlyticsExportV2Schema = z.object({
+  version: z.literal(DataExportVersion.V2),
+  exportedAt: z.string(),
+  coach: coachSchema,
+  athletes: z.array(athleteSchema),
+  workouts: z.array(workoutV2Schema),
+  personalBests: z.array(personalBestV2Schema),
+})
+
+export type SwimlyticsExportV2 = z.infer<typeof swimlyticsExportV2Schema>
+
+export const swimlyticsExportV3Schema = z.object({
+  version: z.literal(DataExportVersion.V3),
+  exportedAt: z.string(),
+  coach: coachSchema,
+  athletes: z.array(athleteSchema),
+  trainingSessions: z.array(z.unknown()),
+  personalBests: z.array(personalBestV2Schema),
+})
+
+export type SwimlyticsExportV3 = Omit<z.infer<typeof swimlyticsExportV3Schema>, 'trainingSessions'> & {
+  trainingSessions: TrainingSession[]
+}
+
+/** Legacy V1: swim-only workouts, PBs without athleteId. */
+const workoutV1Schema = z.object({
   id: z.string(),
   date: z.string(),
   poolLength: z.nativeEnum(PoolLength),
@@ -21,7 +103,7 @@ const workoutSchema = z.object({
   notes: z.string(),
 })
 
-const personalBestSchema = z
+const personalBestV1Schema = z
   .object({
     id: z.string(),
     stroke: z.nativeEnum(Stroke).optional(),
@@ -30,38 +112,110 @@ const personalBestSchema = z
     date: z.string(),
     notes: z.string(),
   })
-  .transform((p) => ({
-    ...p,
-    stroke: p.stroke ?? Stroke.Freestyle,
+  .transform((personalBestV1Row) => ({
+    ...personalBestV1Row,
+    stroke: personalBestV1Row.stroke ?? Stroke.Freestyle,
   }))
 
-export const swimlyticsExportSchema = z.object({
+const swimlyticsExportV1Schema = z.object({
   version: z.literal(DataExportVersion.V1),
   exportedAt: z.string(),
-  workouts: z.array(workoutSchema),
-  personalBests: z.array(personalBestSchema),
+  workouts: z.array(workoutV1Schema),
+  personalBests: z.array(personalBestV1Schema),
 })
 
-export type SwimlyticsExport = z.infer<typeof swimlyticsExportSchema>
+export type SwimlyticsExportV1 = z.infer<typeof swimlyticsExportV1Schema>
 
-export function buildExportPayload(
-  workouts: Workout[],
+export type ParsedImport =
+  | { ok: true; version: DataExportVersion.V3; data: SwimlyticsExportV3 }
+  | { ok: true; version: DataExportVersion.V2; data: SwimlyticsExportV2 }
+  | {
+      ok: true
+      version: DataExportVersion.V1
+      data: {
+        trainingSessions: TrainingSession[]
+        personalBests: PersonalBest[]
+      }
+    }
+  | { ok: false; error: string }
+
+export function buildExportPayloadV3(
+  coach: Coach,
+  athletes: Athlete[],
+  trainingSessions: TrainingSession[],
   personalBests: PersonalBest[],
-): SwimlyticsExport {
+): SwimlyticsExportV3 {
   return {
-    version: DataExportVersion.V1,
+    version: DataExportVersion.V3,
     exportedAt: new Date().toISOString(),
-    workouts,
+    coach,
+    athletes,
+    trainingSessions,
     personalBests,
   }
 }
 
-export function parseImportPayload(
-  json: unknown,
-): { ok: true; data: SwimlyticsExport } | { ok: false; error: string } {
-  const parsed = swimlyticsExportSchema.safeParse(json)
-  if (!parsed.success) {
-    return { ok: false, error: 'Invalid SWIMLYTICS export file.' }
+export function parseImportPayload(json: unknown): ParsedImport {
+  const v3 = swimlyticsExportV3Schema.safeParse(json)
+  if (v3.success) {
+    const trainingSessions: TrainingSession[] = []
+    for (const row of v3.data.trainingSessions) {
+      const normalizedSession = normalizePersistedTrainingSession(row)
+      if (normalizedSession) {
+        trainingSessions.push(normalizedSession)
+      }
+    }
+    return {
+      ok: true,
+      version: DataExportVersion.V3,
+      data: {
+        ...v3.data,
+        trainingSessions,
+      },
+    }
   }
-  return { ok: true, data: parsed.data }
+
+  const v2 = swimlyticsExportV2Schema.safeParse(json)
+  if (v2.success) {
+    return { ok: true, version: DataExportVersion.V2, data: v2.data }
+  }
+
+  const v1 = swimlyticsExportV1Schema.safeParse(json)
+  if (v1.success) {
+    const legacyWorkouts: LegacyWorkout[] = []
+    for (const v1WorkoutRow of v1.data.workouts) {
+      const normalizedWorkout = normalizePersistedLegacyWorkout(v1WorkoutRow, LEGACY_IMPORT_ATHLETE_ID)
+      if (normalizedWorkout) {
+        legacyWorkouts.push(normalizedWorkout)
+      }
+    }
+    const trainingSessions = legacyWorkouts.map(migrateLegacyWorkoutToTrainingSession)
+    const personalBests: PersonalBest[] = v1.data.personalBests.map((v1PersonalBestRow) => ({
+      id: v1PersonalBestRow.id,
+      athleteId: LEGACY_IMPORT_ATHLETE_ID,
+      stroke: v1PersonalBestRow.stroke,
+      distance: v1PersonalBestRow.distance,
+      timeSeconds: v1PersonalBestRow.timeSeconds,
+      date: v1PersonalBestRow.date,
+      notes: v1PersonalBestRow.notes,
+    }))
+    return {
+      ok: true,
+      version: DataExportVersion.V1,
+      data: { trainingSessions, personalBests },
+    }
+  }
+
+  return { ok: false, error: 'Invalid SWIMLYTICS export file.' }
+}
+
+/** When V1 import is applied, ensure this athlete exists in the athlete list. */
+export function legacyImportAthleteSeed(): Athlete {
+  return {
+    id: LEGACY_IMPORT_ATHLETE_ID,
+    fullName: 'Imported athlete',
+    trainingType: AthleteTrainingType.Swimming,
+    notes: 'Created from a V1 export (single-athlete backup).',
+    createdAt: new Date().toISOString(),
+  }
 }

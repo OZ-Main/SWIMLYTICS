@@ -8,6 +8,13 @@ import {
   startOfWeek,
 } from 'date-fns'
 
+import { calculateSwimmingBlockDistanceMeters } from '@/features/sessions/helpers/sessionBlockDistance.helpers'
+import {
+  getGymSessionTotalDurationSeconds,
+  getSwimmingSessionTotalDistanceMeters,
+  getSwimmingSessionTotalDurationSeconds,
+  getSwimmingSessionWeightedPacePer100Seconds,
+} from '@/features/sessions/helpers/sessionTotals.helpers'
 import { weekOptionsMonday } from '@/shared/constants/calendar.constants'
 import { DASHBOARD_CHART } from '@/shared/constants/chartRanges.constants'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
@@ -15,30 +22,43 @@ import { STROKE_ORDER } from '@/shared/constants/strokeLabels'
 import type { Stroke } from '@/shared/domain'
 import type {
   DashboardSummary,
+  GymDashboardSummary,
+  GymTrainingSession,
   NamedChartPoint,
   StrokeSlice,
+  SwimmingTrainingSession,
   TimeSeriesPoint,
-  Workout,
 } from '@/shared/types/domain.types'
 
 export function buildDashboardSummary(
-  workouts: Workout[],
+  swimmingSessions: SwimmingTrainingSession[],
   referenceDate: Date = new Date(),
 ): DashboardSummary {
-  const totalWorkouts = workouts.length
-  const totalDistanceMeters = workouts.reduce((a, w) => a + w.distance, 0)
-  const totalDurationSeconds = workouts.reduce((a, w) => a + w.duration, 0)
+  const totalSessions = swimmingSessions.length
+  const totalDistanceMeters = swimmingSessions.reduce(
+    (totalMeters, session) => totalMeters + getSwimmingSessionTotalDistanceMeters(session),
+    0,
+  )
+  const totalDurationSeconds = swimmingSessions.reduce(
+    (totalSeconds, session) => totalSeconds + getSwimmingSessionTotalDurationSeconds(session),
+    0,
+  )
   const averagePacePer100Seconds =
     totalDistanceMeters > 0 ? (totalDurationSeconds / totalDistanceMeters) * 100 : null
 
   const weekStart = startOfWeek(referenceDate, weekOptionsMonday)
   const weekEnd = endOfWeek(referenceDate, weekOptionsMonday)
-  const currentWeekDistanceMeters = workouts
-    .filter((w) => isWithinInterval(parseISO(w.date), { start: weekStart, end: weekEnd }))
-    .reduce((a, w) => a + w.distance, 0)
+  const currentWeekDistanceMeters = swimmingSessions
+    .filter((session) =>
+      isWithinInterval(parseISO(session.date), { start: weekStart, end: weekEnd }),
+    )
+    .reduce(
+      (totalMeters, session) => totalMeters + getSwimmingSessionTotalDistanceMeters(session),
+      0,
+    )
 
   return {
-    totalWorkouts,
+    totalSessions,
     totalDistanceMeters,
     totalDurationSeconds,
     averagePacePer100Seconds,
@@ -46,72 +66,168 @@ export function buildDashboardSummary(
   }
 }
 
+export function buildGymDashboardSummary(
+  gymSessions: GymTrainingSession[],
+  referenceDate: Date = new Date(),
+): GymDashboardSummary {
+  const sessionCount = gymSessions.length
+  const totalDurationSeconds = gymSessions.reduce(
+    (totalSeconds, session) => totalSeconds + getGymSessionTotalDurationSeconds(session),
+    0,
+  )
+  const weekStart = startOfWeek(referenceDate, weekOptionsMonday)
+  const weekEnd = endOfWeek(referenceDate, weekOptionsMonday)
+  const currentWeekDurationSeconds = gymSessions
+    .filter((session) =>
+      isWithinInterval(parseISO(session.date), { start: weekStart, end: weekEnd }),
+    )
+    .reduce(
+      (totalSeconds, session) => totalSeconds + getGymSessionTotalDurationSeconds(session),
+      0,
+    )
+
+  return {
+    sessionCount,
+    totalDurationSeconds,
+    currentWeekDurationSeconds,
+  }
+}
+
 export function buildWeeklyDistanceSeries(
-  workouts: Workout[],
+  swimmingSessions: SwimmingTrainingSession[],
   weeksBack: number = DASHBOARD_CHART.WEEKLY_WEEKS,
   referenceDate: Date = new Date(),
 ): NamedChartPoint[] {
   const points: NamedChartPoint[] = []
-  for (let i = weeksBack - 1; i >= 0; i--) {
-    const anchor = new Date(referenceDate)
-    anchor.setDate(anchor.getDate() - i * 7)
-    const start = startOfWeek(anchor, weekOptionsMonday)
-    const end = endOfWeek(anchor, weekOptionsMonday)
-    const distance = workouts
-      .filter((w) => isWithinInterval(parseISO(w.date), { start, end }))
-      .reduce((a, w) => a + w.distance, 0)
+  for (let weekOffset = weeksBack - 1; weekOffset >= 0; weekOffset--) {
+    const anchorDate = new Date(referenceDate)
+    anchorDate.setDate(anchorDate.getDate() - weekOffset * 7)
+    const intervalStart = startOfWeek(anchorDate, weekOptionsMonday)
+    const intervalEnd = endOfWeek(anchorDate, weekOptionsMonday)
+    const distance = swimmingSessions
+      .filter((session) =>
+        isWithinInterval(parseISO(session.date), { start: intervalStart, end: intervalEnd }),
+      )
+      .reduce(
+        (totalMeters, session) => totalMeters + getSwimmingSessionTotalDistanceMeters(session),
+        0,
+      )
     points.push({
-      name: format(start, DATE_FORMAT.CHART_WEEK_START),
+      name: format(intervalStart, DATE_FORMAT.CHART_WEEK_START),
       value: Math.round(distance),
+    })
+  }
+  return points
+}
+
+export function buildWeeklyGymDurationSeries(
+  gymSessions: GymTrainingSession[],
+  weeksBack: number = DASHBOARD_CHART.WEEKLY_WEEKS,
+  referenceDate: Date = new Date(),
+): NamedChartPoint[] {
+  const points: NamedChartPoint[] = []
+  for (let weekOffset = weeksBack - 1; weekOffset >= 0; weekOffset--) {
+    const anchorDate = new Date(referenceDate)
+    anchorDate.setDate(anchorDate.getDate() - weekOffset * 7)
+    const intervalStart = startOfWeek(anchorDate, weekOptionsMonday)
+    const intervalEnd = endOfWeek(anchorDate, weekOptionsMonday)
+    const durationSeconds = gymSessions
+      .filter((session) =>
+        isWithinInterval(parseISO(session.date), { start: intervalStart, end: intervalEnd }),
+      )
+      .reduce(
+        (totalSeconds, session) => totalSeconds + getGymSessionTotalDurationSeconds(session),
+        0,
+      )
+    points.push({
+      name: format(intervalStart, DATE_FORMAT.CHART_WEEK_START),
+      value: Math.round(durationSeconds),
     })
   }
   return points
 }
 
 export function buildMonthlyVolumeSeries(
-  workouts: Workout[],
+  swimmingSessions: SwimmingTrainingSession[],
   monthsBack: number = DASHBOARD_CHART.MONTHLY_MONTHS,
   referenceDate: Date = new Date(),
 ): NamedChartPoint[] {
   const points: NamedChartPoint[] = []
-  for (let i = monthsBack - 1; i >= 0; i--) {
-    const anchor = new Date(referenceDate.getFullYear(), referenceDate.getMonth() - i, 1)
-    const start = startOfMonth(anchor)
-    const end = endOfMonth(anchor)
-    const distance = workouts
-      .filter((w) => isWithinInterval(parseISO(w.date), { start, end }))
-      .reduce((a, w) => a + w.distance, 0)
+  for (let monthOffset = monthsBack - 1; monthOffset >= 0; monthOffset--) {
+    const anchorDate = new Date(referenceDate.getFullYear(), referenceDate.getMonth() - monthOffset, 1)
+    const intervalStart = startOfMonth(anchorDate)
+    const intervalEnd = endOfMonth(anchorDate)
+    const distance = swimmingSessions
+      .filter((session) =>
+        isWithinInterval(parseISO(session.date), { start: intervalStart, end: intervalEnd }),
+      )
+      .reduce(
+        (totalMeters, session) => totalMeters + getSwimmingSessionTotalDistanceMeters(session),
+        0,
+      )
     points.push({
-      name: format(start, DATE_FORMAT.CHART_MONTH_SHORT),
+      name: format(intervalStart, DATE_FORMAT.CHART_MONTH_SHORT),
       value: Math.round(distance),
     })
   }
   return points
 }
 
-export function buildStrokeDistribution(workouts: Workout[]): StrokeSlice[] {
-  const map = new Map<Stroke, { count: number; distanceMeters: number }>()
-  for (const w of workouts) {
-    const cur = map.get(w.stroke) ?? { count: 0, distanceMeters: 0 }
-    cur.count += 1
-    cur.distanceMeters += w.distance
-    map.set(w.stroke, cur)
+export function buildMonthlyGymDurationSeries(
+  gymSessions: GymTrainingSession[],
+  monthsBack: number = DASHBOARD_CHART.MONTHLY_MONTHS,
+  referenceDate: Date = new Date(),
+): NamedChartPoint[] {
+  const points: NamedChartPoint[] = []
+  for (let monthOffset = monthsBack - 1; monthOffset >= 0; monthOffset--) {
+    const anchorDate = new Date(referenceDate.getFullYear(), referenceDate.getMonth() - monthOffset, 1)
+    const intervalStart = startOfMonth(anchorDate)
+    const intervalEnd = endOfMonth(anchorDate)
+    const durationSeconds = gymSessions
+      .filter((session) =>
+        isWithinInterval(parseISO(session.date), { start: intervalStart, end: intervalEnd }),
+      )
+      .reduce(
+        (totalSeconds, session) => totalSeconds + getGymSessionTotalDurationSeconds(session),
+        0,
+      )
+    points.push({
+      name: format(intervalStart, DATE_FORMAT.CHART_MONTH_SHORT),
+      value: Math.round(durationSeconds),
+    })
   }
-  return STROKE_ORDER.filter((s) => map.has(s)).map((stroke) => {
-    const v = map.get(stroke)!
+  return points
+}
+
+export function buildStrokeDistribution(swimmingSessions: SwimmingTrainingSession[]): StrokeSlice[] {
+  const strokeTotals = new Map<Stroke, { count: number; distanceMeters: number }>()
+  for (const session of swimmingSessions) {
+    for (const block of session.blocks) {
+      const blockMeters = calculateSwimmingBlockDistanceMeters(block)
+      const running = strokeTotals.get(block.stroke) ?? { count: 0, distanceMeters: 0 }
+      running.count += 1
+      running.distanceMeters += blockMeters
+      strokeTotals.set(block.stroke, running)
+    }
+  }
+  return STROKE_ORDER.filter((stroke) => strokeTotals.has(stroke)).map((stroke) => {
+    const totals = strokeTotals.get(stroke)!
     return {
       stroke,
-      count: v.count,
-      distanceMeters: v.distanceMeters,
+      count: totals.count,
+      distanceMeters: totals.distanceMeters,
     }
   })
 }
 
-export function buildPaceTrendSeries(workouts: Workout[]): TimeSeriesPoint[] {
-  return [...workouts]
-    .sort((a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime())
-    .map((w) => ({
-      date: w.date,
-      value: w.averagePacePer100,
+export function buildPaceTrendSeries(swimmingSessions: SwimmingTrainingSession[]): TimeSeriesPoint[] {
+  return [...swimmingSessions]
+    .sort(
+      (earlierSession, laterSession) =>
+        parseISO(earlierSession.date).getTime() - parseISO(laterSession.date).getTime(),
+    )
+    .map((session) => ({
+      date: session.date,
+      value: getSwimmingSessionWeightedPacePer100Seconds(session),
     }))
 }

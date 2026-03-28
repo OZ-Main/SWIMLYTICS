@@ -1,10 +1,15 @@
 export {
+  AthleteTrainingType,
   DataExportVersion,
+  DrillType,
   EffortLevel,
+  GymBlockCategory,
   MetricType,
   PersonalBestDistance,
   PoolLength,
   ResolvedTheme,
   Stroke,
+  SwimEquipment,
+  SwimmingBlockCategory,
   ThemeMode,
 } from './enums'

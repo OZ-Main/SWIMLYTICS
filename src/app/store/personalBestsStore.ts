@@ -3,53 +3,64 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 
 import { STORAGE_KEYS } from '@/lib/storage/storageKeys'
 import { Stroke } from '@/shared/domain'
+import { LEGACY_IMPORT_ATHLETE_ID } from '@/shared/constants/migration.constants'
 import type { PersonalBest } from '@/shared/types/domain.types'
 
-/** Older persisted rows may omit `stroke`; default for migration. */
-type PbPersisted = PersonalBest & { stroke?: Stroke }
+type PersonalBestPersistedRow = PersonalBest & { stroke?: Stroke; athleteId?: string }
 
 type PersonalBestsState = {
   personalBests: PersonalBest[]
-  addPersonalBest: (pb: PersonalBest) => void
-  updatePersonalBest: (pb: PersonalBest) => void
-  deletePersonalBest: (id: string) => void
-  replaceAllPersonalBests: (items: PersonalBest[]) => void
+  addPersonalBest: (personalBest: PersonalBest) => void
+  updatePersonalBest: (personalBest: PersonalBest) => void
+  deletePersonalBest: (personalBestId: string) => void
+  replaceAllPersonalBests: (nextPersonalBests: PersonalBest[]) => void
 }
 
 export const usePersonalBestsStore = create<PersonalBestsState>()(
   persist(
-    (set, get) => ({
+    (setState, getState) => ({
       personalBests: [],
-      addPersonalBest: (pb) => set({ personalBests: [pb, ...get().personalBests] }),
-      updatePersonalBest: (pb) =>
-        set({
-          personalBests: get().personalBests.map((p) => (p.id === pb.id ? pb : p)),
+      addPersonalBest: (personalBest) =>
+        setState({ personalBests: [personalBest, ...getState().personalBests] }),
+      updatePersonalBest: (updatedPersonalBest) =>
+        setState({
+          personalBests: getState().personalBests.map((existingPersonalBest) =>
+            existingPersonalBest.id === updatedPersonalBest.id
+              ? updatedPersonalBest
+              : existingPersonalBest,
+          ),
         }),
-      deletePersonalBest: (id) =>
-        set({
-          personalBests: get().personalBests.filter((p) => p.id !== id),
+      deletePersonalBest: (personalBestId) =>
+        setState({
+          personalBests: getState().personalBests.filter(
+            (existingPersonalBest) => existingPersonalBest.id !== personalBestId,
+          ),
         }),
-      replaceAllPersonalBests: (items) => set({ personalBests: items }),
+      replaceAllPersonalBests: (nextPersonalBests) =>
+        setState({ personalBests: nextPersonalBests }),
     }),
     {
       name: STORAGE_KEYS.PERSONAL_BESTS,
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ personalBests: state.personalBests }),
+      partialize: (persistedSlice) => ({ personalBests: persistedSlice.personalBests }),
       merge: (persistedState, currentState): PersonalBestsState => {
         if (persistedState == null || typeof persistedState !== 'object') {
           return currentState
         }
-        const raw = persistedState as { personalBests?: unknown }
-        if (!Array.isArray(raw.personalBests)) {
+        const rawPersisted = persistedState as { personalBests?: unknown }
+        if (!Array.isArray(rawPersisted.personalBests)) {
           return currentState
         }
-        const personalBests: PersonalBest[] = raw.personalBests.map((item) => {
-          const pb = item as PbPersisted
-          return {
-            ...pb,
-            stroke: pb.stroke ?? Stroke.Freestyle,
-          }
-        })
+        const personalBests: PersonalBest[] = rawPersisted.personalBests.map(
+          (persistedRowUnknown) => {
+            const persistedRow = persistedRowUnknown as PersonalBestPersistedRow
+            return {
+              ...persistedRow,
+              athleteId: persistedRow.athleteId ?? LEGACY_IMPORT_ATHLETE_ID,
+              stroke: persistedRow.stroke ?? Stroke.Freestyle,
+            }
+          },
+        )
         return {
           ...currentState,
           personalBests,

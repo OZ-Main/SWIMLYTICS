@@ -127,6 +127,8 @@
     --max-page-width: 90rem;
     --max-content-width: 72rem;
     --sidebar-width: 15.75rem;
+    /** Icon-only rail (md+); wide enough for 40×40 touch targets. */
+    --sidebar-width-collapsed: 4.25rem;
     --sidebar-header-height: 4rem;
     --header-height-mobile: 3.5rem;
     --container-2xl: 90rem;
@@ -279,7 +281,7 @@
   }
 
   .surface-panel-muted {
-    @apply rounded-card border border-border/60 bg-muted/25 shadow-card;
+    @apply rounded-card border border-border/70 bg-muted/25 shadow-card;
   }
 
   .form-filter-panel {
@@ -324,5 +326,49 @@
 
   .motion-mount-chart {
     @apply animate-swim-chart-in motion-reduce:animate-none;
+  }
+
+  /** Page-level cards (dashboard recent activity, settings, session hero metrics, statistics summary). */
+  .page-section-header {
+    @apply space-y-1 border-b border-border/40 bg-muted/20 px-card py-section-sm;
+  }
+
+  .page-section-title {
+    @apply font-display text-heading-sm font-semibold tracking-tight text-foreground;
+  }
+
+  /** Nested entities (session blocks, builder blocks). */
+  .nested-card-header {
+    @apply border-b border-border/40 px-card py-tight;
+  }
+
+  /** List shells (recent activity rows, roster-style lists). */
+  .data-list-shell {
+    @apply divide-y divide-border overflow-hidden rounded-card border border-border/70 bg-card text-card-foreground shadow-card;
+  }
+
+  /** Table / rail captions (pool vs gym group labels). */
+  .table-rail-caption {
+    @apply border-b border-border/40 bg-muted/20 px-card py-tight text-label font-medium text-muted-foreground;
+  }
+
+  /** Sticky form footers (session builder save row). */
+  .form-footer-actions {
+    @apply flex flex-wrap justify-end gap-stack border-t border-border/40 pt-stack;
+  }
+
+  /** Inline callouts (athlete notes, coach hints). */
+  .insight-banner {
+    @apply rounded-card border border-border/70 bg-muted/20 px-card py-tight text-body-sm text-muted-foreground;
+  }
+
+  /** Dense KPI tiles (athlete overview, inline stats). */
+  .kpi-tile {
+    @apply rounded-card border border-border/70 bg-card p-card text-card-foreground shadow-card;
+  }
+
+  /** Chart empty / placeholder states (matches chart vertical rhythm). */
+  .chart-empty-state {
+    @apply flex h-full w-full flex-col items-center justify-center gap-tight px-card text-center text-body-sm leading-relaxed text-muted-foreground;
   }
 }

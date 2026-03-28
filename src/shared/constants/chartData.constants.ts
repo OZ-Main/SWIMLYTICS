@@ -14,4 +14,6 @@ export const CHART_DATA_KEY = {
 export const CHART_SERIES_NAME = {
   METERS: 'Meters',
   PACE: 'Pace',
+  /** Total session time (tooltip uses duration formatter). */
+  DURATION: 'Duration',
 } as const

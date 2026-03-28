@@ -7,24 +7,24 @@ import { ThemeMode } from '@/shared/domain'
 type SettingsState = {
   theme: ThemeMode
   initialSampleApplied: boolean
-  setTheme: (theme: ThemeMode) => void
-  setInitialSampleApplied: (value: boolean) => void
+  setTheme: (nextTheme: ThemeMode) => void
+  setInitialSampleApplied: (applied: boolean) => void
 }
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
-    (set) => ({
+    (setState) => ({
       theme: ThemeMode.System,
       initialSampleApplied: false,
-      setTheme: (theme) => set({ theme }),
-      setInitialSampleApplied: (value) => set({ initialSampleApplied: value }),
+      setTheme: (nextTheme) => setState({ theme: nextTheme }),
+      setInitialSampleApplied: (applied) => setState({ initialSampleApplied: applied }),
     }),
     {
       name: STORAGE_KEYS.SETTINGS,
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        theme: state.theme,
-        initialSampleApplied: state.initialSampleApplied,
+      partialize: (persistedSlice) => ({
+        theme: persistedSlice.theme,
+        initialSampleApplied: persistedSlice.initialSampleApplied,
       }),
     },
   ),

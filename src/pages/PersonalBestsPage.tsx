@@ -1,7 +1,9 @@
 import { Pencil, Plus, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 
+import { useAthleteStore } from '@/app/store/athleteStore'
 import { usePersonalBestsStore } from '@/app/store/personalBestsStore'
 import { Button } from '@/components/ui/button'
 import {
@@ -31,21 +33,50 @@ import {
 } from '@/features/personal-bests/helpers/personalBests.helpers'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
 import { FORM_SYNC_KEY } from '@/shared/constants/formSync.constants'
+import { athleteDetailPath, ROUTE_PARAM } from '@/shared/constants/routes.constants'
+import { AthleteTrainingType } from '@/shared/domain'
 import { formatRaceClock } from '@/shared/helpers/formatters'
 import type { PersonalBest } from '@/shared/types/domain.types'
 import { format, parseISO } from 'date-fns'
 
 export default function PersonalBestsPage() {
-  const items = usePersonalBestsStore((s) => s.personalBests)
-  const addPersonalBest = usePersonalBestsStore((s) => s.addPersonalBest)
-  const updatePersonalBest = usePersonalBestsStore((s) => s.updatePersonalBest)
-  const deletePersonalBest = usePersonalBestsStore((s) => s.deletePersonalBest)
+  const params = useParams()
+  const athleteId = params[ROUTE_PARAM.athleteId]
+
+  const athlete = useAthleteStore((athleteStore) =>
+    athleteId
+      ? athleteStore.athletes.find((candidateAthlete) => candidateAthlete.id === athleteId)
+      : undefined,
+  )
+
+  const allPersonalBestsInStore = usePersonalBestsStore(
+    (personalBestsStore) => personalBestsStore.personalBests,
+  )
+  const athletePersonalBests = useMemo(
+    () =>
+      athleteId
+        ? allPersonalBestsInStore.filter(
+            (personalBest) => personalBest.athleteId === athleteId,
+          )
+        : [],
+    [allPersonalBestsInStore, athleteId],
+  )
+
+  const addPersonalBest = usePersonalBestsStore(
+    (personalBestsStore) => personalBestsStore.addPersonalBest,
+  )
+  const updatePersonalBest = usePersonalBestsStore(
+    (personalBestsStore) => personalBestsStore.updatePersonalBest,
+  )
+  const deletePersonalBest = usePersonalBestsStore(
+    (personalBestsStore) => personalBestsStore.deletePersonalBest,
+  )
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<PersonalBest | null>(null)
   const [deleting, setDeleting] = useState<PersonalBest | null>(null)
 
-  const rows = sortPersonalBestsDisplay(items)
+  const rows = sortPersonalBestsDisplay(athletePersonalBests)
 
   function openCreate() {
     setEditing(null)
@@ -60,10 +91,10 @@ export default function PersonalBestsPage() {
   function handleFormSubmit(pb: PersonalBest) {
     if (editing) {
       updatePersonalBest(pb)
-      toast.success('Personal best updated')
+      toast.success('Best time updated')
     } else {
       addPersonalBest(pb)
-      toast.success('Personal best added')
+      toast.success('Best time added')
     }
     setDialogOpen(false)
     setEditing(null)
@@ -74,29 +105,60 @@ export default function PersonalBestsPage() {
       return
     }
     deletePersonalBest(deleting.id)
-    toast.success('Personal best removed')
+    toast.success('Entry removed')
     setDeleting(null)
+  }
+
+  if (!athleteId || !athlete) {
+    return (
+      <div className="page-stack">
+        <PageHeader
+          title="Athlete not found"
+          description="Open personal bests from a swimming athlete profile."
+        />
+      </div>
+    )
+  }
+
+  if (athlete.trainingType !== AthleteTrainingType.Swimming) {
+    return (
+      <div className="page-stack">
+        <PageHeader
+          title="Not available"
+          description="Personal bests apply to swimming athletes. Switch training type to swimming in the athlete profile, or use session log for gym history."
+          actions={
+            <Button asChild variant="outline">
+              <Link to={athleteDetailPath(athlete.id)}>Back to athlete</Link>
+            </Button>
+          }
+        />
+      </div>
+    )
   }
 
   return (
     <div className="page-stack">
       <PageHeader
-        title="Personal bests"
-        description="Track official times by stroke and distance, and compare each mark to your prior best in that event."
+        title={`Best times — ${athlete.fullName}`}
+        description="Official marks by stroke and distance. Each row compares to the athlete's prior best in that event."
         actions={
           <Button onClick={openCreate}>
             <Plus className="h-4 w-4" aria-hidden />
-            Add personal best
+            Add best time
           </Button>
         }
       />
 
-      {items.length === 0 ? (
+      <Button variant="ghost" className="w-fit" asChild>
+        <Link to={athleteDetailPath(athlete.id)}>← Back to athlete</Link>
+      </Button>
+
+      {athletePersonalBests.length === 0 ? (
         <EmptyState
           icon={Plus}
-          title="No personal bests"
-          description="Record your fastest swims by stroke (IM: 100 / 200 / 400 m only) and standard distances."
-          action={<Button onClick={openCreate}>Add a PB</Button>}
+          title="No best times yet"
+          description="Record pool race times by stroke (IM: 100 / 200 / 400 m only) and standard distances."
+          action={<Button onClick={openCreate}>Add a time</Button>}
         />
       ) : (
         <div className="surface-panel motion-mount-surface overflow-hidden">
@@ -112,31 +174,38 @@ export default function PersonalBestsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((pb) => {
-                const prior = findBestPriorPbSameEvent(items, pb)
+              {rows.map((personalBestRow) => {
+                const priorBestSameEvent = findBestPriorPbSameEvent(
+                  athletePersonalBests,
+                  personalBestRow,
+                )
                 const improvement = formatImprovementVsPriorBest(
-                  pb.timeSeconds,
-                  prior?.timeSeconds ?? null,
+                  personalBestRow.timeSeconds,
+                  priorBestSameEvent?.timeSeconds ?? null,
                 )
                 return (
-                  <TableRow key={pb.id}>
-                    <TableCell className="font-medium">{personalBestEventLabel(pb)}</TableCell>
-                    <TableCell className="font-mono tabular-nums">
-                      {formatRaceClock(pb.timeSeconds)}
+                  <TableRow key={personalBestRow.id}>
+                    <TableCell className="font-medium">
+                      {personalBestEventLabel(personalBestRow)}
                     </TableCell>
-                    <TableCell>{format(parseISO(pb.date), DATE_FORMAT.LIST_ROW)}</TableCell>
+                    <TableCell className="font-mono tabular-nums">
+                      {formatRaceClock(personalBestRow.timeSeconds)}
+                    </TableCell>
+                    <TableCell>
+                      {format(parseISO(personalBestRow.date), DATE_FORMAT.LIST_ROW)}
+                    </TableCell>
                     <TableCell className="max-w-[220px] text-body-sm text-muted-foreground">
                       {improvement}
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate text-body-sm">
-                      {pb.notes || '—'}
+                      {personalBestRow.notes || '—'}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
                         size="icon"
                         aria-label="Edit"
-                        onClick={() => openEdit(pb)}
+                        onClick={() => openEdit(personalBestRow)}
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -144,7 +213,7 @@ export default function PersonalBestsPage() {
                         variant="ghost"
                         size="icon"
                         aria-label="Delete"
-                        onClick={() => setDeleting(pb)}
+                        onClick={() => setDeleting(personalBestRow)}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
@@ -160,13 +229,14 @@ export default function PersonalBestsPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editing ? 'Edit personal best' : 'New personal best'}</DialogTitle>
+            <DialogTitle>{editing ? 'Edit best time' : 'New best time'}</DialogTitle>
             <DialogDescription>
               Times support decimals in the seconds field for hundredths.
             </DialogDescription>
           </DialogHeader>
           <PersonalBestForm
             key={editing?.id ?? FORM_SYNC_KEY.NEW_ENTITY}
+            athleteId={athlete.id}
             mode={editing ? 'edit' : 'create'}
             initial={editing}
             onSubmit={handleFormSubmit}
@@ -178,11 +248,11 @@ export default function PersonalBestsPage() {
       <Dialog open={!!deleting} onOpenChange={() => setDeleting(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remove personal best?</DialogTitle>
+            <DialogTitle>Remove best time?</DialogTitle>
             <DialogDescription>
               {deleting
-                ? `Remove ${personalBestEventLabel(deleting)} (${formatRaceClock(deleting.timeSeconds)}) from your local records?`
-                : 'This entry will be deleted from your local records.'}
+                ? `Remove ${personalBestEventLabel(deleting)} (${formatRaceClock(deleting.timeSeconds)}) from ${athlete.fullName}'s records?`
+                : 'This entry will be deleted from local records.'}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

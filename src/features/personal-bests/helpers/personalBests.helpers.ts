@@ -5,9 +5,9 @@ import type { PersonalBestDistance, Stroke } from '@/shared/domain'
 import type { PersonalBest } from '@/shared/types/domain.types'
 
 const STROKE_SORT_INDEX: Record<Stroke, number> = STROKE_ORDER.reduce(
-  (acc, s, i) => {
-    acc[s] = i
-    return acc
+  (sortIndexByStroke, stroke, index) => {
+    sortIndexByStroke[stroke] = index
+    return sortIndexByStroke
   },
   {} as Record<Stroke, number>,
 )
@@ -16,33 +16,36 @@ function strokeSortKey(stroke: Stroke): number {
   return STROKE_SORT_INDEX[stroke] ?? 999
 }
 
-export function sortPersonalBestsDisplay(items: PersonalBest[]): PersonalBest[] {
-  return [...items].sort((a, b) => {
-    if (a.stroke !== b.stroke) {
-      return strokeSortKey(a.stroke) - strokeSortKey(b.stroke)
+export function sortPersonalBestsDisplay(allPersonalBests: PersonalBest[]): PersonalBest[] {
+  return [...allPersonalBests].sort((left, right) => {
+    if (left.stroke !== right.stroke) {
+      return strokeSortKey(left.stroke) - strokeSortKey(right.stroke)
     }
-    if (a.distance !== b.distance) {
-      return a.distance - b.distance
+    if (left.distance !== right.distance) {
+      return left.distance - right.distance
     }
-    return parseISO(a.date).getTime() - parseISO(b.date).getTime()
+    return parseISO(left.date).getTime() - parseISO(right.date).getTime()
   })
 }
 
 export function findBestPriorPbSameEvent(
-  items: PersonalBest[],
-  current: PersonalBest,
+  allPersonalBests: PersonalBest[],
+  currentMark: PersonalBest,
 ): PersonalBest | null {
-  const prior = items.filter(
-    (p) =>
-      p.stroke === current.stroke &&
-      p.distance === current.distance &&
-      p.id !== current.id &&
-      parseISO(p.date).getTime() < parseISO(current.date).getTime(),
+  const priorMarks = allPersonalBests.filter(
+    (candidate) =>
+      candidate.athleteId === currentMark.athleteId &&
+      candidate.stroke === currentMark.stroke &&
+      candidate.distance === currentMark.distance &&
+      candidate.id !== currentMark.id &&
+      parseISO(candidate.date).getTime() < parseISO(currentMark.date).getTime(),
   )
-  if (prior.length === 0) {
+  if (priorMarks.length === 0) {
     return null
   }
-  return prior.reduce((best, p) => (p.timeSeconds < best.timeSeconds ? p : best))
+  return priorMarks.reduce((bestSoFar, candidate) =>
+    candidate.timeSeconds < bestSoFar.timeSeconds ? candidate : bestSoFar,
+  )
 }
 
 export function formatImprovementVsPriorBest(
@@ -62,11 +65,11 @@ export function formatImprovementVsPriorBest(
   return 'Same as prior best'
 }
 
-export function distanceLabel(d: PersonalBestDistance): string {
-  return `${d} m`
+export function distanceLabel(distanceMeters: PersonalBestDistance): string {
+  return `${distanceMeters} m`
 }
 
 /** Full event label for tables and confirmations (stroke + distance). */
-export function personalBestEventLabel(pb: PersonalBest): string {
-  return `${STROKE_LABELS[pb.stroke]} · ${pb.distance} m`
+export function personalBestEventLabel(personalBest: PersonalBest): string {
+  return `${STROKE_LABELS[personalBest.stroke]} · ${personalBest.distance} m`
 }

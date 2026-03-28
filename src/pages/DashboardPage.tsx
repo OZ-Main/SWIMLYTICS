@@ -1,73 +1,106 @@
-import { Clock, Gauge, Route, Timer, Waves } from 'lucide-react'
+import { Activity, Clock, Gauge, Route, Timer, Users, Waves } from 'lucide-react'
 import { createSearchParams, Link } from 'react-router-dom'
 
-import { useWorkoutStore } from '@/app/store/workoutStore'
+import { useAthleteStore } from '@/app/store/athleteStore'
+import { useCoachStore } from '@/app/store/coachStore'
+import { useTrainingSessionStore } from '@/app/store/trainingSessionStore'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import EmptyState from '@/components/feedback/EmptyState'
 import PageHeader from '@/components/layout/PageHeader'
 import { StaggerItem, StaggerList } from '@/components/motion'
 import DashboardCharts from '@/features/dashboard/components/DashboardCharts'
+import GymDashboardCharts from '@/features/dashboard/components/GymDashboardCharts'
 import StatCard from '@/features/dashboard/components/StatCard'
 import {
   buildDashboardSummary,
+  buildGymDashboardSummary,
+  buildMonthlyGymDurationSeries,
   buildMonthlyVolumeSeries,
   buildPaceTrendSeries,
   buildStrokeDistribution,
   buildWeeklyDistanceSeries,
+  buildWeeklyGymDurationSeries,
 } from '@/features/dashboard/helpers/dashboard.helpers'
+import { buildSwimmingSessionSummary } from '@/features/sessions/helpers/sessionSummary.helpers'
+import { getGymSessionTotalDurationSeconds } from '@/features/sessions/helpers/sessionTotals.helpers'
 import { DASHBOARD_CHART } from '@/shared/constants/chartRanges.constants'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
-import { APP_ROUTE, workoutDetailPath } from '@/shared/constants/routes.constants'
-import { STROKE_LABELS } from '@/shared/constants/strokeLabels'
-import { WORKOUTS_SEARCH_PARAMS } from '@/shared/constants/workoutsUrlSearch.constants'
+import { APP_ROUTE, sessionDetailPath } from '@/shared/constants/routes.constants'
+import { STATISTICS_SEARCH_PARAMS } from '@/shared/constants/statisticsUrlSearch.constants'
+import { AthleteTrainingType, MetricType } from '@/shared/domain'
 import { isoWeekRangeStrings } from '@/shared/helpers/isoWeekRange.helpers'
-import { MetricType } from '@/shared/domain'
 import {
   formatDistanceMeters,
   formatDurationSeconds,
   formatPacePer100,
 } from '@/shared/helpers/formatters'
+import {
+  filterGymTrainingSessions,
+  filterSwimmingTrainingSessions,
+} from '@/shared/helpers/sessionType.helpers'
 import { format, parseISO } from 'date-fns'
 
 export default function DashboardPage() {
-  const workouts = useWorkoutStore((s) => s.workouts)
+  const coach = useCoachStore((coachStore) => coachStore.coach)
+  const athletes = useAthleteStore((athleteStore) => athleteStore.athletes)
+  const trainingSessions = useTrainingSessionStore(
+    (trainingSessionStore) => trainingSessionStore.trainingSessions,
+  )
 
-  const summary = buildDashboardSummary(workouts)
-  const weeklyDistance = buildWeeklyDistanceSeries(workouts)
-  const monthlyVolume = buildMonthlyVolumeSeries(workouts)
-  const strokeSlices = buildStrokeDistribution(workouts)
-  const paceTrend = buildPaceTrendSeries(workouts)
+  const swimSessions = filterSwimmingTrainingSessions(trainingSessions)
+  const gymSessions = filterGymTrainingSessions(trainingSessions)
 
-  const recent = [...workouts]
-    .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime())
-    .slice(0, DASHBOARD_CHART.RECENT_WORKOUTS)
+  const swimSummary = buildDashboardSummary(swimSessions)
+  const gymSummary = buildGymDashboardSummary(gymSessions)
+
+  const weeklyDistance = buildWeeklyDistanceSeries(swimSessions)
+  const monthlyVolume = buildMonthlyVolumeSeries(swimSessions)
+  const strokeSlices = buildStrokeDistribution(swimSessions)
+  const paceTrend = buildPaceTrendSeries(swimSessions)
+
+  const weeklyGymDur = buildWeeklyGymDurationSeries(gymSessions)
+  const monthlyGymDur = buildMonthlyGymDurationSeries(gymSessions)
+
+  const athleteById = new Map(athletes.map((athlete) => [athlete.id, athlete]))
+
+  const recent = [...trainingSessions]
+    .sort(
+      (firstSession, secondSession) =>
+        parseISO(secondSession.date).getTime() - parseISO(firstSession.date).getTime(),
+    )
+    .slice(0, DASHBOARD_CHART.RECENT_SESSIONS)
 
   const weekRange = isoWeekRangeStrings()
-  const thisWeekWorkoutsHref = `${APP_ROUTE.workouts}?${createSearchParams({
-    [WORKOUTS_SEARCH_PARAMS.dateFrom]: weekRange.dateFrom,
-    [WORKOUTS_SEARCH_PARAMS.dateTo]: weekRange.dateTo,
+  const thisWeekPoolHref = `${APP_ROUTE.statistics}?${createSearchParams({
+    [STATISTICS_SEARCH_PARAMS.dateFrom]: weekRange.dateFrom,
+    [STATISTICS_SEARCH_PARAMS.dateTo]: weekRange.dateTo,
+    [STATISTICS_SEARCH_PARAMS.trainingType]: AthleteTrainingType.Swimming,
   }).toString()}`
 
-  if (workouts.length === 0) {
+  const drillDownCoach = { kind: 'coach' as const }
+
+  const hasAnyData = trainingSessions.length > 0
+
+  if (!hasAnyData) {
     return (
       <div className="page-stack">
         <PageHeader
-          title="Dashboard"
-          description="Log swims to unlock trends, volume charts, and pace insights."
+          title="Coach dashboard"
+          description={`Hi ${coach.displayName} — add athletes and log sessions to unlock roster-wide trends.`}
         />
         <EmptyState
-          icon={Waves}
-          title="No workouts yet"
-          description="Start with a session or load sample data from Settings if you cleared the store."
+          icon={Users}
+          title="No data yet"
+          description="Create athlete profiles, then log pool or gym sessions. Sample data loads automatically on first launch if the app is empty."
           action={
             <Button asChild>
-              <Link to={APP_ROUTE.workoutNew}>Log a workout</Link>
+              <Link to={APP_ROUTE.athleteNew}>Add athlete</Link>
             </Button>
           }
           secondaryAction={
             <Button asChild variant="outline">
-              <Link to={APP_ROUTE.settings}>Open settings</Link>
+              <Link to={APP_ROUTE.settings}>Settings</Link>
             </Button>
           }
         />
@@ -78,44 +111,63 @@ export default function DashboardPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        title="Dashboard"
-        description="Training load, pacing, and stroke mix at a glance."
+        title="Coach dashboard"
+        description={`Overview for ${coach.displayName} — ${athletes.length} athlete${athletes.length === 1 ? '' : 's'} on file.`}
         actions={
           <Button asChild variant="secondary">
-            <Link to={APP_ROUTE.workoutNew}>New workout</Link>
+            <Link to={APP_ROUTE.athleteNew}>Add athlete</Link>
           </Button>
         }
       />
 
       <div>
-        <p className="section-label mb-stack">Overview</p>
+        <p className="section-label mb-stack">Roster overview</p>
         <div className="analytics-kpi-grid">
           <StatCard
-            title="Total workouts"
-            value={String(summary.totalWorkouts)}
-            icon={Waves}
-            metric={MetricType.WorkoutCount}
-            to={APP_ROUTE.workouts}
+            title="Athletes"
+            value={String(athletes.length)}
+            icon={Users}
+            to={APP_ROUTE.athletes}
+            ariaLabel={`${athletes.length} athletes. Open roster.`}
           />
           <StatCard
-            title="Total distance"
-            value={formatDistanceMeters(summary.totalDistanceMeters)}
+            title="Pool sessions"
+            value={String(swimSummary.totalSessions)}
+            icon={Waves}
+            metric={MetricType.WorkoutCount}
+            to={`${APP_ROUTE.statistics}?${createSearchParams({
+              [STATISTICS_SEARCH_PARAMS.trainingType]: AthleteTrainingType.Swimming,
+            }).toString()}`}
+          />
+          <StatCard
+            title="Gym sessions"
+            value={String(gymSummary.sessionCount)}
+            icon={Activity}
+            to={`${APP_ROUTE.statistics}?${createSearchParams({
+              [STATISTICS_SEARCH_PARAMS.trainingType]: AthleteTrainingType.Gym,
+            }).toString()}`}
+          />
+          <StatCard
+            title="Total pool distance"
+            value={formatDistanceMeters(swimSummary.totalDistanceMeters)}
             icon={Route}
             metric={MetricType.TotalDistance}
             to={APP_ROUTE.statistics}
           />
           <StatCard
-            title="Total duration"
-            value={formatDurationSeconds(summary.totalDurationSeconds)}
+            title="Combined duration"
+            value={formatDurationSeconds(
+              swimSummary.totalDurationSeconds + gymSummary.totalDurationSeconds,
+            )}
             icon={Clock}
             metric={MetricType.TotalDuration}
             to={APP_ROUTE.statistics}
           />
           <StatCard
-            title="Average pace"
+            title="Avg pace (pool)"
             value={
-              summary.averagePacePer100Seconds !== null
-                ? formatPacePer100(summary.averagePacePer100Seconds)
+              swimSummary.averagePacePer100Seconds !== null
+                ? formatPacePer100(swimSummary.averagePacePer100Seconds)
                 : '—'
             }
             hint="Session-weighted"
@@ -124,51 +176,78 @@ export default function DashboardPage() {
             to={APP_ROUTE.statistics}
           />
           <StatCard
-            title="This week"
-            value={formatDistanceMeters(summary.currentWeekDistanceMeters)}
+            title="Pool volume this week"
+            value={formatDistanceMeters(swimSummary.currentWeekDistanceMeters)}
             hint="Mon–Sun"
             icon={Timer}
             metric={MetricType.WeekDistance}
-            to={thisWeekWorkoutsHref}
-            ariaLabel={`This week Mon to Sun, ${formatDistanceMeters(summary.currentWeekDistanceMeters)}. Open workouts filtered to this week.`}
+            to={thisWeekPoolHref}
+            ariaLabel={`Pool distance this week Mon to Sun, ${formatDistanceMeters(swimSummary.currentWeekDistanceMeters)}.`}
           />
         </div>
       </div>
 
-      <div>
-        <p className="section-label mb-stack">Trends</p>
-        <DashboardCharts
-          weeklyDistance={weeklyDistance}
-          monthlyVolume={monthlyVolume}
-          strokeSlices={strokeSlices}
-          paceTrend={paceTrend}
-        />
-      </div>
+      {swimSessions.length > 0 ? (
+        <div>
+          <p className="section-label mb-stack">Pool trends (all athletes)</p>
+          <DashboardCharts
+            weeklyDistance={weeklyDistance}
+            monthlyVolume={monthlyVolume}
+            strokeSlices={strokeSlices}
+            paceTrend={paceTrend}
+            drillDown={drillDownCoach}
+          />
+        </div>
+      ) : null}
+
+      {gymSessions.length > 0 ? (
+        <div>
+          <p className="section-label mb-stack">Gym time (all athletes)</p>
+          <GymDashboardCharts
+            weeklyDuration={weeklyGymDur}
+            monthlyDuration={monthlyGymDur}
+            drillDown={drillDownCoach}
+          />
+        </div>
+      ) : null}
 
       <div>
         <p className="section-label mb-stack">Recent sessions</p>
-        <Card className="overflow-hidden border-border/60 shadow-card">
-          <CardHeader className="border-b border-border/40 bg-muted/15 py-section-sm">
-            <CardTitle className="font-display text-heading-sm">Latest activity</CardTitle>
+        <Card className="overflow-hidden">
+          <CardHeader className="page-section-header">
+            <CardTitle className="page-section-title">Latest activity</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <StaggerList className="divide-y divide-border px-card">
-              {recent.map((w) => (
-                <StaggerItem key={w.id} className="data-row">
-                  <div>
-                    <p className="text-body font-medium text-foreground">
-                      {format(parseISO(w.date), DATE_FORMAT.LIST_ROW)} · {STROKE_LABELS[w.stroke]}
-                    </p>
-                    <p className="text-body-sm text-muted-foreground">
-                      {formatDistanceMeters(w.distance)} · {formatDurationSeconds(w.duration)} ·{' '}
-                      {formatPacePer100(w.averagePacePer100)}
-                    </p>
-                  </div>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link to={workoutDetailPath(w.id)}>View</Link>
-                  </Button>
-                </StaggerItem>
-              ))}
+              {recent.map((recentSession) => {
+                const rosterAthlete = athleteById.get(recentSession.athleteId)
+                const athleteDisplayName = rosterAthlete?.fullName ?? 'Unknown athlete'
+
+                let sessionSummary = ''
+
+                if (recentSession.trainingType === AthleteTrainingType.Swimming) {
+                  const summary = buildSwimmingSessionSummary(recentSession, 2)
+                  sessionSummary = `${summary.primaryStrokeLabel ?? 'Pool'} · ${formatDistanceMeters(summary.totalDistanceMeters)} · ${formatDurationSeconds(summary.totalDurationSeconds)}`
+                } else {
+                  sessionSummary = `${recentSession.sessionTitle || recentSession.blocks[0]?.title || 'Gym'} · ${formatDurationSeconds(getGymSessionTotalDurationSeconds(recentSession))}`
+                }
+                return (
+                  <StaggerItem key={recentSession.id} className="data-row">
+                    <div>
+                      <p className="text-body font-medium text-foreground">{athleteDisplayName}</p>
+                      <p className="text-body-sm text-muted-foreground">
+                        {format(parseISO(recentSession.date), DATE_FORMAT.LIST_ROW)} ·{' '}
+                        {sessionSummary}
+                      </p>
+                    </div>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link to={sessionDetailPath(recentSession.athleteId, recentSession.id)}>
+                        View
+                      </Link>
+                    </Button>
+                  </StaggerItem>
+                )
+              })}
             </StaggerList>
           </CardContent>
         </Card>

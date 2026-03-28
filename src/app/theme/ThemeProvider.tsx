@@ -15,8 +15,8 @@ function getSystemTheme(): ResolvedTheme {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const theme = useSettingsStore((s) => s.theme)
-  const setTheme = useSettingsStore((s) => s.setTheme)
+  const theme = useSettingsStore((settingsStore) => settingsStore.theme)
+  const setTheme = useSettingsStore((settingsStore) => settingsStore.setTheme)
 
   const resolvedTheme: ResolvedTheme =
     theme === ThemeMode.System
