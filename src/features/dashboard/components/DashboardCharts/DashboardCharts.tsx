@@ -1,5 +1,7 @@
 import { useId } from 'react'
 import { createSearchParams, useNavigate } from 'react-router-dom'
+
+import { AthleteTrainingType } from '@/shared/domain'
 import {
   Area,
   AreaChart,
@@ -31,10 +33,12 @@ import { CHART_DATA_KEY, CHART_SERIES_NAME } from '@/shared/constants/chartData.
 import { CHART_GRID_DASH } from '@/shared/constants/recharts.constants'
 import { LINE_POINT_STYLE, PIE_CHART_LAYOUT } from '@/shared/constants/chartLayout.constants'
 import { DATE_FORMAT, PACE_AXIS_LABEL } from '@/shared/constants/dateDisplay.constants'
-import { APP_ROUTE } from '@/shared/constants/routes.constants'
+import { APP_ROUTE, athleteDetailPath } from '@/shared/constants/routes.constants'
+import { STATISTICS_SEARCH_PARAMS } from '@/shared/constants/statisticsUrlSearch.constants'
 import { STROKE_LABELS } from '@/shared/constants/strokeLabels'
 import { WORKOUTS_SEARCH_PARAMS } from '@/shared/constants/workoutsUrlSearch.constants'
 import type { NamedChartPoint, StrokeSlice, TimeSeriesPoint } from '@/shared/types/domain.types'
+import { cn } from '@/shared/utils/cn'
 import { format, parseISO } from 'date-fns'
 
 type PaceSessionDotProps = {
@@ -69,14 +73,14 @@ function PaceSessionDot({ cx, cy, payload, fill, onActivate, r }: PaceSessionDot
       fill={fill}
       className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
       tabIndex={0}
-      aria-label={`Open workouts on ${date}`}
-      onClick={(e) => {
-        e.stopPropagation()
+      aria-label={`Open sessions on ${date}`}
+      onClick={(pointerEvent) => {
+        pointerEvent.stopPropagation()
         onActivate(date)
       }}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
+      onKeyDown={(keyboardEvent) => {
+        if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') {
+          keyboardEvent.preventDefault()
           onActivate(date)
         }
       }}
@@ -84,22 +88,21 @@ function PaceSessionDot({ cx, cy, payload, fill, onActivate, r }: PaceSessionDot
   )
 }
 
+export type SwimChartsDrillDown =
+  | { kind: 'coach' }
+  | { kind: 'athlete'; athleteId: string }
+
 type DashboardChartsProps = {
   weeklyDistance: NamedChartPoint[]
   monthlyVolume: NamedChartPoint[]
   strokeSlices: StrokeSlice[]
   paceTrend: TimeSeriesPoint[]
+  drillDown: SwimChartsDrillDown
 }
 
 function chartEmptyMessage(className?: string) {
   return (
-    <div
-      role="status"
-      className={
-        className ??
-        'flex h-full w-full flex-col items-center justify-center px-card text-center text-body-sm text-muted-foreground'
-      }
-    >
+    <div role="status" className={cn('chart-empty-state', className)}>
       No distance logged in this window.
     </div>
   )
@@ -110,40 +113,69 @@ export default function DashboardCharts({
   monthlyVolume,
   strokeSlices,
   paceTrend,
+  drillDown,
 }: DashboardChartsProps) {
   const chart = useChartTheme()
   const navigate = useNavigate()
   const volumeGradientId = useId().replace(/:/g, '')
 
-  const pieData = strokeSlices.map((s) => ({
-    name: STROKE_LABELS[s.stroke],
-    value: s.distanceMeters,
-    strokeKey: s.stroke,
+  const pieData = strokeSlices.map((strokeSlice) => ({
+    name: STROKE_LABELS[strokeSlice.stroke],
+    value: strokeSlice.distanceMeters,
+    strokeKey: strokeSlice.stroke,
   }))
 
-  const paceChartData = paceTrend.map((p) => ({
-    date: p.date,
-    pace: Number(p.value.toFixed(2)),
+  const paceChartData = paceTrend.map((pacePoint) => ({
+    date: pacePoint.date,
+    pace: Number(pacePoint.value.toFixed(2)),
   }))
 
-  const weekHasVolume = weeklyDistance.some((p) => p.value > 0)
-  const monthHasVolume = monthlyVolume.some((p) => p.value > 0)
+  const weekHasVolume = weeklyDistance.some((weekPoint) => weekPoint.value > 0)
+  const monthHasVolume = monthlyVolume.some((monthPoint) => monthPoint.value > 0)
 
   function goStatistics() {
-    navigate(APP_ROUTE.statistics)
+    if (drillDown.kind === 'coach') {
+      navigate(APP_ROUTE.statistics)
+      return
+    }
+    navigate(
+      `${APP_ROUTE.statistics}?${createSearchParams({
+        [STATISTICS_SEARCH_PARAMS.athleteId]: drillDown.athleteId,
+        [STATISTICS_SEARCH_PARAMS.trainingType]: AthleteTrainingType.Swimming,
+      }).toString()}`,
+    )
   }
 
   function goWorkoutsFilteredByStroke(stroke: (typeof pieData)[number]['strokeKey']) {
+    if (drillDown.kind === 'coach') {
+      navigate(
+        `${APP_ROUTE.statistics}?${createSearchParams({
+          [STATISTICS_SEARCH_PARAMS.stroke]: stroke,
+          [STATISTICS_SEARCH_PARAMS.trainingType]: AthleteTrainingType.Swimming,
+        }).toString()}`,
+      )
+      return
+    }
     navigate(
-      `${APP_ROUTE.workouts}?${createSearchParams({
+      `${athleteDetailPath(drillDown.athleteId)}?${createSearchParams({
         [WORKOUTS_SEARCH_PARAMS.stroke]: stroke,
       }).toString()}`,
     )
   }
 
   function goWorkoutsForDay(isoDate: string) {
+    if (drillDown.kind === 'coach') {
+      navigate(
+        `${APP_ROUTE.statistics}?${createSearchParams({
+          [STATISTICS_SEARCH_PARAMS.dateFrom]: isoDate,
+          [STATISTICS_SEARCH_PARAMS.dateTo]: isoDate,
+          [STATISTICS_SEARCH_PARAMS.trainingType]: AthleteTrainingType.Swimming,
+        }).toString()}`,
+      )
+      return
+    }
     navigate(
-      `${APP_ROUTE.workouts}?${createSearchParams({
+      `${athleteDetailPath(drillDown.athleteId)}?${createSearchParams({
         [WORKOUTS_SEARCH_PARAMS.dateFrom]: isoDate,
         [WORKOUTS_SEARCH_PARAMS.dateTo]: isoDate,
       }).toString()}`,
@@ -249,13 +281,13 @@ export default function DashboardCharts({
 
       <ChartCard
         title="Volume by stroke"
-        description="Share of total meters. Click a slice to filter workouts by stroke."
+        description="Share of total meters. Click a slice to filter sessions by stroke."
       >
         <div className="chart-surface">
           {pieData.length === 0 ? (
-            <p className="flex h-full w-full flex-col items-center justify-center text-center text-body-sm text-muted-foreground">
-              No stroke mix to display yet — log workouts with different strokes to see this chart.
-            </p>
+            <div role="status" className="chart-empty-state">
+              No stroke mix yet — log pool sessions with different strokes to see this chart.
+            </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <PieChart margin={{ ...RECHARTS_MARGIN_DEFAULT }}>
@@ -269,22 +301,24 @@ export default function DashboardCharts({
                   outerRadius={PIE_CHART_LAYOUT.OUTER_RADIUS}
                   paddingAngle={PIE_CHART_LAYOUT.PADDING_ANGLE_DEG}
                   cursor="pointer"
-                  onClick={(_, index) => {
-                    const row = pieData[index]
-                    if (row) {
-                      goWorkoutsFilteredByStroke(row.strokeKey)
+                  onClick={(_rechartsEvent, sliceIndex) => {
+                    const selectedStrokeSlice = pieData[sliceIndex]
+                    if (selectedStrokeSlice) {
+                      goWorkoutsFilteredByStroke(selectedStrokeSlice.strokeKey)
                     }
                   }}
                 >
-                  {pieData.map((entry) => (
+                  {pieData.map((pieSlice) => (
                     <Cell
-                      key={entry.strokeKey}
-                      fill={chart.stroke[entry.strokeKey] ?? chart.chart3}
+                      key={pieSlice.strokeKey}
+                      fill={chart.stroke[pieSlice.strokeKey] ?? chart.chart3}
                     />
                   ))}
                 </Pie>
                 <Tooltip content={<ChartTooltipContent />} />
-                <Legend wrapperStyle={{ fontSize: CHART_TICK_PX }} />
+                <Legend
+                  wrapperStyle={{ fontSize: CHART_TICK_PX, color: chart.axis }}
+                />
               </PieChart>
             </ResponsiveContainer>
           )}
@@ -293,7 +327,7 @@ export default function DashboardCharts({
 
       <ChartCard
         title="Average pace trend"
-        description="Seconds per 100 m by workout date (lower is faster). Click a point to open that day in Workouts."
+        description="Seconds per 100 m by session date (lower is faster). Click a point to open that day in Statistics."
       >
         <div className="chart-surface-flush-left">
           {paceChartData.length === 0 ? (
@@ -308,11 +342,11 @@ export default function DashboardCharts({
                 />
                 <XAxis
                   dataKey={CHART_DATA_KEY.DATE}
-                  tickFormatter={(v) => {
+                  tickFormatter={(axisTickValue) => {
                     try {
-                      return format(parseISO(String(v)), DATE_FORMAT.CHART_WEEK_START)
+                      return format(parseISO(String(axisTickValue)), DATE_FORMAT.CHART_WEEK_START)
                     } catch {
-                      return String(v)
+                      return String(axisTickValue)
                     }
                   }}
                   tick={{ fill: chart.axis, fontSize: CHART_TICK_PX }}

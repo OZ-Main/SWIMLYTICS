@@ -1,10 +1,33 @@
-import { EffortLevel, PersonalBestDistance, PoolLength, Stroke } from '@/shared/domain'
+import {
+  AthleteTrainingType,
+  DrillType,
+  EffortLevel,
+  GymBlockCategory,
+  PersonalBestDistance,
+  PoolLength,
+  Stroke,
+  SwimEquipment,
+  SwimmingBlockCategory,
+} from '@/shared/domain'
 import { ISO_DATE_STRING_LENGTH } from '@/shared/constants/calendar.constants'
 import { totalSecondsFromMinutesAndSeconds } from '@/shared/helpers/duration.helpers'
-import type { PersonalBest, Workout } from '@/shared/types/domain.types'
+import {
+  SESSION_BLOCK_KIND,
+  type Athlete,
+  type GymSessionBlock,
+  type GymTrainingSession,
+  type PersonalBest,
+  type SwimmingSessionBlock,
+  type SwimmingTrainingSession,
+  type TrainingSession,
+} from '@/shared/types/domain.types'
 
-const SEED_WORKOUT_ID_PREFIX = 'seed-w'
+const SEED_SESSION_ID_PREFIX = 'seed-s'
 const SEED_PB_ID_PREFIX = 'seed-pb-'
+const SEED_ATHLETE_PREFIX = 'seed-athlete-'
+
+export const SEED_ATHLETE_SWIM_ID = `${SEED_ATHLETE_PREFIX}swim` as const
+export const SEED_ATHLETE_GYM_ID = `${SEED_ATHLETE_PREFIX}gym` as const
 
 function daysAgoISO(days: number): string {
   const d = new Date()
@@ -12,104 +35,305 @@ function daysAgoISO(days: number): string {
   return d.toISOString().slice(0, ISO_DATE_STRING_LENGTH)
 }
 
-function paceFrom(distance: number, durationSec: number): number {
-  return distance > 0 ? (durationSec / distance) * 100 : 0
+export const SEED_ATHLETES: Athlete[] = [
+  {
+    id: SEED_ATHLETE_SWIM_ID,
+    fullName: 'Alex Rivera',
+    trainingType: AthleteTrainingType.Swimming,
+    notes: 'Distance free / IM focus.',
+    createdAt: daysAgoISO(120),
+  },
+  {
+    id: SEED_ATHLETE_GYM_ID,
+    fullName: 'Jordan Lee',
+    trainingType: AthleteTrainingType.Gym,
+    notes: 'Hypertrophy block — log RPE in notes.',
+    createdAt: daysAgoISO(90),
+  },
+]
+
+function timestampsForCalendarDate(calendarDate: string): { createdAt: string; updatedAt: string } {
+  const createdAt = `${calendarDate}T12:00:00.000Z`
+  return { createdAt, updatedAt: createdAt }
 }
 
-export const SEED_WORKOUTS: Workout[] = [
-  {
-    id: `${SEED_WORKOUT_ID_PREFIX}1`,
-    date: daysAgoISO(1),
-    poolLength: PoolLength.Meters25,
-    stroke: Stroke.Freestyle,
-    distance: 2000,
-    duration: totalSecondsFromMinutesAndSeconds(38, 20),
-    averagePacePer100: paceFrom(2000, totalSecondsFromMinutesAndSeconds(38, 20)),
-    effortLevel: EffortLevel.Moderate,
-    notes: 'Steady aerobic set; focus on long exhale.',
-  },
-  {
-    id: `${SEED_WORKOUT_ID_PREFIX}2`,
-    date: daysAgoISO(2),
-    poolLength: PoolLength.Meters50,
-    stroke: Stroke.Freestyle,
-    distance: 3200,
-    duration: totalSecondsFromMinutesAndSeconds(58, 10),
-    averagePacePer100: paceFrom(3200, totalSecondsFromMinutesAndSeconds(58, 10)),
-    effortLevel: EffortLevel.Easy,
-    notes: 'Recovery swim after hard weekend.',
-  },
-  {
-    id: `${SEED_WORKOUT_ID_PREFIX}3`,
-    date: daysAgoISO(3),
-    poolLength: PoolLength.Meters25,
-    stroke: Stroke.Im,
-    distance: 1600,
-    duration: totalSecondsFromMinutesAndSeconds(35, 40),
-    averagePacePer100: paceFrom(1600, totalSecondsFromMinutesAndSeconds(35, 40)),
-    effortLevel: EffortLevel.Hard,
-    notes: 'IM transitions — smooth turns.',
-  },
-  {
-    id: `${SEED_WORKOUT_ID_PREFIX}4`,
-    date: daysAgoISO(5),
-    poolLength: PoolLength.Meters25,
-    stroke: Stroke.Backstroke,
-    distance: 1200,
-    duration: totalSecondsFromMinutesAndSeconds(24, 15),
-    averagePacePer100: paceFrom(1200, totalSecondsFromMinutesAndSeconds(24, 15)),
-    effortLevel: EffortLevel.Moderate,
-    notes: '',
-  },
-  {
-    id: `${SEED_WORKOUT_ID_PREFIX}5`,
-    date: daysAgoISO(7),
-    poolLength: PoolLength.Meters50,
-    stroke: Stroke.Breaststroke,
-    distance: 800,
-    duration: totalSecondsFromMinutesAndSeconds(22, 0),
-    averagePacePer100: paceFrom(800, totalSecondsFromMinutesAndSeconds(22, 0)),
-    effortLevel: EffortLevel.Easy,
-    notes: 'Technique emphasis — narrow kick.',
-  },
-  {
-    id: `${SEED_WORKOUT_ID_PREFIX}6`,
-    date: daysAgoISO(9),
-    poolLength: PoolLength.Meters25,
-    stroke: Stroke.Butterfly,
-    distance: 600,
-    duration: totalSecondsFromMinutesAndSeconds(18, 30),
-    averagePacePer100: paceFrom(600, totalSecondsFromMinutesAndSeconds(18, 30)),
-    effortLevel: EffortLevel.Hard,
-    notes: '50s on generous rest.',
-  },
-  {
-    id: `${SEED_WORKOUT_ID_PREFIX}7`,
-    date: daysAgoISO(12),
-    poolLength: PoolLength.Meters25,
-    stroke: Stroke.Freestyle,
-    distance: 2800,
-    duration: totalSecondsFromMinutesAndSeconds(52, 0),
-    averagePacePer100: paceFrom(2800, totalSecondsFromMinutesAndSeconds(52, 0)),
-    effortLevel: EffortLevel.Moderate,
-    notes: 'Pull buoy middle block.',
-  },
-  {
-    id: `${SEED_WORKOUT_ID_PREFIX}8`,
-    date: daysAgoISO(14),
-    poolLength: PoolLength.Meters50,
-    stroke: Stroke.Freestyle,
-    distance: 4000,
-    duration: totalSecondsFromMinutesAndSeconds(72, 45),
-    averagePacePer100: paceFrom(4000, totalSecondsFromMinutesAndSeconds(72, 45)),
-    effortLevel: EffortLevel.Race,
-    notes: 'Threshold main set — held splits.',
-  },
+function swimBlock(
+  id: string,
+  orderIndex: number,
+  partial: Omit<SwimmingSessionBlock, 'id' | 'orderIndex' | 'kind'>,
+): SwimmingSessionBlock {
+  return {
+    id,
+    orderIndex,
+    kind: SESSION_BLOCK_KIND.Swimming,
+    ...partial,
+  }
+}
+
+function gymBlock(
+  id: string,
+  orderIndex: number,
+  partial: Omit<GymSessionBlock, 'id' | 'orderIndex' | 'kind'>,
+): GymSessionBlock {
+  return {
+    id,
+    orderIndex,
+    kind: SESSION_BLOCK_KIND.Gym,
+    ...partial,
+  }
+}
+
+function swimmingTrainingSession(
+  sessionId: string,
+  daysAgo: number,
+  sessionTitle: string,
+  notes: string,
+  defaultPoolLength: PoolLength,
+  blocks: SwimmingSessionBlock[],
+): SwimmingTrainingSession {
+  const date = daysAgoISO(daysAgo)
+  const timestamps = timestampsForCalendarDate(date)
+  return {
+    id: sessionId,
+    athleteId: SEED_ATHLETE_SWIM_ID,
+    date,
+    sessionTitle,
+    notes,
+    trainingType: AthleteTrainingType.Swimming,
+    defaultPoolLength,
+    blocks: blocks.map((block, index) => ({ ...block, orderIndex: index })),
+    ...timestamps,
+  }
+}
+
+function gymTrainingSession(
+  sessionId: string,
+  daysAgo: number,
+  sessionTitle: string,
+  notes: string,
+  blocks: GymSessionBlock[],
+): GymTrainingSession {
+  const date = daysAgoISO(daysAgo)
+  const timestamps = timestampsForCalendarDate(date)
+  return {
+    id: sessionId,
+    athleteId: SEED_ATHLETE_GYM_ID,
+    date,
+    sessionTitle,
+    notes,
+    trainingType: AthleteTrainingType.Gym,
+    blocks: blocks.map((block, index) => ({ ...block, orderIndex: index })),
+    ...timestamps,
+  }
+}
+
+const SEED_SWIM_SESSIONS: SwimmingTrainingSession[] = [
+  swimmingTrainingSession(`${SEED_SESSION_ID_PREFIX}1`, 1, 'Aerobic threshold', 'Steady aerobic set; focus on long exhale.', PoolLength.Meters25, [
+    swimBlock(`${SEED_SESSION_ID_PREFIX}1-b0`, 0, {
+      title: 'Continuous free',
+      notes: '',
+      category: SwimmingBlockCategory.MainSet,
+      stroke: Stroke.Freestyle,
+      effortLevel: EffortLevel.Moderate,
+      poolLength: PoolLength.Meters25,
+      repetitions: 1,
+      distancePerRepMeters: 2000,
+      explicitTotalDistanceMeters: 0,
+      durationSeconds: totalSecondsFromMinutesAndSeconds(38, 20),
+      drillType: DrillType.None,
+      intervalSendoffSeconds: null,
+      equipment: [],
+    }),
+  ]),
+  swimmingTrainingSession(`${SEED_SESSION_ID_PREFIX}2`, 2, 'Recovery volume', 'Recovery swim after hard weekend.', PoolLength.Meters50, [
+    swimBlock(`${SEED_SESSION_ID_PREFIX}2-b0`, 0, {
+      title: 'Easy free',
+      notes: '',
+      category: SwimmingBlockCategory.Recovery,
+      stroke: Stroke.Freestyle,
+      effortLevel: EffortLevel.Easy,
+      poolLength: PoolLength.Meters50,
+      repetitions: 1,
+      distancePerRepMeters: 3200,
+      explicitTotalDistanceMeters: 0,
+      durationSeconds: totalSecondsFromMinutesAndSeconds(58, 10),
+      drillType: DrillType.None,
+      intervalSendoffSeconds: null,
+      equipment: [],
+    }),
+  ]),
+  swimmingTrainingSession(`${SEED_SESSION_ID_PREFIX}3`, 3, 'IM transitions', 'IM transitions — smooth turns.', PoolLength.Meters25, [
+    swimBlock(`${SEED_SESSION_ID_PREFIX}3-b0`, 0, {
+      title: 'IM set',
+      notes: '',
+      category: SwimmingBlockCategory.MainSet,
+      stroke: Stroke.Im,
+      effortLevel: EffortLevel.Hard,
+      poolLength: PoolLength.Meters25,
+      repetitions: 1,
+      distancePerRepMeters: 1600,
+      explicitTotalDistanceMeters: 0,
+      durationSeconds: totalSecondsFromMinutesAndSeconds(35, 40),
+      drillType: DrillType.None,
+      intervalSendoffSeconds: null,
+      equipment: [],
+    }),
+  ]),
+  swimmingTrainingSession(`${SEED_SESSION_ID_PREFIX}4`, 5, 'Backstroke tempo', '', PoolLength.Meters25, [
+    swimBlock(`${SEED_SESSION_ID_PREFIX}4-b0`, 0, {
+      title: 'Back steady',
+      notes: '',
+      category: SwimmingBlockCategory.MainSet,
+      stroke: Stroke.Backstroke,
+      effortLevel: EffortLevel.Moderate,
+      poolLength: PoolLength.Meters25,
+      repetitions: 1,
+      distancePerRepMeters: 1200,
+      explicitTotalDistanceMeters: 0,
+      durationSeconds: totalSecondsFromMinutesAndSeconds(24, 15),
+      drillType: DrillType.None,
+      intervalSendoffSeconds: null,
+      equipment: [],
+    }),
+  ]),
+  swimmingTrainingSession(`${SEED_SESSION_ID_PREFIX}5`, 7, 'Breaststroke technique', 'Technique emphasis — narrow kick.', PoolLength.Meters50, [
+    swimBlock(`${SEED_SESSION_ID_PREFIX}5-b0`, 0, {
+      title: 'BR tech',
+      notes: '',
+      category: SwimmingBlockCategory.Technique,
+      stroke: Stroke.Breaststroke,
+      effortLevel: EffortLevel.Easy,
+      poolLength: PoolLength.Meters50,
+      repetitions: 1,
+      distancePerRepMeters: 800,
+      explicitTotalDistanceMeters: 0,
+      durationSeconds: totalSecondsFromMinutesAndSeconds(22, 0),
+      drillType: DrillType.None,
+      intervalSendoffSeconds: null,
+      equipment: [],
+    }),
+  ]),
+  swimmingTrainingSession(`${SEED_SESSION_ID_PREFIX}multi`, 4, 'Mixed aerobic pyramid', 'Coach-structured session with clear parts.', PoolLength.Meters25, [
+    swimBlock(`${SEED_SESSION_ID_PREFIX}multi-b0`, 0, {
+      title: 'Warm-up',
+      notes: 'Easy legs, long strokes.',
+      category: SwimmingBlockCategory.WarmUp,
+      stroke: Stroke.Freestyle,
+      effortLevel: EffortLevel.Easy,
+      poolLength: PoolLength.Meters25,
+      repetitions: 0,
+      distancePerRepMeters: 0,
+      explicitTotalDistanceMeters: 400,
+      durationSeconds: 420,
+      drillType: DrillType.None,
+      intervalSendoffSeconds: null,
+      equipment: [],
+    }),
+    swimBlock(`${SEED_SESSION_ID_PREFIX}multi-b1`, 1, {
+      title: 'Drill 50s',
+      notes: 'Catch-up focus.',
+      category: SwimmingBlockCategory.Drill,
+      stroke: Stroke.Freestyle,
+      effortLevel: EffortLevel.Moderate,
+      poolLength: PoolLength.Meters25,
+      repetitions: 8,
+      distancePerRepMeters: 50,
+      explicitTotalDistanceMeters: 0,
+      durationSeconds: 600,
+      drillType: DrillType.CatchUp,
+      intervalSendoffSeconds: 60,
+      equipment: [SwimEquipment.Paddles],
+    }),
+    swimBlock(`${SEED_SESSION_ID_PREFIX}multi-b2`, 2, {
+      title: 'Main free',
+      notes: 'Hold pace.',
+      category: SwimmingBlockCategory.MainSet,
+      stroke: Stroke.Freestyle,
+      effortLevel: EffortLevel.Hard,
+      poolLength: PoolLength.Meters25,
+      repetitions: 0,
+      distancePerRepMeters: 0,
+      explicitTotalDistanceMeters: 1000,
+      durationSeconds: 900,
+      drillType: DrillType.None,
+      intervalSendoffSeconds: null,
+      equipment: [],
+    }),
+    swimBlock(`${SEED_SESSION_ID_PREFIX}multi-b3`, 3, {
+      title: 'Kick set',
+      notes: 'Board optional.',
+      category: SwimmingBlockCategory.Kick,
+      stroke: Stroke.Freestyle,
+      effortLevel: EffortLevel.Moderate,
+      poolLength: PoolLength.Meters25,
+      repetitions: 0,
+      distancePerRepMeters: 0,
+      explicitTotalDistanceMeters: 200,
+      durationSeconds: 300,
+      drillType: DrillType.None,
+      intervalSendoffSeconds: null,
+      equipment: [SwimEquipment.Kickboard],
+    }),
+    swimBlock(`${SEED_SESSION_ID_PREFIX}multi-b4`, 4, {
+      title: 'Cool-down',
+      notes: '',
+      category: SwimmingBlockCategory.CoolDown,
+      stroke: Stroke.Freestyle,
+      effortLevel: EffortLevel.Easy,
+      poolLength: PoolLength.Meters25,
+      repetitions: 0,
+      distancePerRepMeters: 0,
+      explicitTotalDistanceMeters: 300,
+      durationSeconds: 360,
+      drillType: DrillType.None,
+      intervalSendoffSeconds: null,
+      equipment: [],
+    }),
+  ]),
+]
+
+const SEED_GYM_SESSIONS: GymTrainingSession[] = [
+  gymTrainingSession(`${SEED_SESSION_ID_PREFIX}g-a`, 2, 'Upper push + core', 'Bench progression — top set RPE 8.', [
+    gymBlock(`${SEED_SESSION_ID_PREFIX}g-a-b0`, 0, {
+      title: 'Upper + core',
+      notes: '',
+      category: GymBlockCategory.MainLift,
+      focus: 'Upper push + core',
+      durationSeconds: totalSecondsFromMinutesAndSeconds(52, 0),
+      effortLevel: EffortLevel.Hard,
+    }),
+  ]),
+  gymTrainingSession(`${SEED_SESSION_ID_PREFIX}g-b`, 5, 'Lower strength', 'Squat volume wave.', [
+    gymBlock(`${SEED_SESSION_ID_PREFIX}g-b-b0`, 0, {
+      title: 'Lower strength',
+      notes: '',
+      category: GymBlockCategory.MainLift,
+      focus: 'Lower strength',
+      durationSeconds: totalSecondsFromMinutesAndSeconds(48, 30),
+      effortLevel: EffortLevel.Moderate,
+    }),
+  ]),
+  gymTrainingSession(`${SEED_SESSION_ID_PREFIX}g-c`, 8, 'Conditioning', 'Bike intervals + mobility finisher.', [
+    gymBlock(`${SEED_SESSION_ID_PREFIX}g-c-b0`, 0, {
+      title: 'Conditioning',
+      notes: '',
+      category: GymBlockCategory.Conditioning,
+      focus: 'Conditioning',
+      durationSeconds: totalSecondsFromMinutesAndSeconds(35, 0),
+      effortLevel: EffortLevel.Easy,
+    }),
+  ]),
+]
+
+export const SEED_TRAINING_SESSIONS: TrainingSession[] = [
+  ...SEED_SWIM_SESSIONS,
+  ...SEED_GYM_SESSIONS,
 ]
 
 export const SEED_PERSONAL_BESTS: PersonalBest[] = [
   {
     id: `${SEED_PB_ID_PREFIX}50`,
+    athleteId: SEED_ATHLETE_SWIM_ID,
     stroke: Stroke.Freestyle,
     distance: PersonalBestDistance.M50,
     timeSeconds: 26.8,
@@ -118,14 +342,16 @@ export const SEED_PERSONAL_BESTS: PersonalBest[] = [
   },
   {
     id: `${SEED_PB_ID_PREFIX}100`,
+    athleteId: SEED_ATHLETE_SWIM_ID,
     stroke: Stroke.Freestyle,
     distance: PersonalBestDistance.M100,
     timeSeconds: 58.4,
     date: daysAgoISO(45),
-    notes: 'SCY converted mentally to LC.',
+    notes: 'Converted mentally from short course.',
   },
   {
     id: `${SEED_PB_ID_PREFIX}200`,
+    athleteId: SEED_ATHLETE_SWIM_ID,
     stroke: Stroke.Freestyle,
     distance: PersonalBestDistance.M200,
     timeSeconds: 132.1,
@@ -134,6 +360,7 @@ export const SEED_PERSONAL_BESTS: PersonalBest[] = [
   },
   {
     id: `${SEED_PB_ID_PREFIX}400`,
+    athleteId: SEED_ATHLETE_SWIM_ID,
     stroke: Stroke.Freestyle,
     distance: PersonalBestDistance.M400,
     timeSeconds: 305,

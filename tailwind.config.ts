@@ -166,6 +166,7 @@ const config: Config = {
       },
       width: {
         sidebar: 'var(--sidebar-width)',
+        'sidebar-collapsed': 'var(--sidebar-width-collapsed)',
       },
       height: {
         chart: 'var(--chart-min-height)',

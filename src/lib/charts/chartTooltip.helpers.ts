@@ -3,7 +3,7 @@ import { format, parseISO } from 'date-fns'
 import { ISO_DATE_REGEX } from '@/shared/constants/calendar.constants'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
 import { CHART_DATA_KEY, CHART_SERIES_NAME } from '@/shared/constants/chartData.constants'
-import { formatPacePer100 } from '@/shared/helpers/formatters'
+import { formatDurationSeconds, formatPacePer100 } from '@/shared/helpers/formatters'
 
 export type TooltipPayloadEntry = {
   name?: string
@@ -33,6 +33,10 @@ export function formatChartTooltipValue(entry: TooltipPayloadEntry): string {
 
   if (name === CHART_SERIES_NAME.PACE || dataKey === CHART_DATA_KEY.PACE) {
     return formatPacePer100(value)
+  }
+
+  if (name === CHART_SERIES_NAME.DURATION) {
+    return formatDurationSeconds(value)
   }
 
   if (

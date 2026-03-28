@@ -2,7 +2,8 @@
 export const DASHBOARD_CHART = {
   WEEKLY_WEEKS: 8,
   MONTHLY_MONTHS: 6,
-  RECENT_WORKOUTS: 5,
+  /** Recent rows on the coach dashboard activity list. */
+  RECENT_SESSIONS: 5,
 } as const
 
 export const STATISTICS_AGGREGATE = {

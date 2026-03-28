@@ -1,35 +1,53 @@
 /** App route paths (absolute, for links and document title matching). */
 export const APP_ROUTE = {
   home: '/',
-  workouts: '/workouts',
-  workoutNew: '/workouts/new',
+  athletes: '/athletes',
+  athleteNew: '/athletes/new',
   statistics: '/statistics',
-  personalBests: '/personal-bests',
   settings: '/settings',
 } as const
 
-export function workoutDetailPath(workoutId: string): string {
-  return `${APP_ROUTE.workouts}/${workoutId}`
+export function athleteDetailPath(athleteId: string): string {
+  return `${APP_ROUTE.athletes}/${athleteId}`
 }
 
-export function workoutEditPath(workoutId: string): string {
-  return `${APP_ROUTE.workouts}/${workoutId}/edit`
+export function athleteEditPath(athleteId: string): string {
+  return `${APP_ROUTE.athletes}/${athleteId}/edit`
+}
+
+export function athleteSessionNewPath(athleteId: string): string {
+  return `${APP_ROUTE.athletes}/${athleteId}/sessions/new`
+}
+
+export function sessionDetailPath(athleteId: string, sessionId: string): string {
+  return `${APP_ROUTE.athletes}/${athleteId}/sessions/${sessionId}`
+}
+
+export function sessionEditPath(athleteId: string, sessionId: string): string {
+  return `${APP_ROUTE.athletes}/${athleteId}/sessions/${sessionId}/edit`
+}
+
+export function athletePersonalBestsPath(athleteId: string): string {
+  return `${APP_ROUTE.athletes}/${athleteId}/personal-bests`
 }
 
 /** React Router `Route` path segments (relative to shell layout). */
 export const ROUTE_SEGMENT = {
   index: '',
-  workouts: 'workouts',
+  athletes: 'athletes',
   new: 'new',
   edit: 'edit',
-  workoutIdParam: ':workoutId',
-  statistics: 'statistics',
+  sessions: 'sessions',
   personalBests: 'personal-bests',
+  athleteIdParam: ':athleteId',
+  sessionIdParam: ':sessionId',
+  statistics: 'statistics',
   settings: 'settings',
   wildcard: '*',
 } as const
 
 /** `useParams` keys */
 export const ROUTE_PARAM = {
-  workoutId: 'workoutId',
+  athleteId: 'athleteId',
+  sessionId: 'sessionId',
 } as const

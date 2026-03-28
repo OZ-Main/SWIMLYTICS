@@ -41,6 +41,7 @@ import {
 } from './PersonalBestForm.validation'
 
 type PersonalBestFormProps = {
+  athleteId: string
   mode: 'create' | 'edit'
   initial?: PersonalBest | null
   onSubmit: (pb: PersonalBest) => void
@@ -59,6 +60,7 @@ function defaultCreateValues(): PersonalBestFormValues {
 }
 
 export default function PersonalBestForm({
+  athleteId,
   mode,
   initial,
   onSubmit,
@@ -92,6 +94,7 @@ export default function PersonalBestForm({
     const timeSeconds = personalBestFormToTimeSeconds(values)
     onSubmit({
       id,
+      athleteId,
       stroke: values.stroke,
       distance: parsePbDistance(values.distance),
       timeSeconds,
@@ -121,9 +124,9 @@ export default function PersonalBestForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {STROKE_ORDER.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {STROKE_LABELS[s]}
+                  {STROKE_ORDER.map((strokeOption) => (
+                    <SelectItem key={strokeOption} value={strokeOption}>
+                      {STROKE_LABELS[strokeOption]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -149,9 +152,9 @@ export default function PersonalBestForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {personalBestDistancesForStroke(stroke).map((d) => (
-                    <SelectItem key={d} value={String(d)}>
-                      {d} m
+                  {personalBestDistancesForStroke(stroke).map((distanceMeters) => (
+                    <SelectItem key={distanceMeters} value={String(distanceMeters)}>
+                      {distanceMeters} m
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -1,15 +1,24 @@
 import * as React from 'react'
 
+import { useAthleteStore } from '@/app/store/athleteStore'
+import { useCoachStore } from '@/app/store/coachStore'
 import { usePersonalBestsStore } from '@/app/store/personalBestsStore'
 import { useSettingsStore } from '@/app/store/settingsStore'
-import { useWorkoutStore } from '@/app/store/workoutStore'
-import { SEED_PERSONAL_BESTS, SEED_WORKOUTS } from '@/shared/constants/seedData'
+import { useTrainingSessionStore } from '@/app/store/trainingSessionStore'
+import { migrateLegacyStorage } from '@/lib/storage/migrateLegacyStorage'
+import {
+  SEED_ATHLETES,
+  SEED_PERSONAL_BESTS,
+  SEED_TRAINING_SESSIONS,
+} from '@/shared/constants/seedData'
 
 function storesHydrated(): boolean {
   return (
-    useWorkoutStore.persist.hasHydrated() &&
+    useTrainingSessionStore.persist.hasHydrated() &&
     usePersonalBestsStore.persist.hasHydrated() &&
-    useSettingsStore.persist.hasHydrated()
+    useSettingsStore.persist.hasHydrated() &&
+    useAthleteStore.persist.hasHydrated() &&
+    useCoachStore.persist.hasHydrated()
   )
 }
 
@@ -28,15 +37,19 @@ export function HydrationGate({ children }: { children: React.ReactNode }) {
       }
     }
 
-    const unsub1 = useWorkoutStore.persist.onFinishHydration(markReady)
-    const unsub2 = usePersonalBestsStore.persist.onFinishHydration(markReady)
-    const unsub3 = useSettingsStore.persist.onFinishHydration(markReady)
+    const unsubscribeSessions = useTrainingSessionStore.persist.onFinishHydration(markReady)
+    const unsubscribePersonalBests = usePersonalBestsStore.persist.onFinishHydration(markReady)
+    const unsubscribeSettings = useSettingsStore.persist.onFinishHydration(markReady)
+    const unsubscribeAthletes = useAthleteStore.persist.onFinishHydration(markReady)
+    const unsubscribeCoach = useCoachStore.persist.onFinishHydration(markReady)
     markReady()
 
     return () => {
-      unsub1()
-      unsub2()
-      unsub3()
+      unsubscribeSessions()
+      unsubscribePersonalBests()
+      unsubscribeSettings()
+      unsubscribeAthletes()
+      unsubscribeCoach()
     }
   }, [])
 
@@ -44,12 +57,21 @@ export function HydrationGate({ children }: { children: React.ReactNode }) {
     if (!ready) {
       return
     }
-    const { workouts, replaceAllWorkouts } = useWorkoutStore.getState()
+    migrateLegacyStorage()
+
+    const { trainingSessions, replaceAllTrainingSessions } = useTrainingSessionStore.getState()
     const { personalBests, replaceAllPersonalBests } = usePersonalBestsStore.getState()
+    const { athletes, replaceAllAthletes } = useAthleteStore.getState()
     const { initialSampleApplied, setInitialSampleApplied } = useSettingsStore.getState()
 
-    if (!initialSampleApplied && workouts.length === 0 && personalBests.length === 0) {
-      replaceAllWorkouts(SEED_WORKOUTS)
+    if (
+      !initialSampleApplied &&
+      athletes.length === 0 &&
+      trainingSessions.length === 0 &&
+      personalBests.length === 0
+    ) {
+      replaceAllAthletes(SEED_ATHLETES)
+      replaceAllTrainingSessions(SEED_TRAINING_SESSIONS)
       replaceAllPersonalBests(SEED_PERSONAL_BESTS)
       setInitialSampleApplied(true)
     }

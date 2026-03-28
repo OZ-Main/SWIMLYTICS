@@ -22,6 +22,17 @@ export const WORKOUT_NOTES = {
   MAX_LENGTH: 2000,
 } as const
 
+/** Gym session focus / block label (e.g. “Upper push”). */
+export const GYM_SESSION_FOCUS = {
+  MIN_LENGTH: 1,
+  MAX_LENGTH: 120,
+} as const
+
+export const GYM_DURATION = {
+  MAX_MINUTES: 600,
+  MAX_SECONDS_COMPONENT: 59,
+} as const
+
 /** Suggested defaults for the “new workout” form. */
 export const WORKOUT_FORM_DEFAULTS = {
   DISTANCE_METERS: 1000,
