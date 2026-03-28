@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export const statCardLinkVariants = cva(
-  'block border-l-stat border-l-primary/55 text-inherit no-underline',
+  'block border-l-stat border-l-accent/70 text-inherit no-underline',
 )
 
 export const statCardHeaderRowVariants = cva('flex flex-col gap-1.5 p-card')
@@ -17,7 +17,7 @@ export const statCardIconWrapVariants = cva('rounded-button bg-primary/10 p-2 te
 export const statCardBodyVariants = cva('p-card pt-0')
 
 export const statCardValueVariants = cva(
-  'font-display text-display-lg font-semibold tracking-tight text-foreground',
+  'font-display text-kpi tabular-nums tracking-tight text-foreground',
 )
 
 export const statCardHintVariants = cva('mt-1 text-caption text-muted-foreground')

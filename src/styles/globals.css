@@ -4,98 +4,106 @@
 
 @layer base {
   :root {
-    --background: 207 32% 97%;
-    --foreground: 216 28% 14%;
+    /* Layered cool neutrals — atmospheric, not flat grey */
+    --background: 212 38% 96%;
+    --foreground: 222 28% 11%;
 
-    --card: 210 45% 99%;
-    --card-foreground: 216 28% 14%;
+    --card: 210 55% 99.5%;
+    --card-subtle: 208 48% 97%;
+    --card-foreground: 222 28% 11%;
 
-    --popover: 210 45% 99%;
-    --popover-foreground: 216 28% 14%;
+    --popover: 210 55% 99.5%;
+    --popover-foreground: 222 28% 11%;
 
-    --primary: 197 55% 34%;
-    --primary-foreground: 195 55% 98%;
+    /* Rich aquatic blue-teal — deeper & more saturated identity */
+    --primary: 198 78% 36%;
+    --primary-foreground: 185 60% 98%;
 
-    --secondary: 206 26% 92%;
-    --secondary-foreground: 216 24% 22%;
+    --secondary: 210 32% 92%;
+    --secondary-foreground: 222 22% 22%;
 
-    --muted: 210 22% 93%;
-    --muted-foreground: 215 16% 40%;
+    --muted: 210 28% 93%;
+    --muted-foreground: 215 18% 38%;
 
-    --accent: 189 48% 40%;
-    --accent-foreground: 195 60% 98%;
+    /* Vibrant cyan-teal accent — highlights & key interactions */
+    --accent: 186 72% 40%;
+    --accent-foreground: 198 40% 12%;
 
-    --destructive: 0 65% 46%;
+    --destructive: 0 72% 44%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 156 42% 36%;
-    --success-foreground: 152 50% 97%;
+    --success: 158 62% 34%;
+    --success-foreground: 156 45% 98%;
 
-    --warning: 36 88% 44%;
-    --warning-foreground: 38 100% 11%;
+    --warning: 38 88% 46%;
+    --warning-foreground: 28 85% 12%;
 
-    --border: 210 18% 88%;
-    --input: 210 18% 88%;
-    --ring: 197 55% 38%;
+    --border: 210 24% 86%;
+    --input: 210 26% 88%;
+    --ring: 186 70% 42%;
 
-    --chart-1: 197 55% 38%;
-    --chart-2: 189 48% 42%;
-    --chart-3: 216 20% 48%;
-    --chart-4: 158 38% 38%;
-    --chart-5: 265 38% 52%;
+    /* Distinct chart palette — saturated, distinguishable */
+    --chart-1: 198 75% 42%;
+    --chart-2: 186 78% 40%;
+    --chart-3: 228 58% 52%;
+    --chart-4: 168 52% 38%;
+    --chart-5: 268 52% 54%;
 
-    --chart-grid: 210 18% 88%;
-    --chart-axis: 215 14% 42%;
+    --chart-grid: 210 22% 82%;
+    --chart-axis: 215 18% 36%;
 
-    --stroke-freestyle: 197 55% 42%;
-    --stroke-backstroke: 216 28% 48%;
-    --stroke-breaststroke: 158 36% 36%;
-    --stroke-butterfly: 278 38% 50%;
-    --stroke-im: 189 44% 38%;
-    --stroke-drill: 38 76% 46%;
-    --stroke-kick: 14 68% 50%;
+    --stroke-freestyle: 198 72% 44%;
+    --stroke-backstroke: 222 42% 48%;
+    --stroke-breaststroke: 162 55% 38%;
+    --stroke-butterfly: 278 58% 52%;
+    --stroke-im: 188 65% 42%;
+    --stroke-drill: 42 88% 48%;
+    --stroke-kick: 18 75% 50%;
 
-    --sidebar: 212 36% 15%;
-    --sidebar-foreground: 210 28% 94%;
-    --sidebar-border: 212 28% 22%;
-    --sidebar-accent: 197 48% 26%;
-    --sidebar-accent-foreground: 195 55% 98%;
-    --sidebar-muted: 210 22% 70%;
+    --sidebar: 222 42% 9%;
+    --sidebar-foreground: 210 30% 96%;
+    --sidebar-border: 218 35% 16%;
+    --sidebar-accent: 198 70% 30%;
+    --sidebar-accent-foreground: 185 55% 98%;
+    --sidebar-muted: 215 20% 58%;
 
-    --overlay-scrim: 216 28% 14%;
+    --overlay-scrim: 222 32% 8%;
 
     --radius-sm: 0.25rem;
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-button: 0.5rem;
     --radius-input: 0.5rem;
-    --radius-card: 0.75rem;
-    --radius-dialog: 0.75rem;
-    --radius-chart-bar: 0.25rem;
+    --radius-card: 0.875rem;
+    --radius-dialog: 0.875rem;
+    --radius-chart-bar: 0.35rem;
 
     --shadow-card:
-      0 1px 0 hsl(var(--border) / 0.85), 0 1px 2px hsl(var(--foreground) / 0.04),
-      0 6px 20px hsl(var(--foreground) / 0.05);
+      0 1px 0 hsl(var(--border) / 0.95), 0 2px 6px hsl(222 28% 11% / 0.05),
+      0 14px 36px hsl(222 28% 11% / 0.09);
     --shadow-card-hover:
-      0 1px 0 hsl(var(--border) / 0.9), 0 4px 12px hsl(var(--foreground) / 0.06),
-      0 16px 40px hsl(var(--foreground) / 0.08);
-    --shadow-overlay: 0 24px 48px hsl(var(--foreground) / 0.16);
+      0 1px 0 hsl(var(--border)), 0 8px 24px hsl(222 28% 11% / 0.08),
+      0 22px 48px hsl(222 28% 11% / 0.12);
+    --shadow-card-lift:
+      0 2px 8px hsl(222 28% 11% / 0.06), 0 18px 40px hsl(198 78% 36% / 0.1);
+    --shadow-interactive: 0 4px 18px -2px hsl(var(--primary) / 0.35);
+    --shadow-overlay: 0 28px 56px hsl(222 28% 11% / 0.2);
 
     --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
 
-    --text-display-xl-size: 2.25rem;
-    --text-display-xl-leading: 2.75rem;
-    --text-display-lg-size: 1.875rem;
-    --text-display-lg-leading: 2.25rem;
-    --text-heading-xl-size: 1.5rem;
-    --text-heading-xl-leading: 2rem;
-    --text-heading-lg-size: 1.25rem;
-    --text-heading-lg-leading: 1.75rem;
+    --text-display-xl-size: 2.375rem;
+    --text-display-xl-leading: 2.875rem;
+    --text-display-lg-size: 2rem;
+    --text-display-lg-leading: 2.375rem;
+    --text-heading-xl-size: 1.5625rem;
+    --text-heading-xl-leading: 2.0625rem;
+    --text-heading-lg-size: 1.3125rem;
+    --text-heading-lg-leading: 1.8125rem;
     --text-heading-md-size: 1.125rem;
     --text-heading-md-leading: 1.5rem;
-    --text-heading-sm-size: 1rem;
-    --text-heading-sm-leading: 1.375rem;
+    --text-heading-sm-size: 1.0625rem;
+    --text-heading-sm-leading: 1.4375rem;
     --text-body-lg-size: 1.0625rem;
     --text-body-lg-leading: 1.625rem;
     --text-body-size: 0.9375rem;
@@ -104,13 +112,17 @@
     --text-body-sm-leading: 1.25rem;
     --text-label-size: 0.8125rem;
     --text-label-leading: 1.125rem;
-    --text-label-weight: 500;
+    --text-label-weight: 600;
     --text-caption-size: 0.75rem;
     --text-caption-leading: 1rem;
     --text-chart-tick-size: 0.6875rem;
 
-    --space-section: 2.25rem;
-    --space-section-sm: 1.25rem;
+    --text-kpi-size: 1.875rem;
+    --text-kpi-leading: 2.25rem;
+    --text-kpi-weight: 700;
+
+    --space-section: 2.625rem;
+    --space-section-sm: 1.375rem;
     --space-card: 1.25rem;
     --space-form: 1.5rem;
     --space-form-field: 1rem;
@@ -133,7 +145,7 @@
     --header-height-mobile: 3.5rem;
     --container-2xl: 90rem;
 
-    --chart-min-height: 17rem;
+    --chart-min-height: 18rem;
     --chart-container-padding: 1.25rem;
 
     --table-cell-padding-x: 1rem;
@@ -167,71 +179,75 @@
   }
 
   .dark {
-    --background: 216 28% 8%;
-    --foreground: 210 25% 94%;
+    --background: 222 32% 7%;
+    --foreground: 210 28% 96%;
 
-    --card: 216 26% 11%;
-    --card-foreground: 210 25% 94%;
+    --card: 220 28% 11.5%;
+    --card-subtle: 222 30% 9%;
+    --card-foreground: 210 28% 96%;
 
-    --popover: 216 26% 11%;
-    --popover-foreground: 210 25% 94%;
+    --popover: 220 28% 11.5%;
+    --popover-foreground: 210 28% 96%;
 
-    --primary: 194 58% 52%;
-    --primary-foreground: 216 32% 10%;
+    --primary: 192 72% 48%;
+    --primary-foreground: 222 35% 8%;
 
-    --secondary: 216 22% 17%;
-    --secondary-foreground: 210 20% 90%;
+    --secondary: 220 22% 16%;
+    --secondary-foreground: 210 22% 92%;
 
-    --muted: 216 20% 15%;
-    --muted-foreground: 210 14% 60%;
+    --muted: 220 20% 14%;
+    --muted-foreground: 215 16% 62%;
 
-    --accent: 189 45% 46%;
-    --accent-foreground: 216 32% 10%;
+    --accent: 186 68% 48%;
+    --accent-foreground: 222 35% 8%;
 
-    --destructive: 0 58% 48%;
+    --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 156 38% 40%;
-    --success-foreground: 152 50% 97%;
+    --success: 158 52% 42%;
+    --success-foreground: 156 45% 98%;
 
-    --warning: 36 82% 48%;
-    --warning-foreground: 38 100% 10%;
+    --warning: 40 86% 52%;
+    --warning-foreground: 28 30% 12%;
 
-    --border: 216 18% 20%;
-    --input: 216 18% 20%;
-    --ring: 194 58% 55%;
+    --border: 220 18% 18%;
+    --input: 220 18% 20%;
+    --ring: 186 65% 50%;
 
-    --chart-1: 194 58% 55%;
-    --chart-2: 189 45% 50%;
-    --chart-3: 210 16% 65%;
-    --chart-4: 158 36% 44%;
-    --chart-5: 265 36% 58%;
+    --chart-1: 192 75% 55%;
+    --chart-2: 186 72% 52%;
+    --chart-3: 226 62% 68%;
+    --chart-4: 168 48% 50%;
+    --chart-5: 268 58% 65%;
 
-    --chart-grid: 216 18% 22%;
-    --chart-axis: 210 12% 58%;
+    --chart-grid: 220 16% 22%;
+    --chart-axis: 215 14% 58%;
 
-    --stroke-freestyle: 194 55% 58%;
-    --stroke-backstroke: 216 24% 58%;
-    --stroke-breaststroke: 158 34% 46%;
-    --stroke-butterfly: 278 34% 58%;
-    --stroke-im: 189 40% 52%;
-    --stroke-drill: 38 70% 52%;
-    --stroke-kick: 14 60% 55%;
+    --stroke-freestyle: 192 72% 58%;
+    --stroke-backstroke: 220 35% 62%;
+    --stroke-breaststroke: 165 50% 50%;
+    --stroke-butterfly: 278 55% 62%;
+    --stroke-im: 188 58% 55%;
+    --stroke-drill: 42 82% 56%;
+    --stroke-kick: 18 72% 56%;
 
-    --sidebar: 216 30% 6%;
-    --sidebar-foreground: 210 25% 94%;
-    --sidebar-border: 216 22% 14%;
-    --sidebar-accent: 194 45% 28%;
-    --sidebar-accent-foreground: 195 55% 98%;
-    --sidebar-muted: 210 14% 48%;
+    --sidebar: 222 38% 5%;
+    --sidebar-foreground: 210 28% 96%;
+    --sidebar-border: 220 28% 12%;
+    --sidebar-accent: 198 65% 38%;
+    --sidebar-accent-foreground: 185 55% 98%;
+    --sidebar-muted: 215 16% 48%;
 
-    --overlay-scrim: 216 28% 6%;
+    --overlay-scrim: 222 35% 4%;
 
     --shadow-card:
-      0 1px 0 hsl(0 0% 100% / 0.06), 0 1px 2px hsl(0 0% 0% / 0.35), 0 8px 28px hsl(0 0% 0% / 0.4);
+      0 1px 0 hsl(0 0% 100% / 0.07), 0 2px 8px hsl(0 0% 0% / 0.45), 0 16px 40px hsl(0 0% 0% / 0.5);
     --shadow-card-hover:
-      0 1px 0 hsl(0 0% 100% / 0.08), 0 6px 20px hsl(0 0% 0% / 0.45), 0 18px 48px hsl(0 0% 0% / 0.5);
-    --shadow-overlay: 0 24px 64px hsl(0 0% 0% / 0.55);
+      0 1px 0 hsl(0 0% 100% / 0.1), 0 10px 28px hsl(0 0% 0% / 0.55), 0 24px 56px hsl(0 0% 0% / 0.55);
+    --shadow-card-lift:
+      0 4px 16px hsl(0 0% 0% / 0.5), 0 20px 48px hsl(192 72% 48% / 0.18);
+    --shadow-interactive: 0 4px 22px -2px hsl(var(--primary) / 0.45);
+    --shadow-overlay: 0 28px 72px hsl(0 0% 0% / 0.6);
   }
 
   * {
@@ -239,15 +255,25 @@
   }
 
   body {
-    @apply bg-background font-sans text-body text-foreground antialiased;
+    @apply font-sans text-body text-foreground antialiased;
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(ellipse 120% 70% at 100% -15%, hsl(var(--primary) / 0.09), transparent 52%),
+      radial-gradient(ellipse 90% 55% at -5% 30%, hsl(var(--accent) / 0.07), transparent 48%);
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(ellipse 120% 70% at 100% -15%, hsl(var(--primary) / 0.14), transparent 52%),
+      radial-gradient(ellipse 90% 55% at -5% 25%, hsl(var(--accent) / 0.1), transparent 48%);
   }
 
   h1 {
-    @apply font-display text-display-lg font-semibold tracking-tight text-foreground;
+    @apply font-display text-display-lg font-bold tracking-tight text-foreground;
   }
 
   h2 {
-    @apply font-display text-heading-xl font-semibold tracking-tight text-foreground;
+    @apply font-display text-heading-xl font-bold tracking-tight text-foreground;
   }
 
   h3 {
@@ -273,19 +299,19 @@
   }
 
   .section-label {
-    @apply text-caption font-semibold uppercase tracking-wider text-muted-foreground;
+    @apply text-caption font-semibold uppercase tracking-[0.14em] text-muted-foreground;
   }
 
   .surface-panel {
-    @apply rounded-card border border-border/70 bg-card text-card-foreground shadow-card;
+    @apply rounded-card border border-border/80 bg-gradient-to-br from-card to-card-subtle text-card-foreground shadow-card;
   }
 
   .surface-panel-muted {
-    @apply rounded-card border border-border/70 bg-muted/25 shadow-card;
+    @apply rounded-card border border-border/75 bg-gradient-to-br from-muted/50 to-card/90 text-card-foreground shadow-card;
   }
 
   .form-filter-panel {
-    @apply grid gap-form-field rounded-card border border-border/70 bg-card p-card shadow-card;
+    @apply grid gap-form-field rounded-card border border-border/80 bg-gradient-to-br from-card to-card-subtle p-card text-card-foreground shadow-card;
   }
 
   .chart-surface {
@@ -330,26 +356,26 @@
 
   /** Page-level cards (dashboard recent activity, settings, session hero metrics, statistics summary). */
   .page-section-header {
-    @apply space-y-1 border-b border-border/40 bg-muted/20 px-card py-section-sm;
+    @apply space-y-1 border-b border-border/50 bg-gradient-to-r from-muted/35 via-accent/5 to-muted/25 px-card py-section-sm;
   }
 
   .page-section-title {
-    @apply font-display text-heading-sm font-semibold tracking-tight text-foreground;
+    @apply font-display text-heading-sm font-bold tracking-tight text-foreground;
   }
 
   /** Nested entities (session blocks, builder blocks). */
   .nested-card-header {
-    @apply border-b border-border/40 px-card py-tight;
+    @apply border-b border-border/50 bg-gradient-to-r from-muted/25 to-transparent px-card py-tight;
   }
 
   /** List shells (recent activity rows, roster-style lists). */
   .data-list-shell {
-    @apply divide-y divide-border overflow-hidden rounded-card border border-border/70 bg-card text-card-foreground shadow-card;
+    @apply divide-y divide-border overflow-hidden rounded-card border border-border/80 bg-gradient-to-b from-card to-card-subtle text-card-foreground shadow-card;
   }
 
   /** Table / rail captions (pool vs gym group labels). */
   .table-rail-caption {
-    @apply border-b border-border/40 bg-muted/20 px-card py-tight text-label font-medium text-muted-foreground;
+    @apply border-b border-border/50 bg-gradient-to-r from-muted/40 to-accent/5 px-card py-tight text-label font-medium text-muted-foreground;
   }
 
   /** Sticky form footers (session builder save row). */
@@ -359,12 +385,12 @@
 
   /** Inline callouts (athlete notes, coach hints). */
   .insight-banner {
-    @apply rounded-card border border-border/70 bg-muted/20 px-card py-tight text-body-sm text-muted-foreground;
+    @apply rounded-card border border-primary/15 bg-gradient-to-br from-primary/5 to-accent/5 px-card py-tight text-body-sm text-muted-foreground;
   }
 
   /** Dense KPI tiles (athlete overview, inline stats). */
   .kpi-tile {
-    @apply rounded-card border border-border/70 bg-card p-card text-card-foreground shadow-card;
+    @apply rounded-card border border-border/80 bg-gradient-to-br from-card to-card-subtle p-card text-card-foreground shadow-card;
   }
 
   /** Chart empty / placeholder states (matches chart vertical rhythm). */

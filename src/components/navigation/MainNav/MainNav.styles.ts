@@ -19,7 +19,7 @@ export const mainNavLinkVariants = cva(
       active: {
         true: 'bg-sidebar-accent text-sidebar-accent-foreground',
         false:
-          'text-sidebar-foreground/90 hover:bg-sidebar-border/50 hover:text-sidebar-foreground',
+          'text-sidebar-foreground/90 hover:bg-sidebar-accent/22 hover:text-sidebar-foreground',
       },
       collapsed: {
         true: 'min-h-11 w-full justify-center gap-0 px-0 py-0 motion-safe:hover:scale-100',

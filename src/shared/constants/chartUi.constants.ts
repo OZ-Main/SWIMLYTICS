@@ -1,4 +1,4 @@
-export const CHART_TICK_PX = 11
+export const CHART_TICK_PX = 12
 
 export const CHART_BAR_RADIUS: [number, number, number, number] = [4, 4, 0, 0]
 

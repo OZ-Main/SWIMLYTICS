@@ -134,7 +134,7 @@ export default function SessionDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-card">
-            <p className="font-display text-heading-xl font-semibold tabular-nums text-foreground">
+            <p className="font-display text-kpi tabular-nums text-foreground">
               {formatDurationSeconds(totalSeconds)}
             </p>
           </CardContent>
@@ -237,7 +237,7 @@ export default function SessionDetailPage() {
             <CardTitle className="page-section-title text-muted-foreground">Distance</CardTitle>
           </CardHeader>
           <CardContent className="pt-card">
-            <p className="font-display text-heading-xl font-semibold tabular-nums text-foreground">
+            <p className="font-display text-kpi tabular-nums text-foreground">
               {formatDistanceMeters(getSwimmingSessionTotalDistanceMeters(activeSession))}
             </p>
           </CardContent>
@@ -247,7 +247,7 @@ export default function SessionDetailPage() {
             <CardTitle className="page-section-title text-muted-foreground">Duration</CardTitle>
           </CardHeader>
           <CardContent className="pt-card">
-            <p className="font-display text-heading-xl font-semibold tabular-nums text-foreground">
+            <p className="font-display text-kpi tabular-nums text-foreground">
               {formatDurationSeconds(getSwimmingSessionTotalDurationSeconds(activeSession))}
             </p>
           </CardContent>
@@ -257,7 +257,7 @@ export default function SessionDetailPage() {
             <CardTitle className="page-section-title text-muted-foreground">Avg pace</CardTitle>
           </CardHeader>
           <CardContent className="pt-card">
-            <p className="font-display text-heading-xl font-semibold tabular-nums text-foreground">
+            <p className="font-display text-kpi tabular-nums text-foreground">
               {pace > 0 ? formatPacePer100(pace) : '—'}
             </p>
           </CardContent>

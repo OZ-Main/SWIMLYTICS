@@ -11,7 +11,7 @@ export default function AppShell() {
   const { expanded, toggle } = useSidebarExpanded()
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh min-h-screen">
       <div className="mx-auto flex w-full">
         <aside
           className={cn(
@@ -69,12 +69,12 @@ export default function AppShell() {
           </div>
         </aside>
         <div className="flex min-h-screen min-w-0 flex-1 flex-col">
-          <header className="px-page-padding-x flex h-header-mobile items-center border-b border-border md:hidden">
+          <header className="border-b border-border/80 bg-background/80 px-page-padding-x flex h-header-mobile items-center backdrop-blur-md md:hidden supports-[backdrop-filter]:bg-background/70">
             <span className="font-display text-heading-sm font-semibold tracking-tight">
               SWIMLYTICS
             </span>
           </header>
-          <div className="px-page-padding-x border-b border-border py-tight md:hidden">
+          <div className="border-b border-border/80 bg-background/70 px-page-padding-x py-tight backdrop-blur-sm md:hidden">
             <MainNav className="flex flex-row flex-wrap gap-tight" />
           </div>
           <a

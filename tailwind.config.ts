@@ -50,6 +50,7 @@ const config: Config = {
         card: {
           DEFAULT: 'hsl(var(--card) / <alpha-value>)',
           foreground: 'hsl(var(--card-foreground) / <alpha-value>)',
+          subtle: 'hsl(var(--card-subtle) / <alpha-value>)',
         },
         success: {
           DEFAULT: 'hsl(var(--success) / <alpha-value>)',
@@ -99,6 +100,8 @@ const config: Config = {
       boxShadow: {
         card: 'var(--shadow-card)',
         'card-hover': 'var(--shadow-card-hover)',
+        'card-lift': 'var(--shadow-card-lift)',
+        interactive: 'var(--shadow-interactive)',
         overlay: 'var(--shadow-overlay)',
       },
       fontFamily: {
@@ -142,6 +145,14 @@ const config: Config = {
         ],
         caption: ['var(--text-caption-size)', { lineHeight: 'var(--text-caption-leading)' }],
         'chart-tick': ['var(--text-chart-tick-size)', { lineHeight: '1rem' }],
+        /** Dashboard KPI / hero metrics — larger tabular emphasis. */
+        kpi: [
+          'var(--text-kpi-size)',
+          {
+            lineHeight: 'var(--text-kpi-leading)',
+            fontWeight: 'var(--text-kpi-weight)',
+          },
+        ],
       },
       spacing: {
         section: 'var(--space-section)',

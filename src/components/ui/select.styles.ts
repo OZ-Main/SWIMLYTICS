@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export const selectTriggerVariants = cva(
-  'flex h-10 w-full items-center justify-between rounded-input border border-input bg-background px-3 py-2 text-body ring-offset-background transition-[border-color,box-shadow] duration-motion-normal ease-motion-out placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
+  'flex h-10 w-full items-center justify-between rounded-input border border-border/80 bg-gradient-to-b from-card to-card-subtle px-3 py-2 text-body shadow-sm ring-offset-background transition-[border-color,box-shadow] duration-motion-normal ease-motion-out placeholder:text-muted-foreground focus:border-primary/35 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
 )
 
 export const selectScrollBtnVariants = cva('flex cursor-default items-center justify-center py-1')
@@ -38,7 +38,7 @@ export const selectViewportVariants = cva('p-1', {
 export const selectLabelVariants = cva('py-1.5 pl-8 pr-2 text-label font-semibold')
 
 export const selectItemVariants = cva(
-  'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-body outline-none transition-colors duration-motion-fast ease-motion-out focus:bg-muted focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+  'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-body outline-none transition-colors duration-motion-fast ease-motion-out focus:bg-accent/12 focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
 )
 
 export const selectSeparatorVariants = cva('-mx-1 my-1 h-px bg-border')
