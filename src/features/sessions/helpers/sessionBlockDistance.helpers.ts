@@ -1,9 +1,5 @@
 import type { SwimmingSessionBlock } from '@/shared/types/domain.types'
 
-/**
- * Total swim distance for the block: repetitions × per-rep when both are positive,
- * otherwise explicit total (simple continuous swim).
- */
 export function calculateSwimmingBlockDistanceMeters(block: SwimmingSessionBlock): number {
   if (block.repetitions > 0 && block.distancePerRepMeters > 0) {
     return block.repetitions * block.distancePerRepMeters

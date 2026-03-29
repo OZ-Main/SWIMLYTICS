@@ -69,7 +69,6 @@ export function distanceLabel(distanceMeters: PersonalBestDistance): string {
   return `${distanceMeters} m`
 }
 
-/** Full event label for tables and confirmations (stroke + distance). */
 export function personalBestEventLabel(personalBest: PersonalBest): string {
   return `${STROKE_LABELS[personalBest.stroke]} · ${personalBest.distance} m`
 }

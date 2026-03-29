@@ -36,10 +36,8 @@ import {
 import type { StatisticsFilters } from '@/features/statistics/types/statistics-filters.types'
 import { useChartTheme } from '@/lib/charts/useChartTheme'
 import { useResponsiveChartLayout } from '@/lib/charts/useResponsiveChartLayout'
-import { CHART_BAR_RADIUS } from '@/shared/constants/chartUi.constants'
 import { CHART_DATA_KEY, CHART_SERIES_NAME } from '@/shared/constants/chartData.constants'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
-import { CHART_GRID_DASH } from '@/shared/constants/recharts.constants'
 import { STROKE_FILTER_OPTIONS, STROKE_LABELS } from '@/shared/constants/strokeLabels'
 import { APP_ROUTE, athleteDetailPath } from '@/shared/constants/routes.constants'
 import { ATHLETE_TRAINING_TYPE_LABELS } from '@/shared/constants/athleteTrainingTypeLabels'
@@ -67,7 +65,7 @@ export default function StatisticsPage() {
   )
   const athletes = useAthleteStore((athleteStore) => athleteStore.athletes)
   const chart = useChartTheme()
-  const { tickFontSize, marginTight, yAxisWidthBar } = useResponsiveChartLayout()
+  const { marginTight, yAxisWidthBar } = useResponsiveChartLayout()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [filters, setFilters] = useState<StatisticsFilters>(() =>
@@ -318,18 +316,18 @@ export default function StatisticsPage() {
                         margin={{ ...marginTight }}
                       >
                         <CartesianGrid
-                          strokeDasharray={CHART_GRID_DASH}
+                          strokeDasharray="3 3"
                           stroke={chart.grid}
                           vertical={false}
                         />
                         <XAxis
                           dataKey={CHART_DATA_KEY.WEEK_LABEL}
-                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
+                          tick={{ fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                         />
                         <YAxis
-                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
+                          tick={{ fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                           width={yAxisWidthBar}
@@ -341,7 +339,7 @@ export default function StatisticsPage() {
                         <Bar
                           dataKey={CHART_DATA_KEY.METERS}
                           fill={chart.chart1}
-                          radius={CHART_BAR_RADIUS}
+                          radius={[4, 4, 0, 0]}
                           name={CHART_SERIES_NAME.METERS}
                           cursor="pointer"
                           onClick={() => navigate(APP_ROUTE.athletes)}
@@ -361,18 +359,18 @@ export default function StatisticsPage() {
                         margin={{ ...marginTight }}
                       >
                         <CartesianGrid
-                          strokeDasharray={CHART_GRID_DASH}
+                          strokeDasharray="3 3"
                           stroke={chart.grid}
                           vertical={false}
                         />
                         <XAxis
                           dataKey={CHART_DATA_KEY.MONTH_LABEL}
-                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
+                          tick={{ fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                         />
                         <YAxis
-                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
+                          tick={{ fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                           width={yAxisWidthBar}
@@ -384,7 +382,7 @@ export default function StatisticsPage() {
                         <Bar
                           dataKey={CHART_DATA_KEY.METERS}
                           fill={chart.chart2}
-                          radius={CHART_BAR_RADIUS}
+                          radius={[4, 4, 0, 0]}
                           name={CHART_SERIES_NAME.METERS}
                           cursor="pointer"
                           onClick={() => navigate(APP_ROUTE.athletes)}
@@ -436,18 +434,18 @@ export default function StatisticsPage() {
                         margin={{ ...marginTight }}
                       >
                         <CartesianGrid
-                          strokeDasharray={CHART_GRID_DASH}
+                          strokeDasharray="3 3"
                           stroke={chart.grid}
                           vertical={false}
                         />
                         <XAxis
                           dataKey={CHART_DATA_KEY.WEEK_LABEL}
-                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
+                          tick={{ fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                         />
                         <YAxis
-                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
+                          tick={{ fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                           width={yAxisWidthBar}
@@ -459,7 +457,7 @@ export default function StatisticsPage() {
                         <Bar
                           dataKey="seconds"
                           fill={chart.chart3}
-                          radius={CHART_BAR_RADIUS}
+                          radius={[4, 4, 0, 0]}
                           name={CHART_SERIES_NAME.DURATION}
                           cursor="pointer"
                           onClick={() => navigate(APP_ROUTE.athletes)}
@@ -476,18 +474,18 @@ export default function StatisticsPage() {
                         margin={{ ...marginTight }}
                       >
                         <CartesianGrid
-                          strokeDasharray={CHART_GRID_DASH}
+                          strokeDasharray="3 3"
                           stroke={chart.grid}
                           vertical={false}
                         />
                         <XAxis
                           dataKey={CHART_DATA_KEY.MONTH_LABEL}
-                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
+                          tick={{ fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                         />
                         <YAxis
-                          tick={{ fontSize: tickFontSize, fill: chart.axis }}
+                          tick={{ fill: chart.axis }}
                           axisLine={false}
                           tickLine={false}
                           width={yAxisWidthBar}
@@ -499,7 +497,7 @@ export default function StatisticsPage() {
                         <Bar
                           dataKey="seconds"
                           fill={chart.chart4}
-                          radius={CHART_BAR_RADIUS}
+                          radius={[4, 4, 0, 0]}
                           name={CHART_SERIES_NAME.DURATION}
                           cursor="pointer"
                           onClick={() => navigate(APP_ROUTE.athletes)}

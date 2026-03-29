@@ -83,9 +83,6 @@ function parseGymBlock(raw: unknown): GymSessionBlock | null {
   }
 }
 
-/**
- * Coerce persisted JSON into a {@link TrainingSession}. Accepts v3 session rows or legacy flat workouts.
- */
 export function normalizePersistedTrainingSession(
   raw: unknown,
   fallbackAthleteId: string = LEGACY_IMPORT_ATHLETE_ID,

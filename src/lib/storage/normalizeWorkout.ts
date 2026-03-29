@@ -2,10 +2,6 @@ import { AthleteTrainingType, EffortLevel, PoolLength, Stroke } from '@/shared/d
 import { LEGACY_IMPORT_ATHLETE_ID } from '@/shared/constants/migration.constants'
 import type { LegacyWorkout } from '@/shared/types/legacy-workout.types'
 
-/**
- * Coerce persisted JSON into a flat legacy workout row (v2 / pre-session storage).
- * Legacy rows may omit `trainingType` / `athleteId`.
- */
 export function normalizePersistedLegacyWorkout(
   raw: unknown,
   fallbackAthleteId: string = LEGACY_IMPORT_ATHLETE_ID,
@@ -66,12 +62,4 @@ export function normalizePersistedLegacyWorkout(
   }
 
   return null
-}
-
-/** @deprecated Use {@link normalizePersistedLegacyWorkout} or {@link normalizePersistedTrainingSession}. */
-export function normalizePersistedWorkout(
-  raw: unknown,
-  fallbackAthleteId?: string,
-): LegacyWorkout | null {
-  return normalizePersistedLegacyWorkout(raw, fallbackAthleteId)
 }

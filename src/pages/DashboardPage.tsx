@@ -1,3 +1,4 @@
+import { format, parseISO } from 'date-fns'
 import { Activity, Clock, Gauge, Route, Timer, Users, Waves } from 'lucide-react'
 import { createSearchParams, Link } from 'react-router-dom'
 
@@ -24,8 +25,6 @@ import {
 } from '@/features/dashboard/helpers/dashboard.helpers'
 import { buildSwimmingSessionSummary } from '@/features/sessions/helpers/sessionSummary.helpers'
 import { getGymSessionTotalDurationSeconds } from '@/features/sessions/helpers/sessionTotals.helpers'
-import { DASHBOARD_CHART } from '@/shared/constants/chartRanges.constants'
-import { RESPONSIVE_SM_BUTTON_STRETCH_CLASS } from '@/shared/constants/responsiveTouchTarget.constants'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
 import { APP_ROUTE, sessionDetailPath } from '@/shared/constants/routes.constants'
 import { STATISTICS_SEARCH_PARAMS } from '@/shared/constants/statisticsUrlSearch.constants'
@@ -40,7 +39,6 @@ import {
   filterGymTrainingSessions,
   filterSwimmingTrainingSessions,
 } from '@/shared/helpers/sessionType.helpers'
-import { format, parseISO } from 'date-fns'
 
 export default function DashboardPage() {
   const coach = useCoachStore((coachStore) => coachStore.coach)
@@ -70,7 +68,7 @@ export default function DashboardPage() {
       (firstSession, secondSession) =>
         parseISO(secondSession.date).getTime() - parseISO(firstSession.date).getTime(),
     )
-    .slice(0, DASHBOARD_CHART.RECENT_SESSIONS)
+    .slice(0, 5)
 
   const weekRange = isoWeekRangeStrings()
   const thisWeekPoolHref = `${APP_ROUTE.statistics}?${createSearchParams({
@@ -241,7 +239,7 @@ export default function DashboardPage() {
                         {sessionSummary}
                       </p>
                     </div>
-                    <Button variant="ghost" asChild className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
+                    <Button variant="ghost" asChild className="min-h-10 w-full touch-manipulation sm:h-9 sm:min-h-0 sm:w-auto">
                       <Link to={sessionDetailPath(recentSession.athleteId, recentSession.id)}>
                         View
                       </Link>

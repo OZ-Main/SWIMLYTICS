@@ -22,13 +22,8 @@ const LINKS = [
 type MainNavProps = {
   id?: string
   className?: string
-  /**
-   * Desktop sidebar icon rail. Ignored in `drawer` mode.
-   */
   collapsed?: boolean
-  /** `drawer` — mobile sheet; `sidebar` — desktop aside. */
   mode?: 'sidebar' | 'drawer'
-  /** Called after a navigation item is activated (e.g. to close the mobile sheet). */
   onNavigate?: () => void
 }
 
@@ -42,7 +37,14 @@ export default function MainNav({
   const isDrawer = mode === 'drawer'
 
   function handleNavigate() {
-    onNavigate?.()
+    if (!onNavigate) {
+      return
+    }
+    if (isDrawer) {
+      window.setTimeout(() => onNavigate(), 0)
+      return
+    }
+    onNavigate()
   }
 
   return (

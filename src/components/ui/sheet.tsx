@@ -32,10 +32,20 @@ SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, onCloseAutoFocus, ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
-    <SheetPrimitive.Content ref={ref} className={cn(sheetContentVariants(), className)} {...props}>
+    <SheetPrimitive.Content
+      ref={ref}
+      className={cn(sheetContentVariants(), className)}
+      onCloseAutoFocus={(focusEvent) => {
+        onCloseAutoFocus?.(focusEvent)
+        if (!focusEvent.defaultPrevented) {
+          focusEvent.preventDefault()
+        }
+      }}
+      {...props}
+    >
       {children}
     </SheetPrimitive.Content>
   </SheetPortal>

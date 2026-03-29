@@ -90,7 +90,6 @@ export type SwimlyticsExportV3 = Omit<z.infer<typeof swimlyticsExportV3Schema>, 
   trainingSessions: TrainingSession[]
 }
 
-/** Legacy V1: swim-only workouts, PBs without athleteId. */
 const workoutV1Schema = z.object({
   id: z.string(),
   date: z.string(),
@@ -209,7 +208,6 @@ export function parseImportPayload(json: unknown): ParsedImport {
   return { ok: false, error: 'Invalid SWIMLYTICS export file.' }
 }
 
-/** When V1 import is applied, ensure this athlete exists in the athlete list. */
 export function legacyImportAthleteSeed(): Athlete {
   return {
     id: LEGACY_IMPORT_ATHLETE_ID,

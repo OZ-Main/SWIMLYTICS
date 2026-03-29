@@ -3,9 +3,6 @@ import { Outlet, useLocation } from 'react-router-dom'
 
 import { pageTransition } from '@/lib/motion'
 
-/**
- * Route-level enter/exit. Keeps shell static; only the main outlet animates.
- */
 export default function PageTransitionOutlet() {
   const location = useLocation()
   const reducedMotion = useReducedMotion()

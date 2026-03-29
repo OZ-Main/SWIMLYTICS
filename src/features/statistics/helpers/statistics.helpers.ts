@@ -8,7 +8,6 @@ import {
   getSwimmingSessionWeightedPacePer100Seconds,
 } from '@/features/sessions/helpers/sessionTotals.helpers'
 import { CALENDAR_MONTH_PAD, weekOptionsMonday } from '@/shared/constants/calendar.constants'
-import { STATISTICS_AGGREGATE } from '@/shared/constants/chartRanges.constants'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
 import {
   filterGymTrainingSessions,
@@ -20,6 +19,9 @@ import type {
   SwimmingTrainingSession,
   TrainingSession,
 } from '@/shared/types/domain.types'
+
+const statisticsWeeklyBucketsShown = 8
+const statisticsMonthlyBucketsShown = 6
 
 export type SwimmingStatisticsAggregate = {
   sessionCount: number
@@ -135,7 +137,7 @@ export function buildSwimmingStatisticsAggregate(
 
   const weeklyTotalsMeters = [...distanceByWeekKey.entries()]
     .sort(([leftWeekKey], [rightWeekKey]) => leftWeekKey.localeCompare(rightWeekKey))
-    .slice(-STATISTICS_AGGREGATE.WEEKLY_BUCKETS_SHOWN)
+    .slice(-statisticsWeeklyBucketsShown)
     .map(([weekBucketKey, meters]) => ({
       weekLabel: format(
         parse(weekBucketKey, DATE_FORMAT.STATS_WEEK_BUCKET_KEY, new Date()),
@@ -146,7 +148,7 @@ export function buildSwimmingStatisticsAggregate(
 
   const monthlyTotalsMeters = [...distanceByMonthKey.entries()]
     .sort(([leftMonthKey], [rightMonthKey]) => leftMonthKey.localeCompare(rightMonthKey))
-    .slice(-STATISTICS_AGGREGATE.MONTHLY_BUCKETS_SHOWN)
+    .slice(-statisticsMonthlyBucketsShown)
     .map(([monthBucketKey, meters]) => ({
       monthLabel: formatMonthBucketLabel(monthBucketKey),
       meters: Math.round(meters),
@@ -216,7 +218,7 @@ export function buildGymStatisticsAggregate(
 
   const weeklyTotalsSeconds = [...secondsByWeekKey.entries()]
     .sort(([leftWeekKey], [rightWeekKey]) => leftWeekKey.localeCompare(rightWeekKey))
-    .slice(-STATISTICS_AGGREGATE.WEEKLY_BUCKETS_SHOWN)
+    .slice(-statisticsWeeklyBucketsShown)
     .map(([weekBucketKey, seconds]) => ({
       weekLabel: format(
         parse(weekBucketKey, DATE_FORMAT.STATS_WEEK_BUCKET_KEY, new Date()),
@@ -227,7 +229,7 @@ export function buildGymStatisticsAggregate(
 
   const monthlyTotalsSeconds = [...secondsByMonthKey.entries()]
     .sort(([leftMonthKey], [rightMonthKey]) => leftMonthKey.localeCompare(rightMonthKey))
-    .slice(-STATISTICS_AGGREGATE.MONTHLY_BUCKETS_SHOWN)
+    .slice(-statisticsMonthlyBucketsShown)
     .map(([monthBucketKey, seconds]) => ({
       monthLabel: formatMonthBucketLabel(monthBucketKey),
       seconds: Math.round(seconds),

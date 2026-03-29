@@ -15,6 +15,7 @@ type ChartCardProps = {
   description?: string
   children: React.ReactNode
   contentClassName?: string
+  rootClassName?: string
 }
 
 export default function ChartCard({
@@ -22,9 +23,10 @@ export default function ChartCard({
   description,
   children,
   contentClassName,
+  rootClassName,
 }: ChartCardProps) {
   return (
-    <Card className={chartCardRootVariants()}>
+    <Card className={cn(chartCardRootVariants(), rootClassName)}>
       <CardHeader className={chartCardHeaderVariants()}>
         <CardTitle className={chartCardTitleVariants()}>{title}</CardTitle>
         {description ? (

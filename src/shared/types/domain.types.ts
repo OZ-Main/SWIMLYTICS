@@ -23,7 +23,6 @@ export type {
   SwimmingBlockCategory,
 } from '@/shared/domain'
 
-/** Discriminator literals — avoids magic strings in domain logic. */
 export const SESSION_BLOCK_KIND = {
   Swimming: 'swimming',
   Gym: 'gym',
@@ -31,7 +30,6 @@ export const SESSION_BLOCK_KIND = {
 
 export type SessionBlockKind = (typeof SESSION_BLOCK_KIND)[keyof typeof SESSION_BLOCK_KIND]
 
-/** Local coach profile (single-user install; ready for future multi-coach sync). */
 export type Coach = {
   id: string
   displayName: string
@@ -69,10 +67,8 @@ export type SwimmingSessionBlock = TrainingSessionBlockBase & {
   stroke: Stroke
   effortLevel: EffortLevel
   poolLength: PoolLength
-  /** When both > 0, distance = repetitions × distancePerRepMeters. */
   repetitions: number
   distancePerRepMeters: number
-  /** Used when repetitions or per-rep distance is zero (simple continuous distance). */
   explicitTotalDistanceMeters: number
   durationSeconds: number
   drillType: DrillType
@@ -111,7 +107,6 @@ export type GymTrainingSession = TrainingSessionBase & {
 
 export type TrainingSession = SwimmingTrainingSession | GymTrainingSession
 
-/** Aggregates for swimming-style training (meters / pace). */
 export type DashboardSummary = {
   totalSessions: number
   totalDistanceMeters: number
@@ -120,7 +115,6 @@ export type DashboardSummary = {
   currentWeekDistanceMeters: number
 }
 
-/** Aggregates for gym-style training. */
 export type GymDashboardSummary = {
   sessionCount: number
   totalDurationSeconds: number

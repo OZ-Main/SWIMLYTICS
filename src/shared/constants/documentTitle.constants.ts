@@ -1,6 +1,5 @@
 import { APP_ROUTE } from '@/shared/constants/routes.constants'
 
-/** Browser tab titles (not including product suffix). */
 export const DOCUMENT_TITLE = {
   APP: 'SWIMLYTICS',
   DASHBOARD: 'Dashboard',
@@ -18,7 +17,6 @@ export const DOCUMENT_TITLE = {
 
 export const DOCUMENT_TITLE_SUFFIX = ` · ${DOCUMENT_TITLE.APP}`
 
-/** Match pathname to title (dynamic athlete/workout segments). */
 export function documentTitleForPathname(pathname: string): string {
   const p = pathname.replace(/\/$/, '') || '/'
 

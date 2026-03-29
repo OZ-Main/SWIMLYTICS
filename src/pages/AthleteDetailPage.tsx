@@ -48,9 +48,7 @@ import { buildSwimmingSessionSummary } from '@/features/sessions/helpers/session
 import { getGymSessionTotalDurationSeconds } from '@/features/sessions/helpers/sessionTotals.helpers'
 import type { SessionListFilters } from '@/features/sessions/types/session-filters.types'
 import { ATHLETE_TRAINING_TYPE_LABELS } from '@/shared/constants/athleteTrainingTypeLabels'
-import { DASHBOARD_CHART } from '@/shared/constants/chartRanges.constants'
 import { EFFORT_LABELS, EFFORT_OPTIONS } from '@/shared/constants/effortLabels'
-import { RESPONSIVE_SM_BUTTON_STRETCH_CLASS } from '@/shared/constants/responsiveTouchTarget.constants'
 import {
   APP_ROUTE,
   athleteEditPath,
@@ -203,7 +201,7 @@ export default function AthleteDetailPage() {
       (leftSession, rightSession) =>
         parseISO(rightSession.date).getTime() - parseISO(leftSession.date).getTime(),
     )
-    .slice(0, DASHBOARD_CHART.RECENT_SESSIONS)
+    .slice(0, 5)
 
   return (
     <div className="page-stack">
@@ -217,18 +215,18 @@ export default function AthleteDetailPage() {
           </p>
         </div>
         <div className="flex w-full min-w-0 flex-col gap-tight sm:w-auto sm:flex-row sm:flex-wrap">
-          <Button variant="outline" size="sm" asChild className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
+          <Button variant="outline" size="sm" asChild className="min-h-10 w-full touch-manipulation sm:h-9 sm:min-h-0 sm:w-auto">
             <Link to={athleteEditPath(athlete.id)}>
               <Pencil className="h-4 w-4" aria-hidden />
               Edit
             </Link>
           </Button>
           {athlete.trainingType === AthleteTrainingType.Swimming ? (
-            <Button variant="secondary" size="sm" asChild className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
+            <Button variant="secondary" size="sm" asChild className="min-h-10 w-full touch-manipulation sm:h-9 sm:min-h-0 sm:w-auto">
               <Link to={athletePersonalBestsPath(athlete.id)}>Personal bests</Link>
             </Button>
           ) : null}
-          <Button size="sm" asChild className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
+          <Button size="sm" asChild className="min-h-10 w-full touch-manipulation sm:h-9 sm:min-h-0 sm:w-auto">
             <Link to={athleteSessionNewPath(athlete.id)}>
               <Plus className="h-4 w-4" aria-hidden />
               Log session
@@ -237,7 +235,7 @@ export default function AthleteDetailPage() {
           <Button
             variant="destructive"
             size="sm"
-            className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}
+            className="min-h-10 w-full touch-manipulation sm:h-9 sm:min-h-0 sm:w-auto"
             onClick={() => setRemoveOpen(true)}
           >
             <Trash2 className="h-4 w-4" aria-hidden />
@@ -368,7 +366,7 @@ export default function AthleteDetailPage() {
                         : '—'}
                   </p>
                 </div>
-                <Button variant="ghost" asChild className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
+                <Button variant="ghost" asChild className="min-h-10 w-full touch-manipulation sm:h-9 sm:min-h-0 sm:w-auto">
                   <Link to={sessionDetailPath(athlete.id, recentSession.id)}>View</Link>
                 </Button>
               </div>
@@ -385,7 +383,7 @@ export default function AthleteDetailPage() {
               Filter history by date, stroke, or effort.
             </p>
           </div>
-          <Button asChild size="sm" className={RESPONSIVE_SM_BUTTON_STRETCH_CLASS}>
+          <Button asChild size="sm" className="min-h-10 w-full touch-manipulation sm:h-9 sm:min-h-0 sm:w-auto">
             <Link to={athleteSessionNewPath(athlete.id)}>
               <Plus className="h-4 w-4" aria-hidden />
               New session

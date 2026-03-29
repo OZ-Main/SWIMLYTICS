@@ -29,7 +29,6 @@ import {
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
 import { EFFORT_LABELS } from '@/shared/constants/effortLabels'
 import { GYM_BLOCK_CATEGORY_LABEL } from '@/shared/constants/gymBlockCategoryLabels'
-import { RESPONSIVE_DEFAULT_BUTTON_STRETCH_CLASS } from '@/shared/constants/responsiveTouchTarget.constants'
 import {
   APP_ROUTE,
   athleteDetailPath,
@@ -115,7 +114,7 @@ export default function SessionDetailPage() {
             </p>
           </div>
           <div className="flex w-full min-w-0 flex-col gap-tight sm:w-auto sm:flex-row sm:flex-wrap">
-            <Button variant="outline" asChild className={RESPONSIVE_DEFAULT_BUTTON_STRETCH_CLASS}>
+            <Button variant="outline" asChild className="min-h-10 w-full touch-manipulation sm:min-h-10 sm:min-h-0 sm:w-auto">
               <Link to={sessionEditPath(athleteId, activeSession.id)}>
                 <Pencil className="h-4 w-4" aria-hidden />
                 Edit
@@ -123,7 +122,7 @@ export default function SessionDetailPage() {
             </Button>
             <Button
               variant="destructive"
-              className={RESPONSIVE_DEFAULT_BUTTON_STRETCH_CLASS}
+              className="min-h-10 w-full touch-manipulation sm:min-h-10 sm:min-h-0 sm:w-auto"
               onClick={() => setConfirmOpen(true)}
             >
               <Trash2 className="h-4 w-4" aria-hidden />
@@ -225,7 +224,7 @@ export default function SessionDetailPage() {
           </p>
         </div>
         <div className="flex w-full min-w-0 flex-col gap-tight sm:w-auto sm:flex-row sm:flex-wrap">
-          <Button variant="outline" asChild className={RESPONSIVE_DEFAULT_BUTTON_STRETCH_CLASS}>
+          <Button variant="outline" asChild className="min-h-10 w-full touch-manipulation sm:min-h-10 sm:min-h-0 sm:w-auto">
             <Link to={sessionEditPath(athleteId, activeSession.id)}>
               <Pencil className="h-4 w-4" aria-hidden />
               Edit
@@ -233,7 +232,7 @@ export default function SessionDetailPage() {
           </Button>
           <Button
             variant="destructive"
-            className={RESPONSIVE_DEFAULT_BUTTON_STRETCH_CLASS}
+            className="min-h-10 w-full touch-manipulation sm:min-h-10 sm:min-h-0 sm:w-auto"
             onClick={() => setConfirmOpen(true)}
           >
             <Trash2 className="h-4 w-4" aria-hidden />

@@ -20,7 +20,6 @@ function hslFromVar(cssVarName: string, root: HTMLElement): string {
   return `hsl(${raw})`
 }
 
-/** SSR / pre-paint fallback — aligned with `globals.css` chart + stroke tokens. */
 const FALLBACK_THEME: ResolvedChartTheme = {
   chart1: 'hsl(198 75% 42%)',
   chart2: 'hsl(186 78% 40%)',

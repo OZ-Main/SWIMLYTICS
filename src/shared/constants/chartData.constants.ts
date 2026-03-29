@@ -1,6 +1,3 @@
-/**
- * Recharts `dataKey` / series `name` values — must match tooltip formatters.
- */
 export const CHART_DATA_KEY = {
   VALUE: 'value',
   NAME: 'name',
@@ -14,6 +11,5 @@ export const CHART_DATA_KEY = {
 export const CHART_SERIES_NAME = {
   METERS: 'Meters',
   PACE: 'Pace',
-  /** Total session time (tooltip uses duration formatter). */
   DURATION: 'Duration',
 } as const

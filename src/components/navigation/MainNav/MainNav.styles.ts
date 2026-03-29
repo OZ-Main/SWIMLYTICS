@@ -38,7 +38,6 @@ export const mainNavLinkVariants = cva(
   },
 )
 
-/** Touch-friendly links for the mobile navigation drawer. */
 export const mainNavDrawerLinkVariants = cva(
   'flex min-h-12 w-full items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-[background-color,color] duration-motion-fast ease-motion-out md:min-h-11 md:text-body',
   {
