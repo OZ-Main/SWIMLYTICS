@@ -6,12 +6,14 @@ import { useCoachStore } from '@/app/store/coachStore'
 import { usePersonalBestsStore } from '@/app/store/personalBestsStore'
 import { useSettingsStore } from '@/app/store/settingsStore'
 import { useTrainingSessionStore } from '@/app/store/trainingSessionStore'
+import { useWorkoutTemplateStore } from '@/app/store/workoutTemplateStore'
 import { getFirestoreDb } from '@/lib/firebase/firestoreDb'
 import {
   FIRESTORE_ATHLETES_SUBCOLLECTION,
   FIRESTORE_PERSONAL_BESTS_SUBCOLLECTION,
   FIRESTORE_SESSIONS_SUBCOLLECTION,
   FIRESTORE_USERS_COLLECTION,
+  FIRESTORE_WORKOUT_TEMPLATES_SUBCOLLECTION,
 } from '@/lib/firebase/firestorePaths'
 import { stripUndefinedDeep } from '@/lib/firebase/stripUndefinedDeep'
 import {
@@ -20,10 +22,23 @@ import {
   parseUserProfileSnapshot,
   userProfileDocumentRef,
 } from '@/lib/firebase/userProfileRepository'
-import type { Athlete, PersonalBest, TrainingSession } from '@/shared/types/domain.types'
+import type { Athlete, PersonalBest, TrainingSession, WorkoutTemplate } from '@/shared/types/domain.types'
 
 function mapAthleteDocument(documentId: string, raw: Record<string, unknown>): Athlete {
-  return { ...raw, id: documentId } as Athlete
+  const parsed = { ...raw, id: documentId } as Athlete
+  const groupRaw = raw.group
+  if (typeof groupRaw === 'string') {
+    return { ...parsed, group: groupRaw }
+  }
+
+  return { ...parsed, group: '' }
+}
+
+function mapWorkoutTemplateDocument(
+  documentId: string,
+  raw: Record<string, unknown>,
+): WorkoutTemplate {
+  return { ...raw, id: documentId } as WorkoutTemplate
 }
 
 function mapSessionDocument(documentId: string, raw: Record<string, unknown>): TrainingSession {
@@ -54,15 +69,18 @@ export function subscribeCoachFirestore(firebaseUser: User): Unsubscribe {
         )
         return
       }
+
       const parsed = parseUserProfileSnapshot(uid, snapshot.data() as Record<string, unknown>)
       useCoachStore.getState().replaceCoach(parsed.coach)
       const settingsState = useSettingsStore.getState()
       if (settingsState.theme !== parsed.theme) {
         settingsState.setTheme(parsed.theme)
       }
+
       if (settingsState.initialSampleApplied !== parsed.initialSampleApplied) {
         settingsState.setInitialSampleApplied(parsed.initialSampleApplied)
       }
+
       useCoachStore.getState().setProfileReady(true)
     }),
   )
@@ -93,6 +111,18 @@ export function subscribeCoachFirestore(firebaseUser: User): Unsubscribe {
           mapPersonalBestDocument(documentSnapshot.id, documentSnapshot.data() as Record<string, unknown>),
         )
         usePersonalBestsStore.getState().replaceAllPersonalBests(personalBests)
+      },
+    ),
+  )
+
+  unsubs.push(
+    onSnapshot(
+      collection(db, FIRESTORE_USERS_COLLECTION, uid, FIRESTORE_WORKOUT_TEMPLATES_SUBCOLLECTION),
+      (snap) => {
+        const workoutTemplates = snap.docs.map((documentSnapshot) =>
+          mapWorkoutTemplateDocument(documentSnapshot.id, documentSnapshot.data() as Record<string, unknown>),
+        )
+        useWorkoutTemplateStore.getState().replaceAllWorkoutTemplates(workoutTemplates)
       },
     ),
   )

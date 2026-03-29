@@ -6,6 +6,9 @@ export const APP_ROUTE = {
   athleteNew: '/athletes/new',
   statistics: '/statistics',
   settings: '/settings',
+  workoutTemplates: '/workout-templates',
+  workoutTemplateNew: '/workout-templates/new',
+  assignmentsNew: '/assignments/new',
 } as const
 
 export function athleteDetailPath(athleteId: string): string {
@@ -32,6 +35,10 @@ export function athletePersonalBestsPath(athleteId: string): string {
   return `${APP_ROUTE.athletes}/${athleteId}/personal-bests`
 }
 
+export function workoutTemplateEditPath(templateId: string): string {
+  return `${APP_ROUTE.workoutTemplates}/${templateId}/edit`
+}
+
 export const ROUTE_SEGMENT = {
   index: '',
   login: 'login',
@@ -45,10 +52,14 @@ export const ROUTE_SEGMENT = {
   sessionIdParam: ':sessionId',
   statistics: 'statistics',
   settings: 'settings',
+  workoutTemplates: 'workout-templates',
+  assignments: 'assignments',
+  templateIdParam: ':templateId',
   wildcard: '*',
 } as const
 
 export const ROUTE_PARAM = {
   athleteId: 'athleteId',
   sessionId: 'sessionId',
+  templateId: 'templateId',
 } as const

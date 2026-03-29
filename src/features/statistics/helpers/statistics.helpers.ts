@@ -51,6 +51,7 @@ function resolveMostFrequentStrokeByBlockDistance(
   if (swimmingSessions.length === 0) {
     return null
   }
+
   const distanceByStroke = new Map<Stroke, number>()
   for (const session of swimmingSessions) {
     for (const block of session.blocks) {
@@ -58,6 +59,7 @@ function resolveMostFrequentStrokeByBlockDistance(
       distanceByStroke.set(block.stroke, (distanceByStroke.get(block.stroke) ?? 0) + blockMeters)
     }
   }
+
   let winningStroke: Stroke | null = null
   let highestMeters = 0
   for (const [stroke, meters] of distanceByStroke) {
@@ -66,6 +68,7 @@ function resolveMostFrequentStrokeByBlockDistance(
       winningStroke = stroke
     }
   }
+
   return winningStroke
 }
 
@@ -74,6 +77,7 @@ function formatMonthBucketLabel(monthKey: string): string {
   if (!yearPart || !monthPart) {
     return monthKey
   }
+
   const monthDate = new Date(Number(yearPart), Number(monthPart) - 1, 1)
   return format(monthDate, DATE_FORMAT.STATS_MONTH_LABEL)
 }

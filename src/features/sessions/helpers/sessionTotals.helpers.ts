@@ -43,6 +43,7 @@ export function getSwimmingSessionPrimaryStroke(session: SwimmingTrainingSession
     const blockMeters = calculateSwimmingBlockDistanceMeters(block)
     distanceByStroke.set(block.stroke, (distanceByStroke.get(block.stroke) ?? 0) + blockMeters)
   }
+
   let primaryStroke: Stroke | null = null
   let maxMeters = 0
   for (const [stroke, meters] of distanceByStroke) {
@@ -51,6 +52,7 @@ export function getSwimmingSessionPrimaryStroke(session: SwimmingTrainingSession
       primaryStroke = stroke
     }
   }
+
   return primaryStroke
 }
 
@@ -59,5 +61,6 @@ export function formatSwimmingBlockDistanceSummary(block: SwimmingSessionBlock):
   if (block.repetitions > 1 && block.distancePerRepMeters > 0) {
     return `${block.repetitions}×${block.distancePerRepMeters} m (${totalMeters} m)`
   }
+
   return `${totalMeters} m`
 }

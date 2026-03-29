@@ -15,8 +15,20 @@ import { EFFORT_LABELS, EFFORT_LEVEL_ORDER } from '@/shared/constants/effortLabe
 import { SWIM_EQUIPMENT_LABEL, SWIM_EQUIPMENT_ORDER } from '@/shared/constants/swimEquipmentLabels'
 import { SWIMMING_BLOCK_CATEGORY_LABEL, SWIMMING_BLOCK_CATEGORY_ORDER } from '@/shared/constants/swimmingBlockCategoryLabels'
 import { STROKE_LABELS, STROKE_ORDER } from '@/shared/constants/strokeLabels'
+import { SESSION_PERSISTENCE_FIELD_LIMITS } from '@/shared/constants/sessionPersistenceValidation.constants'
+import {
+  GYM_DURATION,
+  GYM_SESSION_FOCUS,
+  WORKOUT_DISTANCE,
+  WORKOUT_DURATION,
+  WORKOUT_NOTES,
+} from '@/shared/constants/workoutValidation.constants'
 import { DrillType, PoolLength, SwimEquipment } from '@/shared/domain'
 import { calculateSwimmingBlockDistanceMeters } from '@/features/sessions/helpers/sessionBlockDistance.helpers'
+import {
+  formatTrainingBlockDurationMinutesField,
+  parseTrainingBlockDurationMinutesToSeconds,
+} from '@/shared/helpers/duration.helpers'
 import { formatDistanceMeters } from '@/shared/helpers/formatters'
 import type { GymSessionBlock, SwimmingSessionBlock } from '@/shared/types/domain.types'
 
@@ -37,6 +49,7 @@ export function SessionBuilderSwimmingBlockFields({
         <Label>Title</Label>
         <Input
           value={block.title}
+          maxLength={SESSION_PERSISTENCE_FIELD_LIMITS.BLOCK_TITLE_MAX_LENGTH}
           onChange={(changeEvent) => onUpdate({ title: changeEvent.target.value })}
         />
       </div>
@@ -120,9 +133,15 @@ export function SessionBuilderSwimmingBlockFields({
         <Input
           type="number"
           min={0}
+          max={SESSION_PERSISTENCE_FIELD_LIMITS.SWIM_REPETITIONS_MAX}
           value={block.repetitions || ''}
           onChange={(changeEvent) =>
-            onUpdate({ repetitions: Math.max(0, Number(changeEvent.target.value) || 0) })
+            onUpdate({
+              repetitions: Math.min(
+                SESSION_PERSISTENCE_FIELD_LIMITS.SWIM_REPETITIONS_MAX,
+                Math.max(0, Number(changeEvent.target.value) || 0),
+              ),
+            })
           }
           placeholder="0 = use single distance below"
         />
@@ -143,10 +162,14 @@ export function SessionBuilderSwimmingBlockFields({
         <Input
           type="number"
           min={0}
+          max={WORKOUT_DISTANCE.MAX_METERS}
           value={block.explicitTotalDistanceMeters || ''}
           onChange={(changeEvent) =>
             onUpdate({
-              explicitTotalDistanceMeters: Math.max(0, Number(changeEvent.target.value) || 0),
+              explicitTotalDistanceMeters: Math.min(
+                WORKOUT_DISTANCE.MAX_METERS,
+                Math.max(0, Number(changeEvent.target.value) || 0),
+              ),
             })
           }
         />
@@ -158,13 +181,20 @@ export function SessionBuilderSwimmingBlockFields({
         </p>
       </div>
       <div className="space-y-tight">
-        <Label>Duration (seconds)</Label>
+        <Label>Duration (minutes)</Label>
         <Input
           type="number"
           min={0}
-          value={block.durationSeconds || ''}
+          max={WORKOUT_DURATION.MAX_MINUTES}
+          step="any"
+          value={formatTrainingBlockDurationMinutesField(block.durationSeconds)}
           onChange={(changeEvent) =>
-            onUpdate({ durationSeconds: Math.max(0, Number(changeEvent.target.value) || 0) })
+            onUpdate({
+              durationSeconds: parseTrainingBlockDurationMinutesToSeconds(
+                changeEvent.target.value,
+                WORKOUT_DURATION.MAX_MINUTES,
+              ),
+            })
           }
         />
       </div>
@@ -191,12 +221,26 @@ export function SessionBuilderSwimmingBlockFields({
         <Input
           type="number"
           min={0}
+          max={SESSION_PERSISTENCE_FIELD_LIMITS.INTERVAL_SENDOFF_MAX_SECONDS}
           value={block.intervalSendoffSeconds ?? ''}
           onChange={(changeEvent) => {
             const raw = changeEvent.target.value
-            onUpdate({
-              intervalSendoffSeconds: raw === '' ? null : Math.max(0, Number(raw)),
-            })
+            if (raw === '') {
+              onUpdate({ intervalSendoffSeconds: null })
+              return
+            }
+
+            const parsedSeconds = Number(raw)
+            if (!Number.isFinite(parsedSeconds) || parsedSeconds < 0) {
+              onUpdate({ intervalSendoffSeconds: null })
+              return
+            }
+
+            const capped = Math.min(
+              SESSION_PERSISTENCE_FIELD_LIMITS.INTERVAL_SENDOFF_MAX_SECONDS,
+              Math.floor(parsedSeconds),
+            )
+            onUpdate({ intervalSendoffSeconds: capped })
           }}
           placeholder="Optional"
         />
@@ -226,6 +270,7 @@ export function SessionBuilderSwimmingBlockFields({
         <Textarea
           className="min-h-[4rem] resize-y"
           value={block.notes}
+          maxLength={WORKOUT_NOTES.MAX_LENGTH}
           onChange={(changeEvent) => onUpdate({ notes: changeEvent.target.value })}
         />
       </div>
@@ -245,6 +290,7 @@ export function SessionBuilderGymBlockFields({ block, onUpdate }: GymBlockFields
         <Label>Title</Label>
         <Input
           value={block.title}
+          maxLength={SESSION_PERSISTENCE_FIELD_LIMITS.BLOCK_TITLE_MAX_LENGTH}
           onChange={(changeEvent) => onUpdate({ title: changeEvent.target.value })}
         />
       </div>
@@ -292,18 +338,26 @@ export function SessionBuilderGymBlockFields({ block, onUpdate }: GymBlockFields
         <Label>Focus</Label>
         <Input
           value={block.focus}
+          maxLength={GYM_SESSION_FOCUS.MAX_LENGTH}
           onChange={(changeEvent) => onUpdate({ focus: changeEvent.target.value })}
           placeholder="e.g. Squat / Bench / Conditioning circuit"
         />
       </div>
       <div className="space-y-tight sm:col-span-2">
-        <Label>Duration (seconds)</Label>
+        <Label>Duration (minutes)</Label>
         <Input
           type="number"
           min={0}
-          value={block.durationSeconds || ''}
+          max={GYM_DURATION.MAX_MINUTES}
+          step="any"
+          value={formatTrainingBlockDurationMinutesField(block.durationSeconds)}
           onChange={(changeEvent) =>
-            onUpdate({ durationSeconds: Math.max(0, Number(changeEvent.target.value) || 0) })
+            onUpdate({
+              durationSeconds: parseTrainingBlockDurationMinutesToSeconds(
+                changeEvent.target.value,
+                GYM_DURATION.MAX_MINUTES,
+              ),
+            })
           }
         />
       </div>
@@ -312,6 +366,7 @@ export function SessionBuilderGymBlockFields({ block, onUpdate }: GymBlockFields
         <Textarea
           className="min-h-[4rem] resize-y"
           value={block.notes}
+          maxLength={WORKOUT_NOTES.MAX_LENGTH}
           onChange={(changeEvent) => onUpdate({ notes: changeEvent.target.value })}
         />
       </div>

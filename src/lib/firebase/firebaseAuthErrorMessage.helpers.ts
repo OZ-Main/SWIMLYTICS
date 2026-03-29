@@ -30,5 +30,6 @@ export function coachAuthErrorMessage(error: unknown): string {
         return 'Something went wrong. Please try again.'
     }
   }
+
   return 'Something went wrong. Please try again.'
 }

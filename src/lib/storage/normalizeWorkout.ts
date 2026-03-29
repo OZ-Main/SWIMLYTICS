@@ -9,15 +9,18 @@ export function normalizePersistedLegacyWorkout(
   if (!raw || typeof raw !== 'object') {
     return null
   }
+
   const record = raw as Record<string, unknown>
   if (Array.isArray(record.blocks)) {
     return null
   }
+
   const id = String(record.id ?? '')
   const date = String(record.date ?? '')
   if (!id || !date) {
     return null
   }
+
   const athleteId = String(record.athleteId ?? fallbackAthleteId)
   const notes = String(record.notes ?? '')
 

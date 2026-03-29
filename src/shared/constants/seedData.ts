@@ -20,6 +20,7 @@ import {
   type SwimmingSessionBlock,
   type SwimmingTrainingSession,
   type TrainingSession,
+  type WorkoutTemplate,
 } from '@/shared/types/domain.types'
 
 const SEED_SESSION_ID_PREFIX = 'seed-s'
@@ -40,6 +41,7 @@ export const SEED_ATHLETES: Athlete[] = [
     id: SEED_ATHLETE_SWIM_ID,
     fullName: 'Alex Rivera',
     trainingType: AthleteTrainingType.Swimming,
+    group: 'Senior Performance',
     notes: 'Distance free / IM focus.',
     createdAt: daysAgoISO(120),
   },
@@ -47,6 +49,7 @@ export const SEED_ATHLETES: Athlete[] = [
     id: SEED_ATHLETE_GYM_ID,
     fullName: 'Jordan Lee',
     trainingType: AthleteTrainingType.Gym,
+    group: 'Gym Group 1',
     notes: 'Hypertrophy block — log RPE in notes.',
     createdAt: daysAgoISO(90),
   },
@@ -328,6 +331,59 @@ const SEED_GYM_SESSIONS: GymTrainingSession[] = [
 export const SEED_TRAINING_SESSIONS: TrainingSession[] = [
   ...SEED_SWIM_SESSIONS,
   ...SEED_GYM_SESSIONS,
+]
+
+const SEED_WORKOUT_TEMPLATE_TIMESTAMP = new Date().toISOString()
+
+export const SEED_WORKOUT_TEMPLATES: WorkoutTemplate[] = [
+  {
+    id: 'seed-workout-template-swim-aerobic',
+    title: 'Aerobic threshold (template)',
+    description: 'Reusable steady aerobic main set for assignment to swim athletes.',
+    targetGroup: 'Senior Performance',
+    tags: ['aerobic', 'freestyle'],
+    createdAt: SEED_WORKOUT_TEMPLATE_TIMESTAMP,
+    updatedAt: SEED_WORKOUT_TEMPLATE_TIMESTAMP,
+    trainingType: AthleteTrainingType.Swimming,
+    defaultPoolLength: PoolLength.Meters25,
+    blocks: [
+      swimBlock('seed-wt-swim-b0', 0, {
+        title: 'Continuous free',
+        notes: '',
+        category: SwimmingBlockCategory.MainSet,
+        stroke: Stroke.Freestyle,
+        effortLevel: EffortLevel.Moderate,
+        poolLength: PoolLength.Meters25,
+        repetitions: 1,
+        distancePerRepMeters: 2000,
+        explicitTotalDistanceMeters: 0,
+        durationSeconds: totalSecondsFromMinutesAndSeconds(38, 20),
+        drillType: DrillType.None,
+        intervalSendoffSeconds: null,
+        equipment: [],
+      }),
+    ],
+  },
+  {
+    id: 'seed-workout-template-gym-upper',
+    title: 'Upper push + core (template)',
+    description: 'Gym template for upper-body focused days.',
+    targetGroup: 'Gym Group 1',
+    tags: ['strength', 'upper'],
+    createdAt: SEED_WORKOUT_TEMPLATE_TIMESTAMP,
+    updatedAt: SEED_WORKOUT_TEMPLATE_TIMESTAMP,
+    trainingType: AthleteTrainingType.Gym,
+    blocks: [
+      gymBlock('seed-wt-gym-b0', 0, {
+        title: 'Upper + core',
+        notes: '',
+        category: GymBlockCategory.MainLift,
+        focus: 'Upper push + core',
+        durationSeconds: totalSecondsFromMinutesAndSeconds(52, 0),
+        effortLevel: EffortLevel.Hard,
+      }),
+    ],
+  },
 ]
 
 export const SEED_PERSONAL_BESTS: PersonalBest[] = [

@@ -50,7 +50,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="px-page-padding-x flex min-h-screen flex-col items-center justify-center bg-background py-section">
+    <div className="px-page-padding-x mx-4 flex min-h-screen flex-col items-center justify-center bg-background py-section">
       <Card className="w-full max-w-md overflow-hidden shadow-card">
         <CardHeader className="page-section-header">
           <CardTitle className="page-section-title">Sign in</CardTitle>

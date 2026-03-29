@@ -15,6 +15,7 @@ function requiredEnv(name: FirebaseEnvKey): string {
       `Missing or empty ${name}. Copy .env.example to .env and set Firebase Web config values.`,
     )
   }
+
   return value.trim()
 }
 

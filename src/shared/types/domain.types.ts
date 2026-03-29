@@ -36,10 +36,13 @@ export type Coach = {
   createdAt: string
 }
 
+export type AthleteGroupLabel = string
+
 export type Athlete = {
   id: string
   fullName: string
   trainingType: AthleteTrainingType
+  group: AthleteGroupLabel
   notes: string
   createdAt: string
 }
@@ -92,6 +95,7 @@ export type TrainingSessionBase = {
   notes: string
   createdAt: string
   updatedAt: string
+  sourceTemplateId?: string | null
 }
 
 export type SwimmingTrainingSession = TrainingSessionBase & {
@@ -106,6 +110,37 @@ export type GymTrainingSession = TrainingSessionBase & {
 }
 
 export type TrainingSession = SwimmingTrainingSession | GymTrainingSession
+
+export type WorkoutTemplateTag = string
+
+export type WorkoutTemplateBase = {
+  id: string
+  title: string
+  description: string
+  targetGroup: string
+  tags: WorkoutTemplateTag[]
+  createdAt: string
+  updatedAt: string
+}
+
+export type SwimmingWorkoutTemplate = WorkoutTemplateBase & {
+  trainingType: typeof AttTypeEnum.Swimming
+  defaultPoolLength: PoolLength
+  blocks: SwimmingSessionBlock[]
+}
+
+export type GymWorkoutTemplate = WorkoutTemplateBase & {
+  trainingType: typeof AttTypeEnum.Gym
+  blocks: GymSessionBlock[]
+}
+
+export type WorkoutTemplate = SwimmingWorkoutTemplate | GymWorkoutTemplate
+
+export type TemplateAssignmentInput = {
+  templateId: string
+  assignmentDate: string
+  athleteIds: string[]
+}
 
 export type DashboardSummary = {
   totalSessions: number

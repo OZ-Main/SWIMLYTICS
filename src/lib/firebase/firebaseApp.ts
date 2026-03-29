@@ -8,5 +8,6 @@ export function getFirebaseApp(): FirebaseApp {
   if (!firebaseApp) {
     firebaseApp = initializeApp(readFirebaseWebConfig())
   }
+
   return firebaseApp
 }

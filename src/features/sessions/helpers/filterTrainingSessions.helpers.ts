@@ -14,6 +14,7 @@ function sessionHasEffortLevel(
   if (effortLevel === WORKOUT_FILTER_ALL) {
     return true
   }
+
   return session.blocks.some((block) => block.effortLevel === effortLevel)
 }
 
@@ -28,15 +29,19 @@ export function filterTrainingSessions(
         return false
       }
     }
+
     if (!sessionHasEffortLevel(session, filters.effortLevel)) {
       return false
     }
+
     if (filters.dateFrom && session.date < filters.dateFrom) {
       return false
     }
+
     if (filters.dateTo && session.date > filters.dateTo) {
       return false
     }
+
     if (searchQuery) {
       const blockText = session.blocks
         .map((block) => {
@@ -47,6 +52,7 @@ export function filterTrainingSessions(
               STROKE_LABELS[block.stroke],
             ].join(' ')
           }
+
           return [block.title, block.notes, block.focus].join(' ')
         })
         .join(' ')
@@ -62,6 +68,7 @@ export function filterTrainingSessions(
         return false
       }
     }
+
     return true
   })
 }

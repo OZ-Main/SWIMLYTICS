@@ -6,6 +6,7 @@ function readExpanded(): boolean {
   if (typeof window === 'undefined') {
     return true
   }
+
   return window.localStorage.getItem(STORAGE_KEYS.UI_SIDEBAR_EXPANDED) !== 'false'
 }
 
@@ -18,6 +19,7 @@ export function useSidebarExpanded() {
         setExpandedState(event.newValue !== 'false')
       }
     }
+
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
   }, [])
@@ -31,6 +33,7 @@ export function useSidebarExpanded() {
     } catch {
       /* ignore quota */
     }
+
     setExpandedState(next)
   }, [])
 
@@ -45,6 +48,7 @@ export function useSidebarExpanded() {
       } catch {
         /* ignore */
       }
+
       return next
     })
   }, [])

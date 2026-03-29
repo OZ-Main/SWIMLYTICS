@@ -27,9 +27,11 @@ function buildShortSwimmingBlockSummary(session: SwimmingTrainingSession, maxPar
     const meters = calculateSwimmingBlockDistanceMeters(block)
     parts.push(`${categoryLabel} ${meters}m`)
   }
+
   if (sortedBlocks.length > maxParts) {
     parts.push(`+${sortedBlocks.length - maxParts}`)
   }
+
   return parts.join(' · ')
 }
 

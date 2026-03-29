@@ -157,6 +157,7 @@ const DropdownMenuShortcut = ({ className, ...props }: HTMLAttributes<HTMLSpanEl
     <span className={cn(dropdownMenuShortcutVariants(), className)} {...props} />
   )
 }
+
 DropdownMenuShortcut.displayName = 'DropdownMenuShortcut'
 
 export {

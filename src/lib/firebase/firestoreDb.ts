@@ -8,5 +8,6 @@ export function getFirestoreDb(): Firestore {
   if (!firestore) {
     firestore = getFirestore(getFirebaseApp())
   }
+
   return firestore
 }

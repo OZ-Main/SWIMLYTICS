@@ -19,6 +19,7 @@ export function formatChartTooltipLabel(label: string): string {
       return label
     }
   }
+
   return label
 }
 

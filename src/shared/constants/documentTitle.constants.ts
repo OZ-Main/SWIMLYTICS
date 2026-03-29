@@ -13,6 +13,10 @@ export const DOCUMENT_TITLE = {
   ATHLETE_PBS: 'Personal bests',
   STATISTICS: 'Statistics',
   SETTINGS: 'Settings',
+  WORKOUT_TEMPLATES: 'Workout templates',
+  NEW_WORKOUT_TEMPLATE: 'New workout template',
+  EDIT_WORKOUT_TEMPLATE: 'Edit workout template',
+  BULK_ASSIGNMENT: 'Bulk assign workout',
 } as const
 
 export const DOCUMENT_TITLE_SUFFIX = ` · ${DOCUMENT_TITLE.APP}`

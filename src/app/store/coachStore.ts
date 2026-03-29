@@ -22,10 +22,12 @@ export const useCoachStore = create<CoachState>((set, getState) => ({
     if (!uid) {
       return
     }
+
     const currentCoach = getState().coach
     if (currentCoach) {
       set({ coach: { ...currentCoach, displayName } })
     }
+
     await updateUserProfileFields(uid, { displayName })
   },
   replaceCoach: (nextCoach) => set({ coach: nextCoach }),

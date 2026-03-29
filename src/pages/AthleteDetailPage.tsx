@@ -60,6 +60,7 @@ import {
 import { STROKE_FILTER_OPTIONS, STROKE_LABELS } from '@/shared/constants/strokeLabels'
 import { WORKOUT_FILTER_ALL } from '@/shared/constants/workoutFilter.constants'
 import { AthleteTrainingType } from '@/shared/domain'
+import { athleteGroupDisplayLabel } from '@/shared/helpers/athleteGroupDisplay.helpers'
 import { formatDistanceMeters, formatDurationSeconds } from '@/shared/helpers/formatters'
 import {
   filterGymTrainingSessions,
@@ -168,15 +169,18 @@ export default function AthleteDetailPage() {
     if (!athleteId) {
       return
     }
+
     try {
       for (const session of athleteSessions) {
         await deleteTrainingSession(session.id)
       }
+
       for (const personalBest of personalBests.filter(
         (candidate) => candidate.athleteId === athleteId,
       )) {
         await deletePersonalBest(personalBest.id)
       }
+
       await deleteAthlete(athleteId)
       toast.success('Athlete removed')
       setRemoveOpen(false)
@@ -218,7 +222,8 @@ export default function AthleteDetailPage() {
           <p className="section-label">Athlete</p>
           <h1 className="mt-tight text-heading-xl sm:text-display-lg">{athlete.fullName}</h1>
           <p className="mt-tight text-body text-muted-foreground">
-            {ATHLETE_TRAINING_TYPE_LABELS[athlete.trainingType]} · Added{' '}
+            {ATHLETE_TRAINING_TYPE_LABELS[athlete.trainingType]} ·{' '}
+            {athleteGroupDisplayLabel(athlete.group)} · Added{' '}
             {format(parseISO(athlete.createdAt), 'MMM d, yyyy')}
           </p>
         </div>

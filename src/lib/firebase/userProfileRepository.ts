@@ -33,6 +33,7 @@ export function defaultUserProfileFields(
   if (email != null && email.trim() !== '') {
     return { ...base, email: email.trim() }
   }
+
   return base
 }
 
@@ -41,10 +42,12 @@ export function coachDisplayNameFromFirebaseUser(firebaseUser: User): string {
   if (trimmed) {
     return trimmed
   }
+
   const emailLocal = firebaseUser.email?.split('@')[0]?.trim()
   if (emailLocal) {
     return emailLocal
   }
+
   return 'Coach'
 }
 

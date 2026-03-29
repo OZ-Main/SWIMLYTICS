@@ -5,6 +5,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import unusedImports from 'eslint-plugin-unused-imports'
 import prettier from 'eslint-config-prettier'
+import stylistic from '@stylistic/eslint-plugin'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
@@ -25,6 +26,7 @@ export default tseslint.config(
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
       'unused-imports': unusedImports,
+      '@stylistic': stylistic,
     },
 
     settings: {
@@ -52,6 +54,14 @@ export default tseslint.config(
 
       // Let Prettier handle formatting
       ...prettier.rules,
+
+      // After multiline block-shaped statements (`if`/`for`/etc. with `{ }`), require a blank line
+      // before the next statement (matches CONTROL-FLOW SPACING in .cursorrules).
+      '@stylistic/padding-line-between-statements': [
+        'error',
+        { blankLine: 'always', prev: 'multiline-block-like', next: '*' },
+        { blankLine: 'always', prev: 'if', next: ['const', 'let', 'using'] },
+      ],
     },
   },
 )

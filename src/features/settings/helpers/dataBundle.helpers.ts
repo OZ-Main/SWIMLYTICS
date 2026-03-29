@@ -11,8 +11,15 @@ import {
   PoolLength,
   Stroke,
 } from '@/shared/domain'
+import { ATHLETE_GROUP_MAX_LENGTH } from '@/shared/constants/athleteGroup.constants'
 import { LEGACY_IMPORT_ATHLETE_ID } from '@/shared/constants/migration.constants'
-import type { Athlete, Coach, PersonalBest, TrainingSession } from '@/shared/types/domain.types'
+import type {
+  Athlete,
+  Coach,
+  PersonalBest,
+  TrainingSession,
+  WorkoutTemplate,
+} from '@/shared/types/domain.types'
 import type { LegacyWorkout } from '@/shared/types/legacy-workout.types'
 
 const coachSchema = z.object({
@@ -25,6 +32,7 @@ const athleteSchema = z.object({
   id: z.string(),
   fullName: z.string(),
   trainingType: z.nativeEnum(AthleteTrainingType),
+  group: z.string().max(ATHLETE_GROUP_MAX_LENGTH).optional().default(''),
   notes: z.string(),
   createdAt: z.string(),
 })
@@ -84,10 +92,15 @@ export const swimlyticsExportV3Schema = z.object({
   athletes: z.array(athleteSchema),
   trainingSessions: z.array(z.unknown()),
   personalBests: z.array(personalBestV2Schema),
+  workoutTemplates: z.array(z.unknown()).optional(),
 })
 
-export type SwimlyticsExportV3 = Omit<z.infer<typeof swimlyticsExportV3Schema>, 'trainingSessions'> & {
+export type SwimlyticsExportV3 = Omit<
+  z.infer<typeof swimlyticsExportV3Schema>,
+  'trainingSessions' | 'workoutTemplates'
+> & {
   trainingSessions: TrainingSession[]
+  workoutTemplates: WorkoutTemplate[]
 }
 
 const workoutV1Schema = z.object({
@@ -143,6 +156,7 @@ export function buildExportPayloadV3(
   athletes: Athlete[],
   trainingSessions: TrainingSession[],
   personalBests: PersonalBest[],
+  workoutTemplates: WorkoutTemplate[],
 ): SwimlyticsExportV3 {
   return {
     version: DataExportVersion.V3,
@@ -151,6 +165,7 @@ export function buildExportPayloadV3(
     athletes,
     trainingSessions,
     personalBests,
+    workoutTemplates,
   }
 }
 
@@ -164,12 +179,16 @@ export function parseImportPayload(json: unknown): ParsedImport {
         trainingSessions.push(normalizedSession)
       }
     }
+
+    const workoutTemplatesRaw = v3.data.workoutTemplates ?? []
+    const workoutTemplates = workoutTemplatesRaw as WorkoutTemplate[]
     return {
       ok: true,
       version: DataExportVersion.V3,
       data: {
         ...v3.data,
         trainingSessions,
+        workoutTemplates,
       },
     }
   }
@@ -188,6 +207,7 @@ export function parseImportPayload(json: unknown): ParsedImport {
         legacyWorkouts.push(normalizedWorkout)
       }
     }
+
     const trainingSessions = legacyWorkouts.map(migrateLegacyWorkoutToTrainingSession)
     const personalBests: PersonalBest[] = v1.data.personalBests.map((v1PersonalBestRow) => ({
       id: v1PersonalBestRow.id,
@@ -213,6 +233,7 @@ export function legacyImportAthleteSeed(): Athlete {
     id: LEGACY_IMPORT_ATHLETE_ID,
     fullName: 'Imported athlete',
     trainingType: AthleteTrainingType.Swimming,
+    group: '',
     notes: 'Created from a V1 export (single-athlete backup).',
     createdAt: new Date().toISOString(),
   }

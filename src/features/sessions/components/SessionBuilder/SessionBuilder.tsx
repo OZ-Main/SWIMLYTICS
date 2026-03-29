@@ -38,7 +38,11 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { GYM_BLOCK_CATEGORY_LABEL } from '@/shared/constants/gymBlockCategoryLabels'
+import {
+  SESSION_PERSISTENCE_FIELD_LIMITS,
+} from '@/shared/constants/sessionPersistenceValidation.constants'
 import { SWIMMING_BLOCK_CATEGORY_LABEL } from '@/shared/constants/swimmingBlockCategoryLabels'
+import { WORKOUT_NOTES } from '@/shared/constants/workoutValidation.constants'
 import { AthleteTrainingType, PoolLength, SwimEquipment } from '@/shared/domain'
 import { formatDistanceMeters, formatDurationSeconds } from '@/shared/helpers/formatters'
 import { cn } from '@/shared/utils/cn'
@@ -54,9 +58,20 @@ import {
 type SessionBuilderProps = {
   session: TrainingSession
   onChange: (nextSession: TrainingSession) => void
+  hideDateField?: boolean
+  sessionDetailsHeading?: string
+  sessionTitleLabel?: string
+  sessionNotesLabel?: string
 }
 
-export default function SessionBuilder({ session, onChange }: SessionBuilderProps) {
+export default function SessionBuilder({
+  session,
+  onChange,
+  hideDateField = false,
+  sessionDetailsHeading = 'Session details',
+  sessionTitleLabel = 'Session name',
+  sessionNotesLabel = 'Session notes',
+}: SessionBuilderProps) {
   const isSwim = session.trainingType === AthleteTrainingType.Swimming
   const swimmingSession = isSwim ? (session as SwimmingTrainingSession) : null
 
@@ -68,6 +83,7 @@ export default function SessionBuilder({ session, onChange }: SessionBuilderProp
     if (!swimmingSession) {
       return
     }
+
     const nextBlocks = swimmingSession.blocks.map((block) =>
       block.id === blockId ? { ...block, ...partial } : block,
     )
@@ -78,6 +94,7 @@ export default function SessionBuilder({ session, onChange }: SessionBuilderProp
     if (session.trainingType !== AthleteTrainingType.Gym) {
       return
     }
+
     const gymSession = session as GymTrainingSession
     const nextBlocks = gymSession.blocks.map((block) =>
       block.id === blockId ? { ...block, ...partial } : block,
@@ -89,6 +106,7 @@ export default function SessionBuilder({ session, onChange }: SessionBuilderProp
     if (!swimmingSession) {
       return
     }
+
     const nextIndex = swimmingSession.blocks.length
     const newBlock = createEmptySwimmingSessionBlock(nextIndex, swimmingSession.defaultPoolLength)
     updateSession({
@@ -100,6 +118,7 @@ export default function SessionBuilder({ session, onChange }: SessionBuilderProp
     if (session.trainingType !== AthleteTrainingType.Gym) {
       return
     }
+
     const gymSession = session as GymTrainingSession
     const nextIndex = gymSession.blocks.length
     const newBlock = createEmptyGymSessionBlock(nextIndex)
@@ -122,6 +141,7 @@ export default function SessionBuilder({ session, onChange }: SessionBuilderProp
     if (index < 0) {
       return
     }
+
     const original = session.blocks[index]
     const copy = {
       ...original,
@@ -142,10 +162,12 @@ export default function SessionBuilder({ session, onChange }: SessionBuilderProp
     if (index < 0) {
       return
     }
+
     const swapWith = direction === 'up' ? index - 1 : index + 1
     if (swapWith < 0 || swapWith >= ordered.length) {
       return
     }
+
     ;[ordered[index], ordered[swapWith]] = [ordered[swapWith], ordered[index]]
     onChange({
       ...session,
@@ -158,10 +180,12 @@ export default function SessionBuilder({ session, onChange }: SessionBuilderProp
     if (!swimmingSession) {
       return
     }
+
     const block = swimmingSession.blocks.find((candidate) => candidate.id === blockId)
     if (!block) {
       return
     }
+
     const has = block.equipment.includes(equipment)
     const nextEquipment = has
       ? block.equipment.filter((item) => item !== equipment)
@@ -178,29 +202,32 @@ export default function SessionBuilder({ session, onChange }: SessionBuilderProp
           <CardHeader className="page-section-header pb-card">
             <div className="flex items-center gap-tight">
               <Waves className="h-5 w-5 text-primary" aria-hidden />
-              <h2 className="page-section-title">Session details</h2>
+              <h2 className="page-section-title">{sessionDetailsHeading}</h2>
             </div>
           </CardHeader>
           <CardContent className="space-y-form-field pt-card">
             <div className="grid gap-form-field sm:grid-cols-2">
               <div className="space-y-tight sm:col-span-2">
-                <Label htmlFor="session-title">Session name</Label>
+                <Label htmlFor="session-title">{sessionTitleLabel}</Label>
                 <Input
                   id="session-title"
                   value={session.sessionTitle}
+                  maxLength={SESSION_PERSISTENCE_FIELD_LIMITS.SESSION_TITLE_MAX_LENGTH}
                   onChange={(changeEvent) => updateSession({ sessionTitle: changeEvent.target.value })}
                   placeholder="e.g. Tuesday aerobic / Leg day"
                 />
               </div>
-              <div className="space-y-tight">
-                <Label htmlFor="session-date">Date</Label>
-                <Input
-                  id="session-date"
-                  type="date"
-                  value={session.date}
-                  onChange={(changeEvent) => updateSession({ date: changeEvent.target.value })}
-                />
-              </div>
+              {hideDateField ? null : (
+                <div className="space-y-tight">
+                  <Label htmlFor="session-date">Date</Label>
+                  <Input
+                    id="session-date"
+                    type="date"
+                    value={session.date}
+                    onChange={(changeEvent) => updateSession({ date: changeEvent.target.value })}
+                  />
+                </div>
+              )}
               {swimmingSession ? (
                 <div className="space-y-tight">
                   <Label htmlFor="default-pool">Default pool length</Label>
@@ -224,11 +251,12 @@ export default function SessionBuilder({ session, onChange }: SessionBuilderProp
               ) : null}
             </div>
             <div className="space-y-tight">
-              <Label htmlFor="session-notes">Session notes</Label>
+              <Label htmlFor="session-notes">{sessionNotesLabel}</Label>
               <Textarea
                 id="session-notes"
                 className="min-h-form-textarea resize-y"
                 value={session.notes}
+                maxLength={WORKOUT_NOTES.MAX_LENGTH}
                 onChange={(changeEvent) => updateSession({ notes: changeEvent.target.value })}
                 placeholder="Goals, fatigue, environment, anything that helps next week."
               />

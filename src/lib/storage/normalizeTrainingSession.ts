@@ -30,11 +30,13 @@ function parseSwimmingBlock(
   if (!raw || typeof raw !== 'object') {
     return null
   }
+
   const row = raw as Record<string, unknown>
   const id = String(row.id ?? '')
   if (!id) {
     return null
   }
+
   return {
     id,
     orderIndex: Number(row.orderIndex ?? 0),
@@ -65,11 +67,13 @@ function parseGymBlock(raw: unknown): GymSessionBlock | null {
   if (!raw || typeof raw !== 'object') {
     return null
   }
+
   const row = raw as Record<string, unknown>
   const id = String(row.id ?? '')
   if (!id) {
     return null
   }
+
   return {
     id,
     orderIndex: Number(row.orderIndex ?? 0),
@@ -149,6 +153,7 @@ export function normalizePersistedTrainingSession(
           blocks.push(block)
         }
       }
+
       if (blocks.length === 0) {
         return null
       }
