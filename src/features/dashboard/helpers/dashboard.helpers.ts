@@ -119,6 +119,7 @@ export function buildWeeklyDistanceSeries(
       value: Math.round(distance),
     })
   }
+
   return points
 }
 
@@ -146,6 +147,7 @@ export function buildWeeklyGymDurationSeries(
       value: Math.round(durationSeconds),
     })
   }
+
   return points
 }
 
@@ -172,6 +174,7 @@ export function buildMonthlyVolumeSeries(
       value: Math.round(distance),
     })
   }
+
   return points
 }
 
@@ -198,6 +201,7 @@ export function buildMonthlyGymDurationSeries(
       value: Math.round(durationSeconds),
     })
   }
+
   return points
 }
 
@@ -212,6 +216,7 @@ export function buildStrokeDistribution(swimmingSessions: SwimmingTrainingSessio
       strokeTotals.set(block.stroke, running)
     }
   }
+
   return STROKE_ORDER.filter((stroke) => strokeTotals.has(stroke)).map((stroke) => {
     const totals = strokeTotals.get(stroke)!
     return {

@@ -20,6 +20,14 @@ service cloud.firestore {
       match /sessions/{sessionId} {
         allow read, create, update, delete: if isOwner(userId);
       }
+
+      match /personalBests/{personalBestId} {
+        allow read, create, update, delete: if isOwner(userId);
+      }
+
+      match /workoutTemplates/{templateId} {
+        allow read, create, update, delete: if isOwner(userId);
+      }
     }
   }
 }

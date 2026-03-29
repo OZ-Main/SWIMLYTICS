@@ -11,6 +11,8 @@ import {
   createDraftGymTrainingSession,
   createDraftSwimmingTrainingSession,
 } from '@/features/sessions/helpers/sessionFactories.helpers'
+import { validateTrainingSessionForPersistence } from '@/features/sessions/helpers/trainingSessionValidation.helpers'
+import { coachFirestoreErrorMessage } from '@/lib/firebase/coachFirestoreErrorMessage.helpers'
 import { ROUTE_PARAM, sessionDetailPath } from '@/shared/constants/routes.constants'
 import { AthleteTrainingType, PoolLength } from '@/shared/domain'
 import type { TrainingSession } from '@/shared/types/domain.types'
@@ -34,10 +36,12 @@ export default function SessionNewPage() {
     if (!athleteId || !athlete) {
       return
     }
+
     setDraftSession((current) => {
       if (current) {
         return current
       }
+
       return athlete.trainingType === AthleteTrainingType.Gym
         ? createDraftGymTrainingSession(athleteId)
         : createDraftSwimmingTrainingSession(athleteId, PoolLength.Meters25)
@@ -70,22 +74,26 @@ export default function SessionNewPage() {
     if (!athleteId || !draftSession) {
       return
     }
-    if (draftSession.blocks.length === 0) {
-      toast.error('Add at least one training block.')
-      return
-    }
+
     const now = new Date().toISOString()
     const toSave: TrainingSession = {
       ...draftSession,
       updatedAt: now,
       createdAt: draftSession.createdAt || now,
     }
+
+    const validation = validateTrainingSessionForPersistence(toSave)
+    if (!validation.ok) {
+      toast.error(validation.message)
+      return
+    }
+
     try {
       await addTrainingSession(toSave)
       toast.success('Session saved')
       navigate(sessionDetailPath(athleteId, toSave.id))
-    } catch {
-      toast.error('Could not save session.')
+    } catch (error) {
+      toast.error(coachFirestoreErrorMessage(error, 'Could not save session.'))
     }
   }
 

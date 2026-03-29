@@ -21,9 +21,11 @@ export function sortPersonalBestsDisplay(allPersonalBests: PersonalBest[]): Pers
     if (left.stroke !== right.stroke) {
       return strokeSortKey(left.stroke) - strokeSortKey(right.stroke)
     }
+
     if (left.distance !== right.distance) {
       return left.distance - right.distance
     }
+
     return parseISO(left.date).getTime() - parseISO(right.date).getTime()
   })
 }
@@ -43,6 +45,7 @@ export function findBestPriorPbSameEvent(
   if (priorMarks.length === 0) {
     return null
   }
+
   return priorMarks.reduce((bestSoFar, candidate) =>
     candidate.timeSeconds < bestSoFar.timeSeconds ? candidate : bestSoFar,
   )
@@ -55,13 +58,16 @@ export function formatImprovementVsPriorBest(
   if (priorBestSeconds === null) {
     return 'First mark at this event'
   }
+
   const delta = currentSeconds - priorBestSeconds
   if (delta < 0) {
     return `${Math.abs(delta).toFixed(2)}s faster than prior best`
   }
+
   if (delta > 0) {
     return `${delta.toFixed(2)}s slower than prior best`
   }
+
   return 'Same as prior best'
 }
 

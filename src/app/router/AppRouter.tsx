@@ -7,6 +7,7 @@ import AthleteDetailPage from '@/pages/AthleteDetailPage'
 import AthleteEditPage from '@/pages/AthleteEditPage'
 import AthleteNewPage from '@/pages/AthleteNewPage'
 import AthletesListPage from '@/pages/AthletesListPage'
+import BulkAssignmentNewPage from '@/pages/BulkAssignmentNewPage'
 import DashboardPage from '@/pages/DashboardPage'
 import PersonalBestsPage from '@/pages/PersonalBestsPage'
 import SessionDetailPage from '@/pages/SessionDetailPage'
@@ -16,6 +17,9 @@ import SettingsPage from '@/pages/SettingsPage'
 import SignInPage from '@/pages/SignInPage'
 import SignUpPage from '@/pages/SignUpPage'
 import StatisticsPage from '@/pages/StatisticsPage'
+import WorkoutTemplateEditPage from '@/pages/WorkoutTemplateEditPage'
+import WorkoutTemplateNewPage from '@/pages/WorkoutTemplateNewPage'
+import WorkoutTemplatesListPage from '@/pages/WorkoutTemplatesListPage'
 import { APP_ROUTE, ROUTE_SEGMENT } from '@/shared/constants/routes.constants'
 
 export default function AppRouter() {
@@ -67,6 +71,19 @@ export default function AppRouter() {
             element={<PersonalBestsPage />}
           />
           <Route path={ROUTE_SEGMENT.statistics} element={<StatisticsPage />} />
+          <Route
+            path={`${ROUTE_SEGMENT.assignments}/${ROUTE_SEGMENT.new}`}
+            element={<BulkAssignmentNewPage />}
+          />
+          <Route path={ROUTE_SEGMENT.workoutTemplates} element={<WorkoutTemplatesListPage />} />
+          <Route
+            path={`${ROUTE_SEGMENT.workoutTemplates}/${ROUTE_SEGMENT.new}`}
+            element={<WorkoutTemplateNewPage />}
+          />
+          <Route
+            path={`${ROUTE_SEGMENT.workoutTemplates}/${ROUTE_SEGMENT.templateIdParam}/${ROUTE_SEGMENT.edit}`}
+            element={<WorkoutTemplateEditPage />}
+          />
           <Route path={ROUTE_SEGMENT.settings} element={<SettingsPage />} />
           <Route path={ROUTE_SEGMENT.wildcard} element={<Navigate to={APP_ROUTE.home} replace />} />
         </Route>

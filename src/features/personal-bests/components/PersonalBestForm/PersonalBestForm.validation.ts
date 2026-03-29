@@ -35,6 +35,7 @@ export const personalBestFormSchema = z
         path: ['distance'],
       })
     }
+
     const total = totalSecondsFromMinutesAndSeconds(data.timeMinutes, data.timeSeconds)
     if (total <= 0) {
       ctx.addIssue({
@@ -60,5 +61,6 @@ export function parsePbDistance(value: PersonalBestFormValues['distance']): Pers
   if (!PB_DISTANCE_NUMBERS.has(n)) {
     throw new Error('Invalid personal best distance')
   }
+
   return n as PersonalBestDistance
 }

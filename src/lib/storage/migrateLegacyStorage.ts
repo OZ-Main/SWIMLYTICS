@@ -16,6 +16,7 @@ function parsePersistedJson<T>(raw: string | null): T | null {
   if (!raw) {
     return null
   }
+
   try {
     const parsed = JSON.parse(raw) as PersistedZustandShape<T>
     return parsed?.state ?? null
@@ -32,10 +33,12 @@ function ensureLegacyImportAthleteExists(): void {
   if (legacyAthleteAlreadyPresent) {
     return
   }
+
   const legacyAthlete: Athlete = {
     id: LEGACY_IMPORT_ATHLETE_ID,
     fullName: 'Imported athlete',
     trainingType: AthleteTrainingType.Swimming,
+    group: '',
     notes: `Created when migrating from a previous single-athlete install (${ATHLETE_TRAINING_TYPE_LABELS[AthleteTrainingType.Swimming].toLowerCase()} data).`,
     createdAt: new Date().toISOString(),
   }
@@ -62,6 +65,7 @@ export function migrateLegacyStorage(): void {
           }
         }
       }
+
       if (migratedSessions.length > 0) {
         ensureLegacyImportAthleteExists()
         replaceAllTrainingSessions(migratedSessions)
@@ -83,10 +87,12 @@ export function migrateLegacyStorage(): void {
           if (!legacyRowUnknown || typeof legacyRowUnknown !== 'object') {
             return null
           }
+
           const legacyFields = legacyRowUnknown as Record<string, unknown>
           if (!legacyFields.id || !legacyFields.date) {
             return null
           }
+
           return {
             id: String(legacyFields.id),
             athleteId: String(legacyFields.athleteId ?? LEGACY_IMPORT_ATHLETE_ID),

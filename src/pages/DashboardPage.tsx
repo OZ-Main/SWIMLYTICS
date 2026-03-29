@@ -238,6 +238,7 @@ export default function DashboardPage() {
                 } else {
                   sessionSummary = `${recentSession.sessionTitle || recentSession.blocks[0]?.title || 'Gym'} · ${formatDurationSeconds(getGymSessionTotalDurationSeconds(recentSession))}`
                 }
+
                 return (
                   <StaggerItem key={recentSession.id} className="data-row">
                     <div>

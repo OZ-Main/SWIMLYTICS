@@ -17,6 +17,7 @@ function hslFromVar(cssVarName: string, root: HTMLElement): string {
   if (!raw) {
     return 'hsl(200 10% 50%)'
   }
+
   return `hsl(${raw})`
 }
 

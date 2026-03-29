@@ -59,6 +59,7 @@ export default function GymDashboardCharts({
       navigate(APP_ROUTE.statistics)
       return
     }
+
     navigate(
       `${APP_ROUTE.statistics}?${createSearchParams({
         [STATISTICS_SEARCH_PARAMS.athleteId]: drillDown.athleteId,

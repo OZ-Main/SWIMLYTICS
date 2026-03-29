@@ -17,6 +17,7 @@ export async function ensureCoachUserDocumentIfMissing(firebaseUser: User): Prom
   if (existingSnapshot.exists()) {
     return false
   }
+
   const displayName = coachDisplayNameFromFirebaseUser(firebaseUser)
   const profilePayload = stripUndefinedDeep(
     defaultUserProfileFields(displayName, firebaseUser.email),

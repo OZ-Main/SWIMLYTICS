@@ -16,10 +16,11 @@ import {
   FIRESTORE_PERSONAL_BESTS_SUBCOLLECTION,
   FIRESTORE_SESSIONS_SUBCOLLECTION,
   FIRESTORE_USERS_COLLECTION,
+  FIRESTORE_WORKOUT_TEMPLATES_SUBCOLLECTION,
 } from '@/lib/firebase/firestorePaths'
-import { stripUndefinedDeep } from '@/lib/firebase/stripUndefinedDeep'
+import { prepareFirestoreDocumentData } from '@/lib/firebase/prepareFirestoreDocumentData'
 import { userProfileDocumentRef } from '@/lib/firebase/userProfileRepository'
-import type { Athlete, PersonalBest, TrainingSession } from '@/shared/types/domain.types'
+import type { Athlete, PersonalBest, TrainingSession, WorkoutTemplate } from '@/shared/types/domain.types'
 import type { Coach } from '@/shared/types/domain.types'
 
 const FIRESTORE_BATCH_LIMIT = 450
@@ -36,11 +37,15 @@ function personalBestsCollection(db: Firestore, uid: string) {
   return collection(db, FIRESTORE_USERS_COLLECTION, uid, FIRESTORE_PERSONAL_BESTS_SUBCOLLECTION)
 }
 
+function workoutTemplatesCollection(db: Firestore, uid: string) {
+  return collection(db, FIRESTORE_USERS_COLLECTION, uid, FIRESTORE_WORKOUT_TEMPLATES_SUBCOLLECTION)
+}
+
 export async function writeAthleteDocument(uid: string, athlete: Athlete): Promise<void> {
   const db = getFirestoreDb()
   await setDoc(
     doc(athletesCollection(db, uid), athlete.id),
-    stripUndefinedDeep(athlete) as DocumentData,
+    prepareFirestoreDocumentData(athlete),
   )
 }
 
@@ -56,8 +61,53 @@ export async function writeTrainingSessionDocument(
   const db = getFirestoreDb()
   await setDoc(
     doc(sessionsCollection(db, uid), session.id),
-    stripUndefinedDeep(session) as DocumentData,
+    prepareFirestoreDocumentData(session),
   )
+}
+
+export async function bulkWriteTrainingSessionDocuments(
+  uid: string,
+  sessions: TrainingSession[],
+): Promise<void> {
+  if (sessions.length === 0) {
+    return
+  }
+
+  const db = getFirestoreDb()
+  let batch = writeBatch(db)
+  let operationCount = 0
+  for (const session of sessions) {
+    batch.set(
+      doc(sessionsCollection(db, uid), session.id),
+      prepareFirestoreDocumentData(session),
+    )
+    operationCount++
+    if (operationCount >= FIRESTORE_BATCH_LIMIT) {
+      await batch.commit()
+      batch = writeBatch(db)
+      operationCount = 0
+    }
+  }
+
+  if (operationCount > 0) {
+    await batch.commit()
+  }
+}
+
+export async function writeWorkoutTemplateDocument(
+  uid: string,
+  template: WorkoutTemplate,
+): Promise<void> {
+  const db = getFirestoreDb()
+  await setDoc(
+    doc(workoutTemplatesCollection(db, uid), template.id),
+    prepareFirestoreDocumentData(template),
+  )
+}
+
+export async function deleteWorkoutTemplateDocument(uid: string, templateId: string): Promise<void> {
+  const db = getFirestoreDb()
+  await deleteDoc(doc(workoutTemplatesCollection(db, uid), templateId))
 }
 
 export async function deleteTrainingSessionDocument(uid: string, sessionId: string): Promise<void> {
@@ -72,7 +122,7 @@ export async function writePersonalBestDocument(
   const db = getFirestoreDb()
   await setDoc(
     doc(personalBestsCollection(db, uid), personalBest.id),
-    stripUndefinedDeep(personalBest) as DocumentData,
+    prepareFirestoreDocumentData(personalBest),
   )
 }
 
@@ -97,6 +147,7 @@ async function deleteEntireCollection(
       count = 0
     }
   }
+
   if (count > 0) {
     await batch.commit()
   }
@@ -107,16 +158,17 @@ export async function clearAllSubcollections(uid: string): Promise<void> {
   await deleteEntireCollection(db, athletesCollection(db, uid))
   await deleteEntireCollection(db, sessionsCollection(db, uid))
   await deleteEntireCollection(db, personalBestsCollection(db, uid))
+  await deleteEntireCollection(db, workoutTemplatesCollection(db, uid))
 }
 
 export async function replaceCoachProfileCoachFields(uid: string, coach: Coach): Promise<void> {
   const db = getFirestoreDb()
   await setDoc(
     userProfileDocumentRef(db, uid),
-    stripUndefinedDeep({
+    prepareFirestoreDocumentData({
       displayName: coach.displayName,
       createdAt: coach.createdAt,
-    }) as DocumentData,
+    }),
     { merge: true },
   )
 }
@@ -126,6 +178,7 @@ export type CoachBundleForImport = {
   athletes: Athlete[]
   trainingSessions: TrainingSession[]
   personalBests: PersonalBest[]
+  workoutTemplates: WorkoutTemplate[]
 }
 
 export async function replaceAllCoachDataDocuments(
@@ -157,23 +210,34 @@ export async function replaceAllCoachDataDocuments(
     await enqueueSet(
       athletesCollection(db, uid),
       athlete.id,
-      stripUndefinedDeep(athlete) as DocumentData,
+      prepareFirestoreDocumentData(athlete),
     )
   }
+
   for (const session of bundle.trainingSessions) {
     await enqueueSet(
       sessionsCollection(db, uid),
       session.id,
-      stripUndefinedDeep(session) as DocumentData,
+      prepareFirestoreDocumentData(session),
     )
   }
+
   for (const personalBest of bundle.personalBests) {
     await enqueueSet(
       personalBestsCollection(db, uid),
       personalBest.id,
-      stripUndefinedDeep(personalBest) as DocumentData,
+      prepareFirestoreDocumentData(personalBest),
     )
   }
+
+  for (const workoutTemplate of bundle.workoutTemplates) {
+    await enqueueSet(
+      workoutTemplatesCollection(db, uid),
+      workoutTemplate.id,
+      prepareFirestoreDocumentData(workoutTemplate),
+    )
+  }
+
   if (count > 0) {
     await batch.commit()
   }

@@ -8,5 +8,6 @@ export function getFirebaseAuth(): Auth {
   if (!auth) {
     auth = getAuth(getFirebaseApp())
   }
+
   return auth
 }

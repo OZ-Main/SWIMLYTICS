@@ -7,6 +7,7 @@ import { useCoachStore } from '@/app/store/coachStore'
 import { usePersonalBestsStore } from '@/app/store/personalBestsStore'
 import { useSettingsStore } from '@/app/store/settingsStore'
 import { useTrainingSessionStore } from '@/app/store/trainingSessionStore'
+import { useWorkoutTemplateStore } from '@/app/store/workoutTemplateStore'
 import { useTheme } from '@/app/theme/useTheme'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -71,6 +72,9 @@ export default function SettingsPage() {
     (personalBestsStore) => personalBestsStore.personalBests,
   )
   const athletes = useAthleteStore((athleteStore) => athleteStore.athletes)
+  const workoutTemplates = useWorkoutTemplateStore(
+    (workoutTemplateStore) => workoutTemplateStore.workoutTemplates,
+  )
 
   const fileRef = useRef<HTMLInputElement>(null)
   const [clearOpen, setClearOpen] = useState(false)
@@ -87,7 +91,13 @@ export default function SettingsPage() {
       return
     }
 
-    const payload = buildExportPayloadV3(coach, athletes, trainingSessions, personalBests)
+    const payload = buildExportPayloadV3(
+      coach,
+      athletes,
+      trainingSessions,
+      personalBests,
+      workoutTemplates,
+    )
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
       type: 'application/json',
     })
@@ -126,6 +136,7 @@ export default function SettingsPage() {
             toast.error(result.error)
             return
           }
+
           if (result.version === DataExportVersion.V3) {
             const nextCoach = { ...result.data.coach, id: uid }
             await replaceAllCoachDataDocuments(uid, {
@@ -133,6 +144,7 @@ export default function SettingsPage() {
               athletes: result.data.athletes,
               trainingSessions: result.data.trainingSessions,
               personalBests: result.data.personalBests,
+              workoutTemplates: result.data.workoutTemplates,
             })
           } else if (result.version === DataExportVersion.V2) {
             const nextCoach = { ...result.data.coach, id: uid }
@@ -141,6 +153,7 @@ export default function SettingsPage() {
               athletes: result.data.athletes,
               trainingSessions: result.data.workouts.map(migrateLegacyWorkoutToTrainingSession),
               personalBests: result.data.personalBests,
+              workoutTemplates: [],
             })
           } else {
             const legacy = legacyImportAthleteSeed()
@@ -152,8 +165,10 @@ export default function SettingsPage() {
               athletes: nextAthletes,
               trainingSessions: result.data.trainingSessions,
               personalBests: result.data.personalBests,
+              workoutTemplates: [],
             })
           }
+
           await updateUserProfileFields(uid, { initialSampleApplied: true })
           setInitialSampleApplied(true)
           toast.success('Data imported to Firestore')
@@ -162,6 +177,7 @@ export default function SettingsPage() {
         }
       })()
     }
+
     reader.readAsText(file)
   }
 
@@ -171,6 +187,7 @@ export default function SettingsPage() {
       toast.error('You must be signed in.')
       return
     }
+
     try {
       await clearAllSubcollections(uid)
       await resetUserProfileAfterClearingData(uid, user)
@@ -217,8 +234,9 @@ export default function SettingsPage() {
         <CardHeader className="page-section-header">
           <CardTitle className="page-section-title">Backup</CardTitle>
           <CardDescription className="text-caption">
-            Export coach profile, athletes, training sessions, and best times as JSON (v3). Import
-            replaces all documents under your Firebase user. v2 and v1 exports are still accepted.
+            Export coach profile, athletes, training sessions, workout templates, and best times as
+            JSON (v3). Import replaces all documents under your Firebase user. v2 and v1 exports are
+            still accepted.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-stack pt-card">
@@ -242,7 +260,8 @@ export default function SettingsPage() {
         <CardHeader className="border-b border-destructive/20 bg-destructive/5 px-card py-section-sm">
           <CardTitle className="page-section-title text-destructive">Danger zone</CardTitle>
           <CardDescription className="text-caption">
-            Delete all athletes, sessions, and personal bests in Firestore for this signed-in coach.
+            Delete all athletes, sessions, workout templates, and personal bests in Firestore for this
+            signed-in coach.
             Your account and sign-in remain; you can import a backup afterward.
           </CardDescription>
         </CardHeader>

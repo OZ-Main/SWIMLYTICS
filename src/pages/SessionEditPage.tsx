@@ -6,6 +6,8 @@ import { useTrainingSessionStore } from '@/app/store/trainingSessionStore'
 import PageHeader from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 import SessionBuilder from '@/features/sessions/components/SessionBuilder'
+import { validateTrainingSessionForPersistence } from '@/features/sessions/helpers/trainingSessionValidation.helpers'
+import { coachFirestoreErrorMessage } from '@/lib/firebase/coachFirestoreErrorMessage.helpers'
 import { ROUTE_PARAM, sessionDetailPath } from '@/shared/constants/routes.constants'
 import type { TrainingSession } from '@/shared/types/domain.types'
 
@@ -51,21 +53,24 @@ function SessionEditFormInner({ persistedSession }: SessionEditFormInnerProps) {
   const [draftSession, setDraftSession] = useState<TrainingSession>(persistedSession)
 
   async function handleSave() {
-    if (draftSession.blocks.length === 0) {
-      toast.error('Keep at least one training block.')
-      return
-    }
     const now = new Date().toISOString()
     const toSave: TrainingSession = {
       ...draftSession,
       updatedAt: now,
     }
+
+    const validation = validateTrainingSessionForPersistence(toSave)
+    if (!validation.ok) {
+      toast.error(validation.message)
+      return
+    }
+
     try {
       await updateTrainingSession(toSave)
       toast.success('Session updated')
       navigate(sessionDetailPath(toSave.athleteId, toSave.id))
-    } catch {
-      toast.error('Could not update session.')
+    } catch (error) {
+      toast.error(coachFirestoreErrorMessage(error, 'Could not update session.'))
     }
   }
 

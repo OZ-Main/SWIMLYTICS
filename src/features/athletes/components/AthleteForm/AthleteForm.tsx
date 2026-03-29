@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { ATHLETE_GROUP_MAX_LENGTH } from '@/shared/constants/athleteGroup.constants'
 import { ATHLETE_TRAINING_TYPE_LABELS } from '@/shared/constants/athleteTrainingTypeLabels'
 import { FORM_SYNC_KEY } from '@/shared/constants/formSync.constants'
 import { AthleteTrainingType } from '@/shared/domain'
@@ -29,6 +30,7 @@ import type { Athlete } from '@/shared/types/domain.types'
 const athleteFormSchema = z.object({
   fullName: z.string().min(1, 'Name is required').max(120),
   trainingType: z.nativeEnum(AthleteTrainingType),
+  group: z.string().max(ATHLETE_GROUP_MAX_LENGTH).optional().default(''),
   notes: z.string().max(2000).optional().default(''),
 })
 
@@ -45,6 +47,7 @@ function defaultCreate(): AthleteFormValues {
   return {
     fullName: '',
     trainingType: AthleteTrainingType.Swimming,
+    group: '',
     notes: '',
   }
 }
@@ -53,6 +56,7 @@ function athleteToValues(a: Athlete): AthleteFormValues {
   return {
     fullName: a.fullName,
     trainingType: a.trainingType,
+    group: a.group,
     notes: a.notes,
   }
 }
@@ -77,6 +81,7 @@ export default function AthleteForm({ mode, initial, onSubmit, onCancel }: Athle
       id,
       fullName: values.fullName.trim(),
       trainingType: values.trainingType,
+      group: values.group?.trim() ?? '',
       notes: values.notes?.trim() ?? '',
       createdAt,
     })
@@ -121,6 +126,24 @@ export default function AthleteForm({ mode, initial, onSubmit, onCancel }: Athle
                   )}
                 </SelectContent>
               </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="group"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Group</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Squad, lane group, rehab track…"
+                  maxLength={ATHLETE_GROUP_MAX_LENGTH}
+                  {...field}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

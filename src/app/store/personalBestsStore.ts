@@ -12,6 +12,7 @@ function requireCoachUid(): string {
   if (!uid) {
     throw new Error('You must be signed in to change personal bests.')
   }
+
   return uid
 }
 

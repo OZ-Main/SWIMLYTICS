@@ -1,4 +1,4 @@
-import { BarChart3, Home, Settings, Users } from 'lucide-react'
+import { BarChart3, ClipboardList, Home, LayoutTemplate, Settings, Users } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 
 import { APP_ROUTE } from '@/shared/constants/routes.constants'
@@ -15,6 +15,8 @@ import {
 const LINKS = [
   { to: APP_ROUTE.home, label: 'Dashboard', icon: Home },
   { to: APP_ROUTE.athletes, label: 'Athletes', icon: Users },
+  { to: APP_ROUTE.workoutTemplates, label: 'Templates', icon: LayoutTemplate },
+  { to: APP_ROUTE.assignmentsNew, label: 'Assign', icon: ClipboardList },
   { to: APP_ROUTE.statistics, label: 'Statistics', icon: BarChart3 },
   { to: APP_ROUTE.settings, label: 'Settings', icon: Settings },
 ] as const
@@ -40,10 +42,12 @@ export default function MainNav({
     if (!onNavigate) {
       return
     }
+
     if (isDrawer) {
       window.setTimeout(() => onNavigate(), 0)
       return
     }
+
     onNavigate()
   }
 

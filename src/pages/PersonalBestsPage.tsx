@@ -97,6 +97,7 @@ export default function PersonalBestsPage() {
         await addPersonalBest(pb)
         toast.success('Best time added')
       }
+
       setDialogOpen(false)
       setEditing(null)
     } catch {
@@ -108,6 +109,7 @@ export default function PersonalBestsPage() {
     if (!deleting) {
       return
     }
+
     try {
       await deletePersonalBest(deleting.id)
       toast.success('Entry removed')
