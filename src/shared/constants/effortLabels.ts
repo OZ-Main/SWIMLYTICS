@@ -1,5 +1,5 @@
-import { EffortLevel } from '@/shared/domain'
 import { WORKOUT_FILTER_ALL } from '@/shared/constants/workoutFilter.constants'
+import { EffortLevel } from '@/shared/domain'
 
 export const EFFORT_LABELS: Record<EffortLevel, string> = {
   [EffortLevel.Easy]: 'Easy',
@@ -16,7 +16,6 @@ export const EFFORT_OPTIONS: (EffortLevel | typeof WORKOUT_FILTER_ALL)[] = [
   EffortLevel.Race,
 ]
 
-/** Form / display order (excludes filter sentinel). */
 export const EFFORT_LEVEL_ORDER: EffortLevel[] = [
   EffortLevel.Easy,
   EffortLevel.Moderate,

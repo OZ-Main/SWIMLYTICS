@@ -1,6 +1,3 @@
-/** Domain enums — persisted values match JSON storage (string / numeric literals). */
-
-/** Training modality for an athlete (drives workout shape and analytics). */
 export enum AthleteTrainingType {
   Swimming = 'swimming',
   Gym = 'gym',
@@ -37,20 +34,17 @@ export enum PersonalBestDistance {
   M1500 = 1500,
 }
 
-/** User preference; persisted in settings. */
 export enum ThemeMode {
   Light = 'light',
   Dark = 'dark',
   System = 'system',
 }
 
-/** Resolved after applying system preference. */
 export enum ResolvedTheme {
   Light = 'light',
   Dark = 'dark',
 }
 
-/** KPI / analytics identifiers (dashboard & summaries). */
 export enum MetricType {
   WorkoutCount = 'workout_count',
   TotalDistance = 'total_distance',
@@ -59,16 +53,12 @@ export enum MetricType {
   WeekDistance = 'week_distance',
 }
 
-/** Export bundle schema version. */
 export enum DataExportVersion {
   V1 = 1,
-  /** Coach + athletes + discriminated workouts + PBs with athleteId. */
   V2 = 2,
-  /** Coach + athletes + training sessions (multi-block) + PBs. */
   V3 = 3,
 }
 
-/** Part of a pool session — warm-up, main set, etc. */
 export enum SwimmingBlockCategory {
   WarmUp = 'warm_up',
   Drill = 'drill',
@@ -83,7 +73,6 @@ export enum SwimmingBlockCategory {
   Other = 'other',
 }
 
-/** Gym / strength block intent. */
 export enum GymBlockCategory {
   WarmUp = 'warm_up',
   MainLift = 'main_lift',

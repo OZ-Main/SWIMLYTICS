@@ -24,12 +24,9 @@ type StatCardProps = {
   value: string
   hint?: string
   icon: LucideIcon
-  /** Destination when the KPI is activated (keyboard or pointer). */
   to: string
-  /** Overrides default `${title}, ${value}` for screen readers. */
   ariaLabel?: string
   className?: string
-  /** Identifies the KPI for analytics / testing. */
   metric?: MetricType
 }
 

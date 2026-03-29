@@ -1,30 +1,23 @@
 import { useMediaQuery } from '@/lib/hooks/useMediaQuery'
 import {
-  CHART_TICK_PX,
-  CHART_TICK_PX_COMPACT,
-  CHART_Y_AXIS_WIDTH_BAR,
-  CHART_Y_AXIS_WIDTH_BAR_COMPACT,
-  CHART_Y_AXIS_WIDTH_LINE,
-  CHART_Y_AXIS_WIDTH_LINE_COMPACT,
-  RECHARTS_MARGIN_DEFAULT,
-  RECHARTS_MARGIN_DEFAULT_COMPACT,
-  RECHARTS_MARGIN_TIGHT_COMPACT,
-  RECHARTS_MARGIN_TIGHT_LEFT,
-} from '@/shared/constants/chartUi.constants'
-import { PIE_CHART_LAYOUT, PIE_CHART_LAYOUT_COMPACT } from '@/shared/constants/chartLayout.constants'
-import { MEDIA_QUERY_MIN_SM } from '@/shared/constants/tailwindBreakpointMedia.constants'
+  MEDIA_QUERY_MIN_LG,
+  MEDIA_QUERY_MIN_SM,
+} from '@/shared/constants/tailwindBreakpointMedia.constants'
 
-/** Recharts tick sizes, margins, and pie radii aligned with Tailwind `sm` (see `MEDIA_QUERY_MIN_SM`). */
 export function useResponsiveChartLayout() {
   const isSmUp = useMediaQuery(MEDIA_QUERY_MIN_SM)
+  const isLgUp = useMediaQuery(MEDIA_QUERY_MIN_LG)
 
   return {
     isSmUp,
-    tickFontSize: isSmUp ? CHART_TICK_PX : CHART_TICK_PX_COMPACT,
-    yAxisWidthBar: isSmUp ? CHART_Y_AXIS_WIDTH_BAR : CHART_Y_AXIS_WIDTH_BAR_COMPACT,
-    yAxisWidthLine: isSmUp ? CHART_Y_AXIS_WIDTH_LINE : CHART_Y_AXIS_WIDTH_LINE_COMPACT,
-    marginTight: isSmUp ? { ...RECHARTS_MARGIN_TIGHT_LEFT } : { ...RECHARTS_MARGIN_TIGHT_COMPACT },
-    marginDefault: isSmUp ? { ...RECHARTS_MARGIN_DEFAULT } : { ...RECHARTS_MARGIN_DEFAULT_COMPACT },
-    pieLayout: isSmUp ? PIE_CHART_LAYOUT : PIE_CHART_LAYOUT_COMPACT,
+    isLgUp,
+    marginTight: isSmUp
+      ? { top: 12, right: 8, left: 0, bottom: 4 }
+      : { top: 8, right: 4, left: 0, bottom: 2 },
+    marginDefault: isSmUp
+      ? { top: 12, right: 12, left: 4, bottom: 8 }
+      : { top: 8, right: 6, left: 2, bottom: 6 },
+    yAxisWidthBar: isSmUp ? 44 : 32,
+    yAxisWidthLine: isSmUp ? 40 : 28,
   }
 }

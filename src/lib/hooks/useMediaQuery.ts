@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 
-/** SSR-safe: `false` until mounted, then tracks `window.matchMedia(query)`. */
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(false)
 

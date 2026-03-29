@@ -42,9 +42,6 @@ function ensureLegacyImportAthleteExists(): void {
   addAthlete(legacyAthlete)
 }
 
-/**
- * One-shot migration from v1 single-user keys into v2 multi-athlete model.
- */
 export function migrateLegacyStorage(): void {
   const { trainingSessions, replaceAllTrainingSessions } = useTrainingSessionStore.getState()
 

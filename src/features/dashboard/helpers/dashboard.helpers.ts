@@ -16,7 +16,6 @@ import {
   getSwimmingSessionWeightedPacePer100Seconds,
 } from '@/features/sessions/helpers/sessionTotals.helpers'
 import { weekOptionsMonday } from '@/shared/constants/calendar.constants'
-import { DASHBOARD_CHART } from '@/shared/constants/chartRanges.constants'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
 import { STROKE_ORDER } from '@/shared/constants/strokeLabels'
 import type { Stroke } from '@/shared/domain'
@@ -29,6 +28,9 @@ import type {
   SwimmingTrainingSession,
   TimeSeriesPoint,
 } from '@/shared/types/domain.types'
+
+const dashboardWeeklyWeeks = 8
+const dashboardMonthlyMonths = 6
 
 export function buildDashboardSummary(
   swimmingSessions: SwimmingTrainingSession[],
@@ -95,7 +97,7 @@ export function buildGymDashboardSummary(
 
 export function buildWeeklyDistanceSeries(
   swimmingSessions: SwimmingTrainingSession[],
-  weeksBack: number = DASHBOARD_CHART.WEEKLY_WEEKS,
+  weeksBack: number = dashboardWeeklyWeeks,
   referenceDate: Date = new Date(),
 ): NamedChartPoint[] {
   const points: NamedChartPoint[] = []
@@ -122,7 +124,7 @@ export function buildWeeklyDistanceSeries(
 
 export function buildWeeklyGymDurationSeries(
   gymSessions: GymTrainingSession[],
-  weeksBack: number = DASHBOARD_CHART.WEEKLY_WEEKS,
+  weeksBack: number = dashboardWeeklyWeeks,
   referenceDate: Date = new Date(),
 ): NamedChartPoint[] {
   const points: NamedChartPoint[] = []
@@ -149,7 +151,7 @@ export function buildWeeklyGymDurationSeries(
 
 export function buildMonthlyVolumeSeries(
   swimmingSessions: SwimmingTrainingSession[],
-  monthsBack: number = DASHBOARD_CHART.MONTHLY_MONTHS,
+  monthsBack: number = dashboardMonthlyMonths,
   referenceDate: Date = new Date(),
 ): NamedChartPoint[] {
   const points: NamedChartPoint[] = []
@@ -175,7 +177,7 @@ export function buildMonthlyVolumeSeries(
 
 export function buildMonthlyGymDurationSeries(
   gymSessions: GymTrainingSession[],
-  monthsBack: number = DASHBOARD_CHART.MONTHLY_MONTHS,
+  monthsBack: number = dashboardMonthlyMonths,
   referenceDate: Date = new Date(),
 ): NamedChartPoint[] {
   const points: NamedChartPoint[] = []

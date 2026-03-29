@@ -14,9 +14,6 @@ type StaggerListProps = {
   children: React.ReactNode
 }
 
-/**
- * List container with subtle staggered children (Framer Motion).
- */
 export function StaggerList({ className, children }: StaggerListProps) {
   const reduced = useReducedMotion()
   return (

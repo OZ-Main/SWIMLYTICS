@@ -1,6 +1,5 @@
 import { PoolLength } from '@/shared/domain'
 
-/** Workout distance field (meters), independent of pool length enum. */
 export const WORKOUT_DISTANCE = {
   MIN_METERS: 25,
   MAX_METERS: 50_000,
@@ -12,7 +11,6 @@ export const WORKOUT_DURATION = {
   MAX_SECONDS_COMPONENT: 59,
 } as const
 
-/** Sanity bounds for derived pace (seconds per 100 m). */
 export const WORKOUT_PACE = {
   MIN_SEC_PER_100M: 40,
   MAX_SEC_PER_100M: 600,
@@ -22,7 +20,6 @@ export const WORKOUT_NOTES = {
   MAX_LENGTH: 2000,
 } as const
 
-/** Gym session focus / block label (e.g. “Upper push”). */
 export const GYM_SESSION_FOCUS = {
   MIN_LENGTH: 1,
   MAX_LENGTH: 120,
@@ -33,7 +30,6 @@ export const GYM_DURATION = {
   MAX_SECONDS_COMPONENT: 59,
 } as const
 
-/** Suggested defaults for the “new workout” form. */
 export const WORKOUT_FORM_DEFAULTS = {
   DISTANCE_METERS: 1000,
   DURATION_MINUTES: 20,

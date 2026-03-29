@@ -1,4 +1,3 @@
-/** date-fns display patterns reused across charts and tables. */
 export const DATE_FORMAT = {
   CHART_WEEK_START: 'MMM d',
   CHART_MONTH_SHORT: 'MMM yy',

@@ -9,10 +9,6 @@ function readExpanded(): boolean {
   return window.localStorage.getItem(STORAGE_KEYS.UI_SIDEBAR_EXPANDED) !== 'false'
 }
 
-/**
- * Desktop sidebar width: expanded (labels) vs collapsed (icon rail).
- * Persisted in localStorage; defaults to expanded.
- */
 export function useSidebarExpanded() {
   const [expanded, setExpandedState] = useState(() => readExpanded())
 

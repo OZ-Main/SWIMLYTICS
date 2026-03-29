@@ -1,6 +1,5 @@
 import { cva } from 'class-variance-authority'
 
-/** Shell comes from `Card` (`cardRootVariants`); only motion + clip here. */
 export const chartCardRootVariants = cva('motion-mount-chart overflow-hidden')
 
 export const chartCardHeaderVariants = cva('page-section-header')

@@ -1,4 +1,3 @@
-/** App route paths (absolute, for links and document title matching). */
 export const APP_ROUTE = {
   home: '/',
   athletes: '/athletes',
@@ -31,7 +30,6 @@ export function athletePersonalBestsPath(athleteId: string): string {
   return `${APP_ROUTE.athletes}/${athleteId}/personal-bests`
 }
 
-/** React Router `Route` path segments (relative to shell layout). */
 export const ROUTE_SEGMENT = {
   index: '',
   athletes: 'athletes',
@@ -46,7 +44,6 @@ export const ROUTE_SEGMENT = {
   wildcard: '*',
 } as const
 
-/** `useParams` keys */
 export const ROUTE_PARAM = {
   athleteId: 'athleteId',
   sessionId: 'sessionId',

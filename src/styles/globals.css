@@ -139,7 +139,6 @@
     --max-page-width: 90rem;
     --max-content-width: 72rem;
     --sidebar-width: 15.75rem;
-    /** Icon-only rail (md+); wide enough for 40×40 touch targets. */
     --sidebar-width-collapsed: 4.25rem;
     --sidebar-header-height: 4rem;
     --header-height-mobile: 3.5rem;
@@ -322,6 +321,57 @@
     @apply h-[min(18rem,48vw)] min-h-[220px] w-full pb-card pl-0 pr-2 pt-section-sm sm:h-chart sm:min-h-chart sm:pr-card;
   }
 
+  .chart-surface-pie {
+    @apply flex min-h-0 w-full flex-1 flex-col px-2 pb-3 pt-section-sm sm:px-card sm:pb-card;
+    min-height: min(70dvh, 36rem);
+  }
+
+  @media (min-width: 640px) {
+    .chart-surface-pie {
+      min-height: min(56dvh, 32rem);
+      height: auto;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .chart-surface-pie {
+      min-height: min(50dvh, 36rem);
+    }
+  }
+
+  .chart-surface-flush-left .recharts-cartesian-axis-tick text {
+    font-size: var(--text-body-sm-size);
+  }
+
+  @media (max-width: 639px) {
+    .chart-surface-flush-left .recharts-cartesian-axis-tick text {
+      font-size: 0.6875rem;
+    }
+  }
+
+  .chart-surface-flush-left .recharts-label {
+    font-size: var(--text-body-sm-size);
+  }
+
+  .chart-surface-pie .recharts-legend-wrapper {
+    @apply pt-1;
+  }
+
+  .chart-surface-pie .recharts-legend-item-text {
+    font-size: var(--text-body-size);
+    fill: hsl(var(--chart-axis));
+  }
+
+  @media (min-width: 640px) {
+    .chart-surface-pie .recharts-legend-item-text {
+      font-size: var(--text-body-sm-size);
+    }
+  }
+
+  .chart-surface-pie .recharts-legend-icon {
+    @apply h-2.5 w-2.5 sm:h-3 sm:w-3;
+  }
+
   .data-row {
     @apply flex flex-col items-stretch gap-tight py-3 first:pt-0 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between;
   }
@@ -335,17 +385,17 @@
   }
 
   .analytics-chart-grid {
-    @apply grid grid-cols-1 gap-6 md:gap-section lg:grid-cols-2;
+    @apply grid grid-cols-1 items-stretch gap-6 md:gap-section lg:grid-cols-2;
+  }
+
+  .analytics-chart-grid > * {
+    @apply min-h-0;
   }
 
   .stats-metric-grid {
     @apply grid grid-cols-1 gap-stack sm:grid-cols-2 xl:grid-cols-3;
   }
 
-  /**
-   * One-shot mount animations (Tailwind `animate-swim-*`).
-   * Prefer Framer Motion for staggered lists and route transitions.
-   */
   .motion-mount-surface {
     @apply animate-swim-surface-in motion-reduce:animate-none;
   }
@@ -354,7 +404,6 @@
     @apply animate-swim-chart-in motion-reduce:animate-none;
   }
 
-  /** Page-level cards (dashboard recent activity, settings, session hero metrics, statistics summary). */
   .page-section-header {
     @apply space-y-1 border-b border-border/50 bg-gradient-to-r from-muted/35 via-accent/5 to-muted/25 px-card py-section-sm;
   }
@@ -363,37 +412,30 @@
     @apply font-display text-heading-sm font-bold tracking-tight text-foreground;
   }
 
-  /** Nested entities (session blocks, builder blocks). */
   .nested-card-header {
     @apply border-b border-border/50 bg-gradient-to-r from-muted/25 to-transparent px-card py-tight;
   }
 
-  /** List shells (recent activity rows, roster-style lists). */
   .data-list-shell {
     @apply divide-y divide-border overflow-hidden rounded-card border border-border/80 bg-gradient-to-b from-card to-card-subtle text-card-foreground shadow-card;
   }
 
-  /** Table / rail captions (pool vs gym group labels). */
   .table-rail-caption {
     @apply border-b border-border/50 bg-gradient-to-r from-muted/40 to-accent/5 px-card py-tight text-label font-medium text-muted-foreground;
   }
 
-  /** Sticky form footers (session builder save row). */
   .form-footer-actions {
     @apply flex flex-wrap justify-end gap-stack border-t border-border/40 pt-stack;
   }
 
-  /** Inline callouts (athlete notes, coach hints). */
   .insight-banner {
     @apply rounded-card border border-primary/15 bg-gradient-to-br from-primary/5 to-accent/5 px-card py-tight text-body-sm text-muted-foreground;
   }
 
-  /** Dense KPI tiles (athlete overview, inline stats). */
   .kpi-tile {
     @apply rounded-card border border-border/80 bg-gradient-to-br from-card to-card-subtle p-card text-card-foreground shadow-card;
   }
 
-  /** Chart empty / placeholder states (matches chart vertical rhythm). */
   .chart-empty-state {
     @apply flex h-full w-full flex-col items-center justify-center gap-tight px-card text-center text-body-sm leading-relaxed text-muted-foreground;
   }

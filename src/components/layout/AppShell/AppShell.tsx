@@ -1,5 +1,6 @@
 import { ChevronsLeft, ChevronsRight, Menu } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import { PageTransitionOutlet } from '@/components/motion'
 import MainNav from '@/components/navigation/MainNav'
@@ -42,8 +43,10 @@ import { useSidebarExpanded } from './useSidebarExpanded'
 
 export default function AppShell() {
   const { expanded, toggle } = useSidebarExpanded()
+  const location = useLocation()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const isMdUp = useMediaQuery(MEDIA_QUERY_MIN_MD)
+  const mobileNavTriggerRef = useRef<HTMLButtonElement>(null)
 
   const handleOpenMobileNav = useCallback(() => {
     setMobileNavOpen(true)
@@ -53,11 +56,22 @@ export default function AppShell() {
     setMobileNavOpen(false)
   }, [])
 
+  const handleMobileSheetCloseAutoFocus = useCallback((focusEvent: Event) => {
+    focusEvent.preventDefault()
+    requestAnimationFrame(() => {
+      mobileNavTriggerRef.current?.focus({ preventScroll: true })
+    })
+  }, [])
+
   useEffect(() => {
     if (isMdUp) {
       setMobileNavOpen(false)
     }
   }, [isMdUp])
+
+  useEffect(() => {
+    setMobileNavOpen(false)
+  }, [location.pathname, location.search])
 
   return (
     <div className={appShellRootVariants()}>
@@ -108,12 +122,14 @@ export default function AppShell() {
         <div className={appShellMainColumnVariants()}>
           <header className={appShellMobileHeaderVariants()}>
             <Button
+              ref={mobileNavTriggerRef}
               type="button"
               variant="ghost"
               size="icon"
               className={appShellMobileMenuButtonVariants()}
               aria-expanded={mobileNavOpen}
               aria-controls="mobile-main-nav"
+              aria-haspopup="dialog"
               aria-label="Open navigation menu"
               onClick={handleOpenMobileNav}
             >
@@ -123,7 +139,10 @@ export default function AppShell() {
             <span className={appShellMobileHeaderSpacerVariants()} aria-hidden />
           </header>
           <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
-            <SheetContent className={appShellMobileNavSheetContentVariants()}>
+            <SheetContent
+              className={appShellMobileNavSheetContentVariants()}
+              onCloseAutoFocus={handleMobileSheetCloseAutoFocus}
+            >
               <SheetDescription className="sr-only">
                 Application sections: dashboard, athletes, statistics, and settings.
               </SheetDescription>
