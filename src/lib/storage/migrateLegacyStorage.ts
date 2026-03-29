@@ -39,7 +39,7 @@ function ensureLegacyImportAthleteExists(): void {
     notes: `Created when migrating from a previous single-athlete install (${ATHLETE_TRAINING_TYPE_LABELS[AthleteTrainingType.Swimming].toLowerCase()} data).`,
     createdAt: new Date().toISOString(),
   }
-  addAthlete(legacyAthlete)
+  void addAthlete(legacyAthlete).catch(() => {})
 }
 
 export function migrateLegacyStorage(): void {

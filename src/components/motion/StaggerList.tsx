@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import * as React from 'react'
+import type { ReactNode } from 'react'
 
 import {
   staggerContainer,
@@ -11,7 +11,7 @@ import { cn } from '@/shared/utils/cn'
 
 type StaggerListProps = {
   className?: string
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function StaggerList({ className, children }: StaggerListProps) {
@@ -30,7 +30,7 @@ export function StaggerList({ className, children }: StaggerListProps) {
 
 type StaggerItemProps = {
   className?: string
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function StaggerItem({ className, children }: StaggerItemProps) {

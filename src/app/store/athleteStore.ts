@@ -1,41 +1,40 @@
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
 
-import { STORAGE_KEYS } from '@/lib/storage/storageKeys'
+import {
+  deleteAthleteDocument,
+  writeAthleteDocument,
+} from '@/lib/firebase/coachDataRepository'
+import { useAuthStore } from '@/app/store/authStore'
 import type { Athlete } from '@/shared/types/domain.types'
+
+function requireCoachUid(): string {
+  const uid = useAuthStore.getState().user?.uid
+  if (!uid) {
+    throw new Error('You must be signed in to change athletes.')
+  }
+  return uid
+}
 
 type AthleteState = {
   athletes: Athlete[]
-  addAthlete: (athlete: Athlete) => void
-  updateAthlete: (athlete: Athlete) => void
-  deleteAthlete: (athleteId: string) => void
+  addAthlete: (athlete: Athlete) => Promise<void>
+  updateAthlete: (athlete: Athlete) => Promise<void>
+  deleteAthlete: (athleteId: string) => Promise<void>
   replaceAllAthletes: (nextAthletes: Athlete[]) => void
 }
 
-export const useAthleteStore = create<AthleteState>()(
-  persist(
-    (setState, getState) => ({
-      athletes: [],
-      addAthlete: (athlete) =>
-        setState({ athletes: [athlete, ...getState().athletes] }),
-      updateAthlete: (updatedAthlete) =>
-        setState({
-          athletes: getState().athletes.map((existingAthlete) =>
-            existingAthlete.id === updatedAthlete.id ? updatedAthlete : existingAthlete,
-          ),
-        }),
-      deleteAthlete: (athleteId) =>
-        setState({
-          athletes: getState().athletes.filter(
-            (existingAthlete) => existingAthlete.id !== athleteId,
-          ),
-        }),
-      replaceAllAthletes: (nextAthletes) => setState({ athletes: nextAthletes }),
-    }),
-    {
-      name: STORAGE_KEYS.ATHLETES,
-      storage: createJSONStorage(() => localStorage),
-      partialize: (persistedSlice) => ({ athletes: persistedSlice.athletes }),
-    },
-  ),
-)
+export const useAthleteStore = create<AthleteState>(() => ({
+  athletes: [],
+  addAthlete: async (athlete) => {
+    await writeAthleteDocument(requireCoachUid(), athlete)
+  },
+  updateAthlete: async (updatedAthlete) => {
+    await writeAthleteDocument(requireCoachUid(), updatedAthlete)
+  },
+  deleteAthlete: async (athleteId) => {
+    await deleteAthleteDocument(requireCoachUid(), athleteId)
+  },
+  replaceAllAthletes: (nextAthletes) => {
+    useAthleteStore.setState({ athletes: nextAthletes })
+  },
+}))

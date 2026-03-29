@@ -88,25 +88,33 @@ export default function PersonalBestsPage() {
     setDialogOpen(true)
   }
 
-  function handleFormSubmit(pb: PersonalBest) {
-    if (editing) {
-      updatePersonalBest(pb)
-      toast.success('Best time updated')
-    } else {
-      addPersonalBest(pb)
-      toast.success('Best time added')
+  async function handleFormSubmit(pb: PersonalBest) {
+    try {
+      if (editing) {
+        await updatePersonalBest(pb)
+        toast.success('Best time updated')
+      } else {
+        await addPersonalBest(pb)
+        toast.success('Best time added')
+      }
+      setDialogOpen(false)
+      setEditing(null)
+    } catch {
+      toast.error('Could not save personal best.')
     }
-    setDialogOpen(false)
-    setEditing(null)
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!deleting) {
       return
     }
-    deletePersonalBest(deleting.id)
-    toast.success('Entry removed')
-    setDeleting(null)
+    try {
+      await deletePersonalBest(deleting.id)
+      toast.success('Entry removed')
+      setDeleting(null)
+    } catch {
+      toast.error('Could not remove entry.')
+    }
   }
 
   if (!athleteId || !athlete) {

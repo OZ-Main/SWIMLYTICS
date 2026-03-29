@@ -1,4 +1,5 @@
-import * as React from 'react'
+import { forwardRef } from 'react'
+import type { HTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react'
 
 import { cn } from '@/shared/utils/cn'
 
@@ -14,7 +15,7 @@ import {
   tableWrapperVariants,
 } from './table.styles'
 
-const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
+const Table = forwardRef<HTMLTableElement, HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
     <div className={tableWrapperVariants()}>
       <table ref={ref} className={cn(tableRootVariants(), className)} {...props} />
@@ -23,56 +24,56 @@ const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableE
 )
 Table.displayName = 'Table'
 
-const TableHeader = React.forwardRef<
+const TableHeader = forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
+  HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
   <thead ref={ref} className={cn(tableHeaderVariants(), className)} {...props} />
 ))
 TableHeader.displayName = 'TableHeader'
 
-const TableBody = React.forwardRef<
+const TableBody = forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
+  HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
   <tbody ref={ref} className={cn(tableBodyVariants(), className)} {...props} />
 ))
 TableBody.displayName = 'TableBody'
 
-const TableFooter = React.forwardRef<
+const TableFooter = forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
+  HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
   <tfoot ref={ref} className={cn(tableFooterVariants(), className)} {...props} />
 ))
 TableFooter.displayName = 'TableFooter'
 
-const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
+const TableRow = forwardRef<HTMLTableRowElement, HTMLAttributes<HTMLTableRowElement>>(
   ({ className, ...props }, ref) => (
     <tr ref={ref} className={cn(tableRowVariants(), className)} {...props} />
   ),
 )
 TableRow.displayName = 'TableRow'
 
-const TableHead = React.forwardRef<
+const TableHead = forwardRef<
   HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
+  ThHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
   <th ref={ref} className={cn(tableHeadVariants(), className)} {...props} />
 ))
 TableHead.displayName = 'TableHead'
 
-const TableCell = React.forwardRef<
+const TableCell = forwardRef<
   HTMLTableCellElement,
-  React.TdHTMLAttributes<HTMLTableCellElement>
+  TdHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
   <td ref={ref} className={cn(tableCellVariants(), className)} {...props} />
 ))
 TableCell.displayName = 'TableCell'
 
-const TableCaption = React.forwardRef<
+const TableCaption = forwardRef<
   HTMLTableCaptionElement,
-  React.HTMLAttributes<HTMLTableCaptionElement>
+  HTMLAttributes<HTMLTableCaptionElement>
 >(({ className, ...props }, ref) => (
   <caption ref={ref} className={cn(tableCaptionVariants(), className)} {...props} />
 ))

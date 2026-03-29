@@ -164,18 +164,26 @@ export default function AthleteDetailPage() {
     setFilters({ ...DEFAULT_FILTERS })
   }
 
-  function handleRemoveAthlete() {
+  async function handleRemoveAthlete() {
     if (!athleteId) {
       return
     }
-    athleteSessions.forEach((session) => deleteTrainingSession(session.id))
-    personalBests
-      .filter((personalBest) => personalBest.athleteId === athleteId)
-      .forEach((personalBest) => deletePersonalBest(personalBest.id))
-    deleteAthlete(athleteId)
-    toast.success('Athlete removed')
-    setRemoveOpen(false)
-    navigate(APP_ROUTE.athletes)
+    try {
+      for (const session of athleteSessions) {
+        await deleteTrainingSession(session.id)
+      }
+      for (const personalBest of personalBests.filter(
+        (candidate) => candidate.athleteId === athleteId,
+      )) {
+        await deletePersonalBest(personalBest.id)
+      }
+      await deleteAthlete(athleteId)
+      toast.success('Athlete removed')
+      setRemoveOpen(false)
+      navigate(APP_ROUTE.athletes)
+    } catch {
+      toast.error('Could not remove athlete.')
+    }
   }
 
   if (!athleteId || !athlete) {

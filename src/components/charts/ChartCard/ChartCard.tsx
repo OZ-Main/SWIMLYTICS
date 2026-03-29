@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type { ReactNode } from 'react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/shared/utils/cn'
@@ -13,7 +13,7 @@ import {
 type ChartCardProps = {
   title: string
   description?: string
-  children: React.ReactNode
+  children: ReactNode
   contentClassName?: string
   rootClassName?: string
 }

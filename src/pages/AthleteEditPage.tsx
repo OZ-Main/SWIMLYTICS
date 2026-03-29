@@ -35,10 +35,14 @@ export default function AthleteEditPage() {
     )
   }
 
-  function handleSubmit(updatedAthlete: Athlete) {
-    updateAthlete(updatedAthlete)
-    toast.success('Profile updated')
-    navigate(athleteDetailPath(updatedAthlete.id))
+  async function handleSubmit(updatedAthlete: Athlete) {
+    try {
+      await updateAthlete(updatedAthlete)
+      toast.success('Profile updated')
+      navigate(athleteDetailPath(updatedAthlete.id))
+    } catch {
+      toast.error('Could not update athlete.')
+    }
   }
 
   return (

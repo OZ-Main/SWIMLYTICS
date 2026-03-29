@@ -1,5 +1,5 @@
-import * as React from 'react'
 import type { LucideIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 import { cn } from '@/shared/utils/cn'
 
@@ -17,8 +17,8 @@ type EmptyStateProps = {
   title: string
   description: string
   className?: string
-  action?: React.ReactNode
-  secondaryAction?: React.ReactNode
+  action?: ReactNode
+  secondaryAction?: ReactNode
 }
 
 export default function EmptyState({

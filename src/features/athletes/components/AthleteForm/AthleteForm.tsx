@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -65,7 +65,7 @@ export default function AthleteForm({ mode, initial, onSubmit, onCancel }: Athle
 
   const syncKey = initial?.id ?? FORM_SYNC_KEY.NEW_ENTITY
 
-  React.useEffect(() => {
+  useEffect(() => {
     form.reset(initial ? athleteToValues(initial) : defaultCreate())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncKey, form, mode])

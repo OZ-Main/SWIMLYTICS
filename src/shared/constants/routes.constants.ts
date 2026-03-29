@@ -1,5 +1,7 @@
 export const APP_ROUTE = {
   home: '/',
+  login: '/login',
+  signUp: '/sign-up',
   athletes: '/athletes',
   athleteNew: '/athletes/new',
   statistics: '/statistics',
@@ -32,6 +34,8 @@ export function athletePersonalBestsPath(athleteId: string): string {
 
 export const ROUTE_SEGMENT = {
   index: '',
+  login: 'login',
+  signUp: 'sign-up',
   athletes: 'athletes',
   new: 'new',
   edit: 'edit',

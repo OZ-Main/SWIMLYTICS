@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import * as React from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { Button } from '@/components/ui/button'
@@ -73,17 +73,18 @@ export default function PersonalBestForm({
 
   const pbSyncKey = initial?.id ?? FORM_SYNC_KEY.NEW_ENTITY
 
-  React.useEffect(() => {
+  useEffect(() => {
     form.reset(initial ? personalBestToFormValues(initial) : defaultCreateValues())
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset when switching PB or create flow, not on object identity
   }, [pbSyncKey, form])
 
   const stroke = form.watch('stroke')
 
-  React.useEffect(() => {
+  useEffect(() => {
     const allowed = personalBestDistancesForStroke(stroke)
     const allowedStr = new Set(allowed.map(String))
     const current = form.getValues('distance')
+
     if (!allowedStr.has(current)) {
       form.setValue('distance', String(allowed[0]))
     }
