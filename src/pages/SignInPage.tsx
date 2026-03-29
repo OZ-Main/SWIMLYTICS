@@ -50,7 +50,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-page-padding-x py-section">
+    <div className="px-page-padding-x flex min-h-screen flex-col items-center justify-center bg-background py-section">
       <Card className="w-full max-w-md overflow-hidden shadow-card">
         <CardHeader className="page-section-header">
           <CardTitle className="page-section-title">Sign in</CardTitle>
@@ -59,8 +59,6 @@ export default function SignInPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-stack pt-card">
-          <GoogleSignInButton disabled={authBusy} onPress={beginGoogleSignIn} />
-          <AuthOAuthDivider />
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-stack">
               <FormField
@@ -94,6 +92,9 @@ export default function SignInPage() {
               </Button>
             </form>
           </Form>
+          <AuthOAuthDivider />
+          <GoogleSignInButton disabled={authBusy} onPress={beginGoogleSignIn} />
+
           <p className="mt-stack text-center text-body-sm text-muted-foreground">
             No account?{' '}
             <Link

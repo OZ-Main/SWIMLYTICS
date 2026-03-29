@@ -39,6 +39,7 @@ import {
   appShellSidebarFooterInnerVariants,
   appShellSidebarFooterVariants,
   appShellSidebarHeaderRowVariants,
+  appShellSidebarSignOutButtonVariants,
   appShellSidebarToggleButtonVariants,
   appShellSkipLinkVariants,
 } from './AppShell.styles'
@@ -133,7 +134,7 @@ export default function AppShell() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="w-full justify-start gap-2 text-sidebar-foreground/90"
+                className={appShellSidebarSignOutButtonVariants()}
                 onClick={() => void handleSignOut()}
               >
                 <LogOut className="h-4 w-4 shrink-0" aria-hidden />

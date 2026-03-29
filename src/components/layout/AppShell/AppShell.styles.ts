@@ -84,6 +84,10 @@ export const appShellSidebarFooterVariants = cva('px-3 pb-card')
 
 export const appShellSidebarFooterInnerVariants = cva('px-3')
 
+export const appShellSidebarSignOutButtonVariants = cva(
+  'w-full justify-start gap-2 text-sidebar-foreground/90 hover:bg-sidebar-border/60 hover:text-sidebar-foreground motion-safe:hover:scale-100 motion-safe:active:scale-100',
+)
+
 export const appShellDesktopMainNavVariants = cva('flex-1 py-section-sm', {
   variants: {
     expanded: {
