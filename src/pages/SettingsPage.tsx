@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { type ChangeEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useAthleteStore } from '@/app/store/athleteStore'
+import { useAuthStore } from '@/app/store/authStore'
 import { useCoachStore } from '@/app/store/coachStore'
 import { usePersonalBestsStore } from '@/app/store/personalBestsStore'
 import { useSettingsStore } from '@/app/store/settingsStore'
@@ -27,13 +28,20 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import PageHeader from '@/components/layout/PageHeader'
-import { migrateLegacyWorkoutToTrainingSession } from '@/lib/storage/migrateLegacyWorkoutToSession'
 import {
   buildExportPayloadV3,
   legacyImportAthleteSeed,
   parseImportPayload,
 } from '@/features/settings/helpers/dataBundle.helpers'
-import { DEFAULT_LOCAL_COACH_ID } from '@/shared/constants/migration.constants'
+import {
+  clearAllSubcollections,
+  replaceAllCoachDataDocuments,
+} from '@/lib/firebase/coachDataRepository'
+import { migrateLegacyWorkoutToTrainingSession } from '@/lib/storage/migrateLegacyWorkoutToSession'
+import {
+  resetUserProfileAfterClearingData,
+  updateUserProfileFields,
+} from '@/lib/firebase/userProfileRepository'
 import {
   buildExportDownloadFilename,
   exportFilenameDateSlice,
@@ -47,15 +55,8 @@ function isThemeMode(value: string): value is ThemeMode {
   return (Object.values(ThemeMode) as string[]).includes(value)
 }
 
-function defaultCoachRecord() {
-  return {
-    id: DEFAULT_LOCAL_COACH_ID,
-    displayName: 'Coach',
-    createdAt: new Date().toISOString(),
-  }
-}
-
 export default function SettingsPage() {
+  const user = useAuthStore((authStore) => authStore.user)
   const theme = useSettingsStore((settingsStore) => settingsStore.theme)
   const setInitialSampleApplied = useSettingsStore(
     (settingsStore) => settingsStore.setInitialSampleApplied,
@@ -63,21 +64,13 @@ export default function SettingsPage() {
   const { setTheme } = useTheme()
 
   const coach = useCoachStore((coachStore) => coachStore.coach)
-  const replaceCoach = useCoachStore((coachStore) => coachStore.replaceCoach)
   const trainingSessions = useTrainingSessionStore(
     (trainingSessionStore) => trainingSessionStore.trainingSessions,
-  )
-  const replaceAllTrainingSessions = useTrainingSessionStore(
-    (trainingSessionStore) => trainingSessionStore.replaceAllTrainingSessions,
   )
   const personalBests = usePersonalBestsStore(
     (personalBestsStore) => personalBestsStore.personalBests,
   )
-  const replaceAllPersonalBests = usePersonalBestsStore(
-    (personalBestsStore) => personalBestsStore.replaceAllPersonalBests,
-  )
   const athletes = useAthleteStore((athleteStore) => athleteStore.athletes)
-  const replaceAllAthletes = useAthleteStore((athleteStore) => athleteStore.replaceAllAthletes)
 
   const fileRef = useRef<HTMLInputElement>(null)
   const [clearOpen, setClearOpen] = useState(false)
@@ -89,6 +82,11 @@ export default function SettingsPage() {
   }
 
   function handleExport() {
+    if (!coach) {
+      toast.error('Profile not ready yet.')
+      return
+    }
+
     const payload = buildExportPayloadV3(coach, athletes, trainingSessions, personalBests)
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
       type: 'application/json',
@@ -104,73 +102,98 @@ export default function SettingsPage() {
     toast.success('Export downloaded')
   }
 
-  function handleImportFile(changeEvent: React.ChangeEvent<HTMLInputElement>) {
+  async function handleImportFile(changeEvent: ChangeEvent<HTMLInputElement>) {
+    const uid = user?.uid
+    if (!uid) {
+      toast.error('You must be signed in to import.')
+      return
+    }
+
     const file = changeEvent.target.files?.[0]
     changeEvent.target.value = ''
+
     if (!file) {
       return
     }
+
     const reader = new FileReader()
     reader.onload = () => {
-      try {
-        const json = JSON.parse(String(reader.result))
-        const result = parseImportPayload(json)
-        if (!result.ok) {
-          toast.error(result.error)
-          return
+      void (async () => {
+        try {
+          const json = JSON.parse(String(reader.result))
+          const result = parseImportPayload(json)
+          if (!result.ok) {
+            toast.error(result.error)
+            return
+          }
+          if (result.version === DataExportVersion.V3) {
+            const nextCoach = { ...result.data.coach, id: uid }
+            await replaceAllCoachDataDocuments(uid, {
+              coach: nextCoach,
+              athletes: result.data.athletes,
+              trainingSessions: result.data.trainingSessions,
+              personalBests: result.data.personalBests,
+            })
+          } else if (result.version === DataExportVersion.V2) {
+            const nextCoach = { ...result.data.coach, id: uid }
+            await replaceAllCoachDataDocuments(uid, {
+              coach: nextCoach,
+              athletes: result.data.athletes,
+              trainingSessions: result.data.workouts.map(migrateLegacyWorkoutToTrainingSession),
+              personalBests: result.data.personalBests,
+            })
+          } else {
+            const legacy = legacyImportAthleteSeed()
+            const nextAthletes = athletes.some((existingAthlete) => existingAthlete.id === legacy.id)
+              ? athletes
+              : [legacy, ...athletes]
+            await replaceAllCoachDataDocuments(uid, {
+              coach: { id: uid, displayName: coach?.displayName ?? 'Coach', createdAt: coach?.createdAt ?? new Date().toISOString() },
+              athletes: nextAthletes,
+              trainingSessions: result.data.trainingSessions,
+              personalBests: result.data.personalBests,
+            })
+          }
+          await updateUserProfileFields(uid, { initialSampleApplied: true })
+          setInitialSampleApplied(true)
+          toast.success('Data imported to Firestore')
+        } catch {
+          toast.error('Could not read JSON file.')
         }
-        if (result.version === DataExportVersion.V3) {
-          replaceCoach(result.data.coach)
-          replaceAllAthletes(result.data.athletes)
-          replaceAllTrainingSessions(result.data.trainingSessions)
-          replaceAllPersonalBests(result.data.personalBests)
-        } else if (result.version === DataExportVersion.V2) {
-          replaceCoach(result.data.coach)
-          replaceAllAthletes(result.data.athletes)
-          replaceAllTrainingSessions(
-            result.data.workouts.map(migrateLegacyWorkoutToTrainingSession),
-          )
-          replaceAllPersonalBests(result.data.personalBests)
-        } else {
-          const legacy = legacyImportAthleteSeed()
-          const nextAthletes = athletes.some((existingAthlete) => existingAthlete.id === legacy.id)
-            ? athletes
-            : [legacy, ...athletes]
-          replaceAllAthletes(nextAthletes)
-          replaceAllTrainingSessions(result.data.trainingSessions)
-          replaceAllPersonalBests(result.data.personalBests)
-        }
-        setInitialSampleApplied(true)
-        toast.success('Data imported')
-      } catch {
-        toast.error('Could not read JSON file.')
-      }
+      })()
     }
     reader.readAsText(file)
   }
 
-  function handleClearAll() {
-    replaceAllTrainingSessions([])
-    replaceAllPersonalBests([])
-    replaceAllAthletes([])
-    replaceCoach(defaultCoachRecord())
-    setInitialSampleApplied(true)
-    setClearOpen(false)
-    toast.success('Local data cleared')
+  async function handleClearAll() {
+    const uid = user?.uid
+    if (!uid || !user) {
+      toast.error('You must be signed in.')
+      return
+    }
+    try {
+      await clearAllSubcollections(uid)
+      await resetUserProfileAfterClearingData(uid, user)
+      setInitialSampleApplied(true)
+      setClearOpen(false)
+      toast.success('Cloud data cleared for this account')
+    } catch {
+      toast.error('Could not clear data.')
+    }
   }
 
   return (
     <div className="page-stack max-w-2xl">
       <PageHeader
         title="Settings"
-        description="Appearance, backups, and local data for this browser."
+        description="Appearance, JSON backups, and your Firestore workspace."
       />
 
       <Card className="overflow-hidden">
         <CardHeader className="page-section-header">
           <CardTitle className="page-section-title">Appearance</CardTitle>
           <CardDescription className="text-caption">
-            Light, dark, or follow the system setting.
+            Light, dark, or follow the system setting. Saved to your coach profile.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-tight pt-card">
@@ -195,7 +218,7 @@ export default function SettingsPage() {
           <CardTitle className="page-section-title">Backup</CardTitle>
           <CardDescription className="text-caption">
             Export coach profile, athletes, training sessions, and best times as JSON (v3). Import
-            replaces current local data. v2 and v1 exports are still accepted.
+            replaces all documents under your Firebase user. v2 and v1 exports are still accepted.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-stack pt-card">
@@ -217,17 +240,15 @@ export default function SettingsPage() {
 
       <Card className="overflow-hidden border-destructive/30 shadow-card">
         <CardHeader className="border-b border-destructive/20 bg-destructive/5 px-card py-section-sm">
-          <CardTitle className="page-section-title text-destructive">
-            Danger zone
-          </CardTitle>
+          <CardTitle className="page-section-title text-destructive">Danger zone</CardTitle>
           <CardDescription className="text-caption">
-            Remove all SWIMLYTICS data stored in this browser (coach, athletes, sessions, best
-            times).
+            Delete all athletes, sessions, and personal bests in Firestore for this signed-in coach.
+            Your account and sign-in remain; you can import a backup afterward.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-card">
           <Button variant="destructive" onClick={() => setClearOpen(true)}>
-            Clear local data
+            Clear cloud data
           </Button>
         </CardContent>
       </Card>
@@ -235,23 +256,24 @@ export default function SettingsPage() {
       <Separator />
 
       <p className="text-caption text-muted-foreground">
-        Local-first coach workspace · No cloud sync · Export regularly for backups.
+        Firebase Authentication and Cloud Firestore. Deploy firestore.rules so each coach can only
+        read and write their own user document and subcollections.
       </p>
 
       <Dialog open={clearOpen} onOpenChange={setClearOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Clear all data?</DialogTitle>
+            <DialogTitle>Clear all cloud data?</DialogTitle>
             <DialogDescription>
-              Athletes, sessions, and personal bests will be removed from local storage. Export first
-              if you need a backup.
+              Athletes, sessions, and personal bests will be removed from Firestore. Export first if
+              you need a backup.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setClearOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleClearAll}>
+            <Button variant="destructive" onClick={() => void handleClearAll()}>
               Clear everything
             </Button>
           </DialogFooter>

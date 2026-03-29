@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type { ReactNode } from 'react'
 
 import { cn } from '@/shared/utils/cn'
 
@@ -11,7 +11,7 @@ import {
 type PageHeaderProps = {
   title: string
   description?: string
-  actions?: React.ReactNode
+  actions?: ReactNode
   className?: string
 }
 

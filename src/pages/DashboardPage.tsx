@@ -81,6 +81,14 @@ export default function DashboardPage() {
 
   const hasAnyData = trainingSessions.length > 0
 
+  if (!coach) {
+    return (
+      <div className="page-stack">
+        <PageHeader title="Coach dashboard" description="Loading your workspace…" />
+      </div>
+    )
+  }
+
   if (!hasAnyData) {
     return (
       <div className="page-stack">
@@ -91,7 +99,7 @@ export default function DashboardPage() {
         <EmptyState
           icon={Users}
           title="No data yet"
-          description="Create athlete profiles, then log pool or gym sessions. Sample data loads automatically on first launch if the app is empty."
+          description="Create athlete profiles, then log pool or gym sessions. New accounts include sample data you can edit or remove."
           action={
             <Button asChild>
               <Link to={APP_ROUTE.athleteNew}>Add athlete</Link>

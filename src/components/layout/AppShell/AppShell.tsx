@@ -1,7 +1,9 @@
-import { ChevronsLeft, ChevronsRight, Menu } from 'lucide-react'
+import { ChevronsLeft, ChevronsRight, LogOut, Menu } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 
+import { useAuthStore } from '@/app/store/authStore'
 import { PageTransitionOutlet } from '@/components/motion'
 import MainNav from '@/components/navigation/MainNav'
 import { Button } from '@/components/ui/button'
@@ -13,6 +15,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useMediaQuery } from '@/lib/hooks/useMediaQuery'
+import { APP_ROUTE } from '@/shared/constants/routes.constants'
 import { MEDIA_QUERY_MIN_MD } from '@/shared/constants/tailwindBreakpointMedia.constants'
 import { cn } from '@/shared/utils/cn'
 
@@ -42,6 +45,8 @@ import {
 import { useSidebarExpanded } from './useSidebarExpanded'
 
 export default function AppShell() {
+  const navigate = useNavigate()
+  const signOutUser = useAuthStore((authStore) => authStore.signOutUser)
   const { expanded, toggle } = useSidebarExpanded()
   const location = useLocation()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
@@ -72,6 +77,16 @@ export default function AppShell() {
   useEffect(() => {
     setMobileNavOpen(false)
   }, [location.pathname, location.search])
+
+  async function handleSignOut() {
+    try {
+      await signOutUser()
+      toast.success('Signed out')
+      navigate(APP_ROUTE.login, { replace: true })
+    } catch {
+      toast.error('Could not sign out.')
+    }
+  }
 
   return (
     <div className={appShellRootVariants()}>
@@ -114,8 +129,16 @@ export default function AppShell() {
             aria-hidden={!expanded}
           >
             <div className={appShellSidebarFooterInnerVariants()}>
-              <span className="h-4 w-4 shrink-0" aria-hidden />
-              <p className="text-caption text-sidebar-muted">Coach analytics</p>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start gap-2 text-sidebar-foreground/90"
+                onClick={() => void handleSignOut()}
+              >
+                <LogOut className="h-4 w-4 shrink-0" aria-hidden />
+                Sign out
+              </Button>
             </div>
           </div>
         </aside>

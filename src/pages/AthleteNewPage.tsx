@@ -11,10 +11,14 @@ export default function AthleteNewPage() {
   const navigate = useNavigate()
   const addAthlete = useAthleteStore((athleteStore) => athleteStore.addAthlete)
 
-  function handleSubmit(athlete: Athlete) {
-    addAthlete(athlete)
-    toast.success('Athlete created')
-    navigate(athleteDetailPath(athlete.id))
+  async function handleSubmit(athlete: Athlete) {
+    try {
+      await addAthlete(athlete)
+      toast.success('Athlete created')
+      navigate(athleteDetailPath(athlete.id))
+    } catch {
+      toast.error('Could not save athlete.')
+    }
   }
 
   return (

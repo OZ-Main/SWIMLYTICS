@@ -66,7 +66,7 @@ export default function SessionNewPage() {
     )
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (!athleteId || !draftSession) {
       return
     }
@@ -80,9 +80,13 @@ export default function SessionNewPage() {
       updatedAt: now,
       createdAt: draftSession.createdAt || now,
     }
-    addTrainingSession(toSave)
-    toast.success('Session saved')
-    navigate(sessionDetailPath(athleteId, toSave.id))
+    try {
+      await addTrainingSession(toSave)
+      toast.success('Session saved')
+      navigate(sessionDetailPath(athleteId, toSave.id))
+    } catch {
+      toast.error('Could not save session.')
+    }
   }
 
   const title =

@@ -1,5 +1,5 @@
-import * as React from 'react'
+import { createContext } from 'react'
 
 import type { ThemeContextValue } from './theme.types'
 
-export const ThemeContext = React.createContext<ThemeContextValue | null>(null)
+export const ThemeContext = createContext<ThemeContextValue | null>(null)

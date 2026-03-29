@@ -86,11 +86,15 @@ export default function SessionDetailPage() {
   const activeSession = session
   const backHref = athleteDetailPath(athleteId)
 
-  function handleDelete() {
-    deleteTrainingSession(activeSession.id)
-    toast.success('Session removed')
-    setConfirmOpen(false)
-    navigate(backHref)
+  async function handleDelete() {
+    try {
+      await deleteTrainingSession(activeSession.id)
+      toast.success('Session removed')
+      setConfirmOpen(false)
+      navigate(backHref)
+    } catch {
+      toast.error('Could not remove session.')
+    }
   }
 
   if (isGymTrainingSession(activeSession)) {

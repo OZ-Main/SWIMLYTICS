@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 import { Toaster as Sonner } from 'sonner'
 
 import { useTheme } from '@/app/theme/useTheme'
 import { ResolvedTheme } from '@/shared/domain'
 
-type ToasterProps = React.ComponentProps<typeof Sonner>
+type ToasterProps = ComponentProps<typeof Sonner>
 
 function Toaster({ ...props }: ToasterProps) {
   const { resolvedTheme } = useTheme()

@@ -50,7 +50,7 @@ function SessionEditFormInner({ persistedSession }: SessionEditFormInnerProps) {
   )
   const [draftSession, setDraftSession] = useState<TrainingSession>(persistedSession)
 
-  function handleSave() {
+  async function handleSave() {
     if (draftSession.blocks.length === 0) {
       toast.error('Keep at least one training block.')
       return
@@ -60,9 +60,13 @@ function SessionEditFormInner({ persistedSession }: SessionEditFormInnerProps) {
       ...draftSession,
       updatedAt: now,
     }
-    updateTrainingSession(toSave)
-    toast.success('Session updated')
-    navigate(sessionDetailPath(toSave.athleteId, toSave.id))
+    try {
+      await updateTrainingSession(toSave)
+      toast.success('Session updated')
+      navigate(sessionDetailPath(toSave.athleteId, toSave.id))
+    } catch {
+      toast.error('Could not update session.')
+    }
   }
 
   return (

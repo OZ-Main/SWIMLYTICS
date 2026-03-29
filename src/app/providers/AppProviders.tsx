@@ -1,21 +1,21 @@
-import * as React from 'react'
+import { type ReactNode } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 
 import { ThemeProvider } from '@/app/theme/ThemeProvider'
 import { Toaster } from '@/components/ui/sonner'
 
+import { AuthBootstrap } from './AuthBootstrap'
 import { DocumentTitleSync } from './DocumentTitleSync'
-import { HydrationGate } from './HydrationGate'
 
-export function AppProviders({ children }: { children: React.ReactNode }) {
+export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <BrowserRouter>
       <DocumentTitleSync />
       <ThemeProvider>
-        <HydrationGate>
+        <AuthBootstrap>
           {children}
           <Toaster position="top-right" richColors closeButton />
-        </HydrationGate>
+        </AuthBootstrap>
       </ThemeProvider>
     </BrowserRouter>
   )
