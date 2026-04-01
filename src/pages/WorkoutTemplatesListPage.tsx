@@ -1,6 +1,7 @@
 import { format, parseISO } from 'date-fns'
 import { ClipboardList, LayoutTemplate, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 
@@ -21,6 +22,7 @@ import { buildWorkoutTemplateSummaryLine } from '@/features/workout-templates/he
 import { APP_ROUTE, workoutTemplateEditPath } from '@/shared/constants/routes.constants'
 
 export default function WorkoutTemplatesListPage() {
+  const { t } = useTranslation()
   const workoutTemplates = useWorkoutTemplateStore(
     (workoutTemplateStore) => workoutTemplateStore.workoutTemplates,
   )
@@ -45,30 +47,30 @@ export default function WorkoutTemplatesListPage() {
 
     try {
       await deleteWorkoutTemplate(templatePendingDeleteId)
-      toast.success('Template deleted')
+      toast.success(t('templates.deletedToast'))
       setTemplatePendingDeleteId(null)
     } catch {
-      toast.error('Could not delete template.')
+      toast.error(t('templates.deleteFailedToast'))
     }
   }
 
   return (
     <div className="page-stack">
       <PageHeader
-        title="Workout templates"
-        description="Reusable blueprints for pool and gym plans. Assign one template to many athletes in bulk."
+        title={t('templates.title')}
+        description={t('templates.description')}
         actions={
           <div className="flex flex-wrap gap-tight">
             <Button variant="outline" asChild>
               <Link to={APP_ROUTE.assignmentsNew}>
                 <ClipboardList className="h-4 w-4" aria-hidden />
-                Bulk assign
+                {t('templates.bulkAssign')}
               </Link>
             </Button>
             <Button asChild>
               <Link to={APP_ROUTE.workoutTemplateNew}>
                 <Plus className="h-4 w-4" aria-hidden />
-                New template
+                {t('templates.newTemplate')}
               </Link>
             </Button>
           </div>
@@ -78,11 +80,11 @@ export default function WorkoutTemplatesListPage() {
       {sortedTemplates.length === 0 ? (
         <EmptyState
           icon={LayoutTemplate}
-          title="No workout templates yet"
-          description="Build a template once, then assign it to any athlete roster that matches the training type."
+          title={t('templates.emptyTitle')}
+          description={t('templates.emptyDescription')}
           action={
             <Button asChild>
-              <Link to={APP_ROUTE.workoutTemplateNew}>Create a template</Link>
+              <Link to={APP_ROUTE.workoutTemplateNew}>{t('templates.createTemplate')}</Link>
             </Button>
           }
         />
@@ -90,11 +92,11 @@ export default function WorkoutTemplatesListPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Summary</TableHead>
-              <TableHead>Target group</TableHead>
-              <TableHead>Updated</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('templates.tableTitle')}</TableHead>
+              <TableHead>{t('templates.tableSummary')}</TableHead>
+              <TableHead>{t('templates.tableTargetGroup')}</TableHead>
+              <TableHead>{t('templates.tableUpdated')}</TableHead>
+              <TableHead className="text-right">{t('templates.tableActions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -105,7 +107,7 @@ export default function WorkoutTemplatesListPage() {
                   {buildWorkoutTemplateSummaryLine(workoutTemplate)}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {workoutTemplate.targetGroup.trim() || '—'}
+                  {workoutTemplate.targetGroup.trim() || t('dashboard.dash')}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {format(parseISO(workoutTemplate.updatedAt), 'MMM d, yyyy')}
@@ -115,7 +117,7 @@ export default function WorkoutTemplatesListPage() {
                     <Button variant="ghost" size="sm" asChild>
                       <Link to={workoutTemplateEditPath(workoutTemplate.id)}>
                         <Pencil className="h-4 w-4" aria-hidden />
-                        Edit
+                        {t('templates.edit')}
                       </Link>
                     </Button>
                     <Button
@@ -126,7 +128,7 @@ export default function WorkoutTemplatesListPage() {
                       onClick={() => setTemplatePendingDeleteId(workoutTemplate.id)}
                     >
                       <Trash2 className="h-4 w-4" aria-hidden />
-                      Delete
+                      {t('templates.delete')}
                     </Button>
                   </div>
                 </TableCell>
@@ -146,19 +148,21 @@ export default function WorkoutTemplatesListPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete workout template?</DialogTitle>
+            <DialogTitle>{t('templates.deleteDialogTitle')}</DialogTitle>
             <DialogDescription>
               {templatePendingDelete
-                ? `“${templatePendingDelete.title}” will be removed. Sessions already created from this template stay on the athlete timeline.`
-                : 'This template will be removed.'}
+                ? t('templates.deleteDialogDescriptionNamed', {
+                    title: templatePendingDelete.title,
+                  })
+                : t('templates.deleteDialogDescriptionFallback')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setTemplatePendingDeleteId(null)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="button" variant="destructive" onClick={handleConfirmDelete}>
-              Delete template
+              {t('templates.deleteConfirm')}
             </Button>
           </DialogFooter>
         </DialogContent>

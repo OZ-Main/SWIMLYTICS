@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { useTranslation } from 'react-i18next'
 import { createSearchParams, useNavigate } from 'react-router-dom'
 import {
   Area,
@@ -16,7 +17,7 @@ import ChartCard from '@/components/charts/ChartCard'
 import ChartTooltipContent from '@/components/charts/ChartTooltipContent'
 import { useChartTheme } from '@/lib/charts/useChartTheme'
 import { useResponsiveChartLayout } from '@/lib/charts/useResponsiveChartLayout'
-import { CHART_DATA_KEY, CHART_SERIES_NAME } from '@/shared/constants/chartData.constants'
+import { CHART_DATA_KEY } from '@/shared/constants/chartData.constants'
 import { APP_ROUTE, athleteDetailPath } from '@/shared/constants/routes.constants'
 import { STATISTICS_SEARCH_PARAMS } from '@/shared/constants/statisticsUrlSearch.constants'
 import { AthleteTrainingType } from '@/shared/domain'
@@ -33,19 +34,12 @@ type GymDashboardChartsProps = {
   drillDown: GymChartsDrillDown
 }
 
-function chartEmptyMessage(msg: string, className?: string) {
-  return (
-    <div role="status" className={cn('chart-empty-state', className)}>
-      {msg}
-    </div>
-  )
-}
-
 export default function GymDashboardCharts({
   weeklyDuration,
   monthlyDuration,
   drillDown,
 }: GymDashboardChartsProps) {
+  const { t } = useTranslation()
   const chart = useChartTheme()
   const navigate = useNavigate()
   const volumeGradientId = useId().replace(/:/g, '')
@@ -74,15 +68,23 @@ export default function GymDashboardCharts({
     }
   }
 
+  function chartEmptyMessage(messageKey: 'gymEmptyWindow' | 'gymEmptyMonth', className?: string) {
+    return (
+      <div role="status" className={cn('chart-empty-state', className)}>
+        {t(`charts.${messageKey}`)}
+      </div>
+    )
+  }
+
   return (
     <div className="analytics-chart-grid">
       <ChartCard
-        title="Weekly training time"
-        description="Total session duration per ISO week (Mon–Sun). Click a bar for Statistics."
+        title={t('charts.gymWeeklyTimeTitle')}
+        description={t('charts.gymWeeklyTimeDesc')}
       >
         <div className="chart-surface-flush-left">
           {!weekHas ? (
-            chartEmptyMessage('No gym time logged in this window.')
+            chartEmptyMessage('gymEmptyWindow')
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyDuration} margin={{ ...marginTight }}>
@@ -109,7 +111,7 @@ export default function GymDashboardCharts({
                 />
                 <Bar
                   dataKey={CHART_DATA_KEY.VALUE}
-                  name={CHART_SERIES_NAME.DURATION}
+                  name={t('charts.series.duration')}
                   fill={chart.chart3}
                   radius={[4, 4, 0, 0]}
                   cursor="pointer"
@@ -122,12 +124,12 @@ export default function GymDashboardCharts({
       </ChartCard>
 
       <ChartCard
-        title="Monthly training time"
-        description="Total duration by calendar month. Click the area for Statistics."
+        title={t('charts.gymMonthlyTimeTitle')}
+        description={t('charts.gymMonthlyTimeDesc')}
       >
         <div className="chart-surface-flush-left">
           {!monthHas ? (
-            chartEmptyMessage('No gym time in this window.')
+            chartEmptyMessage('gymEmptyMonth')
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={monthlyDuration} margin={{ ...marginTight }}>
@@ -158,7 +160,7 @@ export default function GymDashboardCharts({
                 <Area
                   type="monotone"
                   dataKey={CHART_DATA_KEY.VALUE}
-                  name={CHART_SERIES_NAME.DURATION}
+                  name={t('charts.series.duration')}
                   stroke={chart.chart4}
                   fill={`url(#${volumeGradientId})`}
                   strokeWidth={2}

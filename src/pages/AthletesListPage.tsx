@@ -1,5 +1,6 @@
 import { ChevronRight, Plus, Users } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { useAthleteStore } from '@/app/store/athleteStore'
@@ -17,7 +18,6 @@ import {
 import EmptyState from '@/components/feedback/EmptyState'
 import PageHeader from '@/components/layout/PageHeader'
 import { StaggerItem, StaggerList } from '@/components/motion'
-import { ATHLETE_TRAINING_TYPE_LABELS } from '@/shared/constants/athleteTrainingTypeLabels'
 import { WORKOUT_FILTER_ALL } from '@/shared/constants/workoutFilter.constants'
 import {
   APP_ROUTE,
@@ -26,8 +26,10 @@ import {
 } from '@/shared/constants/routes.constants'
 import { AthleteTrainingType } from '@/shared/domain'
 import { athleteGroupDisplayLabel } from '@/shared/helpers/athleteGroupDisplay.helpers'
+import { translateTrainingType } from '@/shared/helpers/i18nLabels.helpers'
 
 export default function AthletesListPage() {
+  const { t } = useTranslation()
   const athletes = useAthleteStore((athleteStore) => athleteStore.athletes)
   const [trainingTypeFilter, setTrainingTypeFilter] = useState<
     typeof WORKOUT_FILTER_ALL | AthleteTrainingType
@@ -64,13 +66,13 @@ export default function AthletesListPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        title="Athletes"
-        description="Manage clients, training type, and session history in one place."
+        title={t('athletesList.title')}
+        description={t('athletesList.description')}
         actions={
           <Button asChild>
             <Link to={APP_ROUTE.athleteNew}>
               <Plus className="h-4 w-4" aria-hidden />
-              Add athlete
+              {t('athletesList.addAthlete')}
             </Link>
           </Button>
         }
@@ -79,11 +81,11 @@ export default function AthletesListPage() {
       {athletes.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="No athletes yet"
-          description="Create a profile for each client to log pool or gym sessions and track analytics."
+          title={t('athletesList.emptyRosterTitle')}
+          description={t('athletesList.emptyRosterDescription')}
           action={
             <Button asChild>
-              <Link to={APP_ROUTE.athleteNew}>Add your first athlete</Link>
+              <Link to={APP_ROUTE.athleteNew}>{t('athletesList.addFirstAthlete')}</Link>
             </Button>
           }
         />
@@ -91,7 +93,7 @@ export default function AthletesListPage() {
         <>
           <div className="flex flex-col gap-tight rounded-xl border border-border/60 bg-card/30 p-card sm:flex-row sm:flex-wrap sm:items-end">
             <div className="min-w-[10rem] flex-1 space-y-tight">
-              <p className="text-label text-muted-foreground">Training type</p>
+              <p className="text-label text-muted-foreground">{t('filters.trainingType')}</p>
               <Select
                 value={trainingTypeFilter}
                 onValueChange={(value) =>
@@ -101,14 +103,14 @@ export default function AthletesListPage() {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="All types" />
+                  <SelectValue placeholder={t('filters.allTypes')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={WORKOUT_FILTER_ALL}>All types</SelectItem>
+                  <SelectItem value={WORKOUT_FILTER_ALL}>{t('filters.allTypes')}</SelectItem>
                   {(Object.values(AthleteTrainingType) as AthleteTrainingType[]).map(
                     (trainingTypeOption) => (
                       <SelectItem key={trainingTypeOption} value={trainingTypeOption}>
-                        {ATHLETE_TRAINING_TYPE_LABELS[trainingTypeOption]}
+                        {translateTrainingType(t, trainingTypeOption)}
                       </SelectItem>
                     ),
                   )}
@@ -116,19 +118,19 @@ export default function AthletesListPage() {
               </Select>
             </div>
             <div className="min-w-[10rem] flex-1 space-y-tight">
-              <p className="text-label text-muted-foreground">Group contains</p>
+              <p className="text-label text-muted-foreground">{t('filters.groupContains')}</p>
               <Input
                 value={groupSearch}
                 onChange={(changeEvent) => setGroupSearch(changeEvent.target.value)}
-                placeholder="Filter by group…"
+                placeholder={t('filters.filterByGroupPlaceholder')}
               />
             </div>
             <div className="min-w-[10rem] flex-1 space-y-tight">
-              <p className="text-label text-muted-foreground">Name contains</p>
+              <p className="text-label text-muted-foreground">{t('filters.nameContains')}</p>
               <Input
                 value={nameSearch}
                 onChange={(changeEvent) => setNameSearch(changeEvent.target.value)}
-                placeholder="Search name…"
+                placeholder={t('filters.searchNamePlaceholder')}
               />
             </div>
           </div>
@@ -136,8 +138,8 @@ export default function AthletesListPage() {
           {sortedFiltered.length === 0 ? (
             <EmptyState
               icon={Users}
-              title="No athletes match filters"
-              description="Try clearing filters or broadening your search."
+              title={t('athletesList.noMatchTitle')}
+              description={t('athletesList.noMatchDescription')}
               action={
                 <Button
                   type="button"
@@ -148,7 +150,7 @@ export default function AthletesListPage() {
                     setNameSearch('')
                   }}
                 >
-                  Clear filters
+                  {t('athletesList.clearFilters')}
                 </Button>
               }
             />
@@ -168,7 +170,7 @@ export default function AthletesListPage() {
                           </p>
                           <div className="flex flex-wrap gap-tight">
                             <Badge variant="secondary" className="font-normal">
-                              {ATHLETE_TRAINING_TYPE_LABELS[rosterAthlete.trainingType]}
+                              {translateTrainingType(t, rosterAthlete.trainingType)}
                             </Badge>
                             <Badge variant="outline" className="font-normal text-muted-foreground">
                               {athleteGroupDisplayLabel(rosterAthlete.group)}
@@ -187,7 +189,9 @@ export default function AthletesListPage() {
                       </Link>
                       <div className="border-t border-border/40 px-card py-tight">
                         <Button variant="ghost" size="sm" className="h-8 text-caption" asChild>
-                          <Link to={athleteEditPath(rosterAthlete.id)}>Edit profile</Link>
+                          <Link to={athleteEditPath(rosterAthlete.id)}>
+                            {t('athletesList.editProfile')}
+                          </Link>
                         </Button>
                       </div>
                     </CardContent>

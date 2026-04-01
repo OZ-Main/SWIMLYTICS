@@ -1,6 +1,7 @@
 import { format, parseISO } from 'date-fns'
 import { BarChart3 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
@@ -36,11 +37,10 @@ import {
 import type { StatisticsFilters } from '@/features/statistics/types/statistics-filters.types'
 import { useChartTheme } from '@/lib/charts/useChartTheme'
 import { useResponsiveChartLayout } from '@/lib/charts/useResponsiveChartLayout'
-import { CHART_DATA_KEY, CHART_SERIES_NAME } from '@/shared/constants/chartData.constants'
+import { CHART_DATA_KEY } from '@/shared/constants/chartData.constants'
 import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
-import { STROKE_FILTER_OPTIONS, STROKE_LABELS } from '@/shared/constants/strokeLabels'
 import { APP_ROUTE, athleteDetailPath } from '@/shared/constants/routes.constants'
-import { ATHLETE_TRAINING_TYPE_LABELS } from '@/shared/constants/athleteTrainingTypeLabels'
+import { STROKE_FILTER_OPTIONS } from '@/shared/constants/strokeLabels'
 import { WORKOUT_FILTER_ALL } from '@/shared/constants/workoutFilter.constants'
 import { AthleteTrainingType } from '@/shared/domain'
 import {
@@ -48,6 +48,7 @@ import {
   formatDurationSeconds,
   formatPacePer100,
 } from '@/shared/helpers/formatters'
+import { translateStroke, translateTrainingType } from '@/shared/helpers/i18nLabels.helpers'
 
 function emptyFilters(): StatisticsFilters {
   return {
@@ -60,6 +61,7 @@ function emptyFilters(): StatisticsFilters {
 }
 
 export default function StatisticsPage() {
+  const { t } = useTranslation()
   const trainingSessions = useTrainingSessionStore(
     (trainingSessionStore) => trainingSessionStore.trainingSessions,
   )
@@ -111,13 +113,13 @@ export default function StatisticsPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        title="Statistics"
-        description="Coach-wide aggregates. Filter by athlete, training type, stroke, or date range."
+        title={t('statistics.title')}
+        description={t('statistics.description')}
       />
 
       <div className="form-filter-panel sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-tight">
-          <Label htmlFor="stats-athlete">Athlete</Label>
+          <Label htmlFor="stats-athlete">{t('statistics.athlete')}</Label>
           <Select
             value={filters.athleteId ?? 'all'}
             onValueChange={(nextAthleteId) =>
@@ -128,10 +130,10 @@ export default function StatisticsPage() {
             }
           >
             <SelectTrigger id="stats-athlete">
-              <SelectValue placeholder="All athletes" />
+              <SelectValue placeholder={t('statistics.allAthletes')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All athletes</SelectItem>
+              <SelectItem value="all">{t('statistics.allAthletes')}</SelectItem>
               {sortedAthletes.map((athleteOption) => (
                 <SelectItem key={athleteOption.id} value={athleteOption.id}>
                   {athleteOption.fullName}
@@ -141,7 +143,7 @@ export default function StatisticsPage() {
           </Select>
         </div>
         <div className="space-y-tight">
-          <Label htmlFor="stats-training">Training type</Label>
+          <Label htmlFor="stats-training">{t('filters.trainingType')}</Label>
           <Select
             value={filters.trainingType}
             onValueChange={(nextTrainingType) =>
@@ -155,18 +157,18 @@ export default function StatisticsPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All types</SelectItem>
+              <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
               <SelectItem value={AthleteTrainingType.Swimming}>
-                {ATHLETE_TRAINING_TYPE_LABELS[AthleteTrainingType.Swimming]}
+                {translateTrainingType(t, AthleteTrainingType.Swimming)}
               </SelectItem>
               <SelectItem value={AthleteTrainingType.Gym}>
-                {ATHLETE_TRAINING_TYPE_LABELS[AthleteTrainingType.Gym]}
+                {translateTrainingType(t, AthleteTrainingType.Gym)}
               </SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-tight">
-          <Label htmlFor="stats-stroke">Stroke (pool)</Label>
+          <Label htmlFor="stats-stroke">{t('filters.strokePool')}</Label>
           <Select
             value={filters.stroke}
             onValueChange={(nextStrokeValue) =>
@@ -180,12 +182,12 @@ export default function StatisticsPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={WORKOUT_FILTER_ALL}>All strokes</SelectItem>
+              <SelectItem value={WORKOUT_FILTER_ALL}>{t('filters.allStrokes')}</SelectItem>
               {STROKE_FILTER_OPTIONS.filter(
                 (strokeOption) => strokeOption !== WORKOUT_FILTER_ALL,
               ).map((strokeOption) => (
                 <SelectItem key={strokeOption} value={strokeOption}>
-                  {STROKE_LABELS[strokeOption]}
+                  {translateStroke(t, strokeOption)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -193,7 +195,7 @@ export default function StatisticsPage() {
         </div>
         <div className="grid grid-cols-1 gap-stack sm:col-span-2 sm:grid-cols-2 lg:col-span-1">
           <div className="space-y-tight">
-            <Label htmlFor="stats-from">From</Label>
+            <Label htmlFor="stats-from">{t('statistics.from')}</Label>
             <Input
               id="stats-from"
               type="date"
@@ -207,7 +209,7 @@ export default function StatisticsPage() {
             />
           </div>
           <div className="space-y-tight">
-            <Label htmlFor="stats-to">To</Label>
+            <Label htmlFor="stats-to">{t('statistics.to')}</Label>
             <Input
               id="stats-to"
               type="date"
@@ -227,21 +229,23 @@ export default function StatisticsPage() {
         <EmptyState
           icon={BarChart3}
           title={
-            trainingSessions.length === 0 ? 'No sessions to analyze' : 'No sessions in this slice'
+            trainingSessions.length === 0
+              ? t('statistics.emptyNoSessionsTitle')
+              : t('statistics.emptyNoSliceTitle')
           }
           description={
             trainingSessions.length === 0
-              ? 'Log pool or gym sessions under each athlete to populate analytics.'
-              : 'Widen filters or clear the date range to include more history.'
+              ? t('statistics.emptyNoSessionsDescription')
+              : t('statistics.emptyWidenDescription')
           }
           action={
             trainingSessions.length === 0 ? (
               <Button asChild>
-                <Link to={APP_ROUTE.athletes}>Open athletes</Link>
+                <Link to={APP_ROUTE.athletes}>{t('statistics.openAthletes')}</Link>
               </Button>
             ) : filtersActive ? (
               <Button type="button" variant="default" onClick={() => setFilters(emptyFilters())}>
-                Clear filters
+                {t('statistics.clearFilters')}
               </Button>
             ) : undefined
           }
@@ -250,41 +254,41 @@ export default function StatisticsPage() {
         <>
           {hasSwim ? (
             <div className="space-y-6 sm:space-y-section">
-              <p className="section-label">Pool (swimming)</p>
+              <p className="section-label">{t('statistics.poolSection')}</p>
               <div className="stats-metric-grid">
-                <StatBlock label="Sessions" value={String(swimStats.sessionCount)} />
+                <StatBlock label={t('statistics.metricSessions')} value={String(swimStats.sessionCount)} />
                 <StatBlock
-                  label="Total distance"
+                  label={t('statistics.metricTotalDistance')}
                   value={formatDistanceMeters(swimStats.totalDistanceMeters)}
                 />
                 <StatBlock
-                  label="Total duration"
+                  label={t('statistics.metricTotalDuration')}
                   value={formatDurationSeconds(swimStats.totalDurationSeconds)}
                 />
                 <StatBlock
-                  label="Average distance"
+                  label={t('statistics.metricAvgDistance')}
                   value={formatDistanceMeters(swimStats.averageDistanceMeters)}
                 />
                 <StatBlock
-                  label="Average duration"
+                  label={t('statistics.metricAvgDuration')}
                   value={formatDurationSeconds(swimStats.averageDurationSeconds)}
                 />
                 <StatBlock
-                  label="Best pace (fastest)"
+                  label={t('statistics.metricBestPace')}
                   value={
                     swimStats.bestPacePer100 !== null
                       ? formatPacePer100(swimStats.bestPacePer100)
-                      : '—'
+                      : t('statistics.dash')
                   }
                 />
                 <StatBlock
-                  label="Longest session (distance)"
+                  label={t('statistics.metricLongestSessionDistance')}
                   value={
                     swimStats.longestSwimmingSession
                       ? formatDistanceMeters(
                           getSwimmingSessionTotalDistanceMeters(swimStats.longestSwimmingSession),
                         )
-                      : '—'
+                      : t('statistics.dash')
                   }
                   hint={
                     swimStats.longestSwimmingSession
@@ -296,18 +300,18 @@ export default function StatisticsPage() {
                   }
                 />
                 <StatBlock
-                  label="Most frequent stroke"
+                  label={t('statistics.metricMostFrequentStroke')}
                   value={
                     swimStats.mostFrequentStroke
-                      ? STROKE_LABELS[swimStats.mostFrequentStroke]
-                      : '—'
+                      ? translateStroke(t, swimStats.mostFrequentStroke)
+                      : t('statistics.dash')
                   }
                 />
               </div>
               <div className="analytics-chart-grid">
                 <ChartCard
-                  title="Weekly pool volume"
-                  description="Meters by week (Mon start). Click a bar to open the roster."
+                  title={t('statistics.weeklyPoolVolume')}
+                  description={t('statistics.weeklyPoolVolumeDesc')}
                 >
                   <div className="chart-surface-flush-left">
                     <ResponsiveContainer width="100%" height="100%">
@@ -340,7 +344,7 @@ export default function StatisticsPage() {
                           dataKey={CHART_DATA_KEY.METERS}
                           fill={chart.chart1}
                           radius={[4, 4, 0, 0]}
-                          name={CHART_SERIES_NAME.METERS}
+                          name={t('charts.series.meters')}
                           cursor="pointer"
                           onClick={() => navigate(APP_ROUTE.athletes)}
                         />
@@ -349,8 +353,8 @@ export default function StatisticsPage() {
                   </div>
                 </ChartCard>
                 <ChartCard
-                  title="Monthly pool volume"
-                  description="Meters per calendar month."
+                  title={t('statistics.monthlyPoolVolume')}
+                  description={t('statistics.monthlyPoolVolumeDesc')}
                 >
                   <div className="chart-surface-flush-left">
                     <ResponsiveContainer width="100%" height="100%">
@@ -383,7 +387,7 @@ export default function StatisticsPage() {
                           dataKey={CHART_DATA_KEY.METERS}
                           fill={chart.chart2}
                           radius={[4, 4, 0, 0]}
-                          name={CHART_SERIES_NAME.METERS}
+                          name={t('charts.series.meters')}
                           cursor="pointer"
                           onClick={() => navigate(APP_ROUTE.athletes)}
                         />
@@ -397,25 +401,25 @@ export default function StatisticsPage() {
 
           {hasGym ? (
             <div className="space-y-6 sm:space-y-section">
-              <p className="section-label">Gym / strength</p>
+              <p className="section-label">{t('statistics.gymSection')}</p>
               <div className="stats-metric-grid">
-                <StatBlock label="Sessions" value={String(gymStats.sessionCount)} />
+                <StatBlock label={t('statistics.metricSessions')} value={String(gymStats.sessionCount)} />
                 <StatBlock
-                  label="Total duration"
+                  label={t('statistics.metricTotalDuration')}
                   value={formatDurationSeconds(gymStats.totalDurationSeconds)}
                 />
                 <StatBlock
-                  label="Average duration"
+                  label={t('statistics.metricAvgDuration')}
                   value={formatDurationSeconds(gymStats.averageDurationSeconds)}
                 />
                 <StatBlock
-                  label="Longest session"
+                  label={t('statistics.metricLongestSession')}
                   value={
                     gymStats.longestGymSession
                       ? formatDurationSeconds(
                           getGymSessionTotalDurationSeconds(gymStats.longestGymSession),
                         )
-                      : '—'
+                      : t('statistics.dash')
                   }
                   hint={
                     gymStats.longestGymSession
@@ -426,7 +430,7 @@ export default function StatisticsPage() {
                 />
               </div>
               <div className="analytics-chart-grid">
-                <ChartCard title="Weekly gym time" description="Total duration by week (Mon start).">
+                <ChartCard title={t('statistics.weeklyGymTime')} description={t('statistics.weeklyGymTimeDesc')}>
                   <div className="chart-surface-flush-left">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
@@ -458,7 +462,7 @@ export default function StatisticsPage() {
                           dataKey="seconds"
                           fill={chart.chart3}
                           radius={[4, 4, 0, 0]}
-                          name={CHART_SERIES_NAME.DURATION}
+                          name={t('charts.series.duration')}
                           cursor="pointer"
                           onClick={() => navigate(APP_ROUTE.athletes)}
                         />
@@ -466,7 +470,7 @@ export default function StatisticsPage() {
                     </ResponsiveContainer>
                   </div>
                 </ChartCard>
-                <ChartCard title="Monthly gym time" description="Total duration per month.">
+                <ChartCard title={t('statistics.monthlyGymTime')} description={t('statistics.monthlyGymTimeDesc')}>
                   <div className="chart-surface-flush-left">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
@@ -498,7 +502,7 @@ export default function StatisticsPage() {
                           dataKey="seconds"
                           fill={chart.chart4}
                           radius={[4, 4, 0, 0]}
-                          name={CHART_SERIES_NAME.DURATION}
+                          name={t('charts.series.duration')}
                           cursor="pointer"
                           onClick={() => navigate(APP_ROUTE.athletes)}
                         />
@@ -512,35 +516,30 @@ export default function StatisticsPage() {
 
           <Card>
             <CardHeader className="page-section-header">
-              <CardTitle className="page-section-title">Summary</CardTitle>
+              <CardTitle className="page-section-title">{t('statistics.summaryHeading')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-tight pt-card text-body-sm leading-relaxed text-muted-foreground">
               {hasSwim ? (
                 <p>
-                  In this slice, pool athletes averaged{' '}
-                  <span className="font-medium text-foreground">
-                    {formatDistanceMeters(swimStats.averageDistanceMeters)}
-                  </span>{' '}
-                  per session over{' '}
-                  <span className="font-medium text-foreground">
-                    {formatDurationSeconds(swimStats.averageDurationSeconds)}
-                  </span>{' '}
-                  of swimming.
+                  {t('statistics.summarySwim', {
+                    distance: formatDistanceMeters(swimStats.averageDistanceMeters),
+                    duration: formatDurationSeconds(swimStats.averageDurationSeconds),
+                  })}
                 </p>
               ) : null}
               {hasGym ? (
                 <p>
-                  Gym blocks averaged{' '}
-                  <span className="font-medium text-foreground">
-                    {formatDurationSeconds(gymStats.averageDurationSeconds)}
-                  </span>{' '}
-                  per logged session.
+                  {t('statistics.summaryGym', {
+                    duration: formatDurationSeconds(gymStats.averageDurationSeconds),
+                  })}
                 </p>
               ) : null}
               {filters.athleteId ? (
                 <p>
                   <Button variant="link" className="h-auto p-0" asChild>
-                    <Link to={athleteDetailPath(filters.athleteId)}>Open this athlete</Link>
+                    <Link to={athleteDetailPath(filters.athleteId)}>
+                      {t('statistics.openThisAthlete')}
+                    </Link>
                   </Button>
                 </p>
               ) : null}
