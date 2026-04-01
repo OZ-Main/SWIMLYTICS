@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
@@ -24,10 +25,11 @@ import { coachAuthErrorMessage } from '@/lib/firebase/firebaseAuthErrorMessage.h
 import { APP_ROUTE } from '@/shared/constants/routes.constants'
 
 export default function SignInPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
   const { googleSignInPending, beginGoogleSignIn } = useCoachGoogleSignIn({
-    successMessage: 'Signed in',
+    successMessage: t('auth.signedIn'),
   })
   const authBusy = submitting || googleSignInPending
 
@@ -40,7 +42,7 @@ export default function SignInPage() {
     setSubmitting(true)
     try {
       await signInCoachWithEmailPassword(values.email, values.password)
-      toast.success('Signed in')
+      toast.success(t('auth.signedIn'))
       navigate(APP_ROUTE.home, { replace: true })
     } catch (error: unknown) {
       toast.error(coachAuthErrorMessage(error))
@@ -53,10 +55,8 @@ export default function SignInPage() {
     <div className="px-page-padding-x mx-4 flex min-h-screen flex-col items-center justify-center bg-background py-section">
       <Card className="w-full max-w-md overflow-hidden shadow-card">
         <CardHeader className="page-section-header">
-          <CardTitle className="page-section-title">Sign in</CardTitle>
-          <CardDescription className="text-caption">
-            Use your coach email and password to open your SWIMLYTICS workspace.
-          </CardDescription>
+          <CardTitle className="page-section-title">{t('auth.signIn')}</CardTitle>
+          <CardDescription className="text-caption">{t('auth.signInDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-stack pt-card">
           <Form {...form}>
@@ -66,7 +66,7 @@ export default function SignInPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('auth.email')}</FormLabel>
                     <FormControl>
                       <Input type="email" autoComplete="email" {...field} />
                     </FormControl>
@@ -79,7 +79,7 @@ export default function SignInPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{t('auth.password')}</FormLabel>
                     <FormControl>
                       <Input type="password" autoComplete="current-password" {...field} />
                     </FormControl>
@@ -88,7 +88,7 @@ export default function SignInPage() {
                 )}
               />
               <Button type="submit" className="w-full" disabled={authBusy}>
-                {submitting ? 'Signing in…' : 'Sign in'}
+                {submitting ? t('auth.signingIn') : t('auth.signIn')}
               </Button>
             </form>
           </Form>
@@ -96,12 +96,12 @@ export default function SignInPage() {
           <GoogleSignInButton disabled={authBusy} onPress={beginGoogleSignIn} />
 
           <p className="mt-stack text-center text-body-sm text-muted-foreground">
-            No account?{' '}
+            {t('auth.noAccount')}{' '}
             <Link
               to={APP_ROUTE.signUp}
               className="font-medium text-primary underline-offset-4 hover:underline"
             >
-              Create one
+              {t('auth.createOne')}
             </Link>
           </p>
         </CardContent>

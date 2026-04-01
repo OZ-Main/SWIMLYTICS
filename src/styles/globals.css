@@ -42,23 +42,24 @@
     --input: 210 26% 88%;
     --ring: 186 70% 42%;
 
-    /* Distinct chart palette — saturated, distinguishable */
-    --chart-1: 198 75% 42%;
-    --chart-2: 186 78% 40%;
-    --chart-3: 228 58% 52%;
-    --chart-4: 168 52% 38%;
-    --chart-5: 268 52% 54%;
+    /* Charts — same aquatic family as primary/accent; hues pushed apart (esp. vs old 198 vs 186) */
+    --chart-1: 199 78% 42%;
+    --chart-2: 168 58% 38%;
+    --chart-3: 227 58% 52%;
+    --chart-4: 154 54% 36%;
+    --chart-5: 270 54% 54%;
 
     --chart-grid: 210 22% 82%;
     --chart-axis: 215 18% 36%;
 
-    --stroke-freestyle: 198 72% 44%;
-    --stroke-backstroke: 222 42% 48%;
-    --stroke-breaststroke: 162 55% 38%;
-    --stroke-butterfly: 278 58% 52%;
-    --stroke-im: 188 65% 42%;
-    --stroke-drill: 42 88% 48%;
-    --stroke-kick: 18 75% 50%;
+    /* Stroke pie slices — cool pool tones + drill/kick warmth; IM greener than freestyle */
+    --stroke-freestyle: 199 76% 44%;
+    --stroke-backstroke: 217 42% 48%;
+    --stroke-breaststroke: 156 56% 38%;
+    --stroke-butterfly: 276 56% 52%;
+    --stroke-im: 176 68% 40%;
+    --stroke-drill: 44 90% 48%;
+    --stroke-kick: 16 74% 50%;
 
     --sidebar: 222 42% 9%;
     --sidebar-foreground: 210 30% 96%;
@@ -213,22 +214,22 @@
     --input: 220 18% 20%;
     --ring: 186 65% 50%;
 
-    --chart-1: 192 75% 55%;
-    --chart-2: 186 72% 52%;
-    --chart-3: 226 62% 68%;
-    --chart-4: 168 48% 50%;
-    --chart-5: 268 58% 65%;
+    --chart-1: 198 78% 56%;
+    --chart-2: 168 55% 50%;
+    --chart-3: 228 58% 64%;
+    --chart-4: 156 50% 48%;
+    --chart-5: 272 52% 62%;
 
     --chart-grid: 220 16% 22%;
     --chart-axis: 215 14% 58%;
 
-    --stroke-freestyle: 192 72% 58%;
-    --stroke-backstroke: 220 35% 62%;
-    --stroke-breaststroke: 165 50% 50%;
-    --stroke-butterfly: 278 55% 62%;
-    --stroke-im: 188 58% 55%;
-    --stroke-drill: 42 82% 56%;
-    --stroke-kick: 18 72% 56%;
+    --stroke-freestyle: 198 75% 58%;
+    --stroke-backstroke: 218 38% 62%;
+    --stroke-breaststroke: 158 50% 52%;
+    --stroke-butterfly: 276 54% 62%;
+    --stroke-im: 176 62% 54%;
+    --stroke-drill: 44 85% 56%;
+    --stroke-kick: 16 70% 58%;
 
     --sidebar: 222 38% 5%;
     --sidebar-foreground: 210 28% 96%;

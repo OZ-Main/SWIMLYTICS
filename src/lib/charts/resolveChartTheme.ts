@@ -22,21 +22,21 @@ function hslFromVar(cssVarName: string, root: HTMLElement): string {
 }
 
 const FALLBACK_THEME: ResolvedChartTheme = {
-  chart1: 'hsl(198 75% 42%)',
-  chart2: 'hsl(186 78% 40%)',
-  chart3: 'hsl(228 58% 52%)',
-  chart4: 'hsl(168 52% 38%)',
-  chart5: 'hsl(268 52% 54%)',
+  chart1: 'hsl(199 78% 42%)',
+  chart2: 'hsl(168 58% 38%)',
+  chart3: 'hsl(227 58% 52%)',
+  chart4: 'hsl(154 54% 36%)',
+  chart5: 'hsl(270 54% 54%)',
   grid: 'hsl(210 22% 82%)',
   axis: 'hsl(215 18% 36%)',
   stroke: {
-    [Stroke.Freestyle]: 'hsl(198 72% 44%)',
-    [Stroke.Backstroke]: 'hsl(222 42% 48%)',
-    [Stroke.Breaststroke]: 'hsl(162 55% 38%)',
-    [Stroke.Butterfly]: 'hsl(278 58% 52%)',
-    [Stroke.Im]: 'hsl(188 65% 42%)',
-    [Stroke.Drill]: 'hsl(42 88% 48%)',
-    [Stroke.Kick]: 'hsl(18 75% 50%)',
+    [Stroke.Freestyle]: 'hsl(199 76% 44%)',
+    [Stroke.Backstroke]: 'hsl(217 42% 48%)',
+    [Stroke.Breaststroke]: 'hsl(156 56% 38%)',
+    [Stroke.Butterfly]: 'hsl(276 56% 52%)',
+    [Stroke.Im]: 'hsl(176 68% 40%)',
+    [Stroke.Drill]: 'hsl(44 90% 48%)',
+    [Stroke.Kick]: 'hsl(16 74% 50%)',
   },
 }
 

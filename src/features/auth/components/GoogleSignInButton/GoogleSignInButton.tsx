@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { Button } from '@/components/ui/button'
 import { cn } from '@/shared/utils/cn'
 
@@ -10,6 +12,8 @@ type GoogleSignInButtonProps = {
 }
 
 export function GoogleSignInButton({ disabled, onPress }: GoogleSignInButtonProps) {
+  const { t } = useTranslation()
+
   return (
     <Button
       type="button"
@@ -19,7 +23,7 @@ export function GoogleSignInButton({ disabled, onPress }: GoogleSignInButtonProp
       onClick={() => void onPress()}
     >
       <GoogleBrandIcon aria-hidden />
-      Continue with Google
+      {t('auth.continueGoogle')}
     </Button>
   )
 }

@@ -1,6 +1,8 @@
 import { type ChangeEvent, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
+import { useLanguage } from '@/app/i18n/useLanguage'
 import { useAthleteStore } from '@/app/store/athleteStore'
 import { useAuthStore } from '@/app/store/authStore'
 import { useCoachStore } from '@/app/store/coachStore'
@@ -43,12 +45,13 @@ import {
   resetUserProfileAfterClearingData,
   updateUserProfileFields,
 } from '@/lib/firebase/userProfileRepository'
+import { APP_LANGUAGE_NATIVE_LABEL, APP_LANGUAGE_OPTIONS } from '@/shared/constants/languageUi.constants'
 import {
   buildExportDownloadFilename,
   exportFilenameDateSlice,
 } from '@/shared/constants/settings.constants'
-import { THEME_MODE_LABEL } from '@/shared/constants/themeLabels.constants'
 import { DataExportVersion, ThemeMode } from '@/shared/domain'
+import { isAppLanguage } from '@/shared/helpers/appLanguage.helpers'
 
 const THEME_SELECT_OPTIONS = [ThemeMode.Light, ThemeMode.Dark, ThemeMode.System] as const
 
@@ -57,6 +60,8 @@ function isThemeMode(value: string): value is ThemeMode {
 }
 
 export default function SettingsPage() {
+  const { t } = useTranslation()
+  const { language, setLanguage } = useLanguage()
   const user = useAuthStore((authStore) => authStore.user)
   const theme = useSettingsStore((settingsStore) => settingsStore.theme)
   const setInitialSampleApplied = useSettingsStore(
@@ -85,9 +90,15 @@ export default function SettingsPage() {
     }
   }
 
+  function handleLanguageChange(value: string) {
+    if (isAppLanguage(value)) {
+      setLanguage(value)
+    }
+  }
+
   function handleExport() {
     if (!coach) {
-      toast.error('Profile not ready yet.')
+      toast.error(t('settings.profileNotReady'))
       return
     }
 
@@ -109,13 +120,13 @@ export default function SettingsPage() {
     )
     downloadAnchor.click()
     URL.revokeObjectURL(url)
-    toast.success('Export downloaded')
+    toast.success(t('settings.exportSuccess'))
   }
 
   async function handleImportFile(changeEvent: ChangeEvent<HTMLInputElement>) {
     const uid = user?.uid
     if (!uid) {
-      toast.error('You must be signed in to import.')
+      toast.error(t('settings.mustBeSignedInImport'))
       return
     }
 
@@ -171,9 +182,9 @@ export default function SettingsPage() {
 
           await updateUserProfileFields(uid, { initialSampleApplied: true })
           setInitialSampleApplied(true)
-          toast.success('Data imported to Firestore')
+          toast.success(t('settings.importSuccess'))
         } catch {
-          toast.error('Could not read JSON file.')
+          toast.error(t('settings.importReadError'))
         }
       })()
     }
@@ -184,7 +195,7 @@ export default function SettingsPage() {
   async function handleClearAll() {
     const uid = user?.uid
     if (!uid || !user) {
-      toast.error('You must be signed in.')
+      toast.error(t('settings.mustBeSignedIn'))
       return
     }
 
@@ -193,36 +204,31 @@ export default function SettingsPage() {
       await resetUserProfileAfterClearingData(uid, user)
       setInitialSampleApplied(true)
       setClearOpen(false)
-      toast.success('Cloud data cleared for this account')
+      toast.success(t('settings.clearSuccess'))
     } catch {
-      toast.error('Could not clear data.')
+      toast.error(t('settings.clearError'))
     }
   }
 
   return (
     <div className="page-stack max-w-2xl">
-      <PageHeader
-        title="Settings"
-        description="Appearance, JSON backups, and your Firestore workspace."
-      />
+      <PageHeader title={t('settings.title')} description={t('settings.description')} />
 
       <Card className="overflow-hidden">
         <CardHeader className="page-section-header">
-          <CardTitle className="page-section-title">Appearance</CardTitle>
-          <CardDescription className="text-caption">
-            Light, dark, or follow the system setting. Saved to your coach profile.
-          </CardDescription>
+          <CardTitle className="page-section-title">{t('settings.language')}</CardTitle>
+          <CardDescription className="text-caption">{t('settings.languageDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-tight pt-card">
-          <Label htmlFor="theme-select">Theme</Label>
-          <Select value={theme} onValueChange={handleThemeChange}>
-            <SelectTrigger id="theme-select" className="max-w-xs">
+          <Label htmlFor="language-select">{t('settings.language')}</Label>
+          <Select value={language} onValueChange={handleLanguageChange}>
+            <SelectTrigger id="language-select" className="max-w-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {THEME_SELECT_OPTIONS.map((mode) => (
-                <SelectItem key={mode} value={mode}>
-                  {THEME_MODE_LABEL[mode]}
+              {APP_LANGUAGE_OPTIONS.map((code) => (
+                <SelectItem key={code} value={code}>
+                  {APP_LANGUAGE_NATIVE_LABEL[code]}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -232,19 +238,37 @@ export default function SettingsPage() {
 
       <Card className="overflow-hidden">
         <CardHeader className="page-section-header">
-          <CardTitle className="page-section-title">Backup</CardTitle>
-          <CardDescription className="text-caption">
-            Export coach profile, athletes, training sessions, workout templates, and best times as
-            JSON (v3). Import replaces all documents under your Firebase user. v2 and v1 exports are
-            still accepted.
-          </CardDescription>
+          <CardTitle className="page-section-title">{t('settings.appearance')}</CardTitle>
+          <CardDescription className="text-caption">{t('settings.appearanceDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-tight pt-card">
+          <Label htmlFor="theme-select">{t('settings.theme')}</Label>
+          <Select value={theme} onValueChange={handleThemeChange}>
+            <SelectTrigger id="theme-select" className="max-w-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {THEME_SELECT_OPTIONS.map((mode) => (
+                <SelectItem key={mode} value={mode}>
+                  {t(`theme.${mode}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      <Card className="overflow-hidden">
+        <CardHeader className="page-section-header">
+          <CardTitle className="page-section-title">{t('settings.backup')}</CardTitle>
+          <CardDescription className="text-caption">{t('settings.backupDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-stack pt-card">
           <Button type="button" variant="secondary" onClick={handleExport}>
-            Export JSON
+            {t('settings.exportJson')}
           </Button>
           <Button type="button" variant="outline" onClick={() => fileRef.current?.click()}>
-            Import JSON
+            {t('settings.importJson')}
           </Button>
           <input
             ref={fileRef}
@@ -258,42 +282,32 @@ export default function SettingsPage() {
 
       <Card className="overflow-hidden border-destructive/30 shadow-card">
         <CardHeader className="border-b border-destructive/20 bg-destructive/5 px-card py-section-sm">
-          <CardTitle className="page-section-title text-destructive">Danger zone</CardTitle>
-          <CardDescription className="text-caption">
-            Delete all athletes, sessions, workout templates, and personal bests in Firestore for this
-            signed-in coach.
-            Your account and sign-in remain; you can import a backup afterward.
-          </CardDescription>
+          <CardTitle className="page-section-title text-destructive">{t('settings.dangerZone')}</CardTitle>
+          <CardDescription className="text-caption">{t('settings.dangerDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="pt-card">
           <Button variant="destructive" onClick={() => setClearOpen(true)}>
-            Clear cloud data
+            {t('settings.clearCloudData')}
           </Button>
         </CardContent>
       </Card>
 
       <Separator />
 
-      <p className="text-caption text-muted-foreground">
-        Firebase Authentication and Cloud Firestore. Deploy firestore.rules so each coach can only
-        read and write their own user document and subcollections.
-      </p>
+      <p className="text-caption text-muted-foreground">{t('settings.footerNote')}</p>
 
       <Dialog open={clearOpen} onOpenChange={setClearOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Clear all cloud data?</DialogTitle>
-            <DialogDescription>
-              Athletes, sessions, and personal bests will be removed from Firestore. Export first if
-              you need a backup.
-            </DialogDescription>
+            <DialogTitle>{t('settings.clearDialogTitle')}</DialogTitle>
+            <DialogDescription>{t('settings.clearDialogDescription')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setClearOpen(false)}>
-              Cancel
+              {t('settings.cancel')}
             </Button>
             <Button variant="destructive" onClick={() => void handleClearAll()}>
-              Clear everything
+              {t('settings.clearEverything')}
             </Button>
           </DialogFooter>
         </DialogContent>

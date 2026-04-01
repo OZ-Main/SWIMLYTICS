@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
@@ -24,10 +25,11 @@ import { coachAuthErrorMessage } from '@/lib/firebase/firebaseAuthErrorMessage.h
 import { APP_ROUTE } from '@/shared/constants/routes.constants'
 
 export default function SignUpPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
   const { googleSignInPending, beginGoogleSignIn } = useCoachGoogleSignIn({
-    successMessage: 'Signed in with Google',
+    successMessage: t('auth.signedInGoogle'),
   })
   const authBusy = submitting || googleSignInPending
 
@@ -49,7 +51,7 @@ export default function SignUpPage() {
         password: values.password,
         displayName: values.displayName,
       })
-      toast.success('Account ready — sample athletes and sessions were added.')
+      toast.success(t('auth.accountReady'))
       navigate(APP_ROUTE.home, { replace: true })
     } catch (error: unknown) {
       toast.error(coachAuthErrorMessage(error))
@@ -62,11 +64,8 @@ export default function SignUpPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-page-padding-x py-section">
       <Card className="w-full max-w-md overflow-hidden shadow-card">
         <CardHeader className="page-section-header">
-          <CardTitle className="page-section-title">Create coach account</CardTitle>
-          <CardDescription className="text-caption">
-            Your data is stored in your Firebase project. Only you can access athletes and sessions
-            tied to this account.
-          </CardDescription>
+          <CardTitle className="page-section-title">{t('auth.signUpTitle')}</CardTitle>
+          <CardDescription className="text-caption">{t('auth.signUpDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-stack pt-card">
           <GoogleSignInButton disabled={authBusy} onPress={beginGoogleSignIn} />
@@ -78,7 +77,7 @@ export default function SignUpPage() {
                 name="displayName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Display name</FormLabel>
+                    <FormLabel>{t('auth.displayName')}</FormLabel>
                     <FormControl>
                       <Input autoComplete="name" {...field} />
                     </FormControl>
@@ -91,7 +90,7 @@ export default function SignUpPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('auth.email')}</FormLabel>
                     <FormControl>
                       <Input type="email" autoComplete="email" {...field} />
                     </FormControl>
@@ -104,7 +103,7 @@ export default function SignUpPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{t('auth.password')}</FormLabel>
                     <FormControl>
                       <Input type="password" autoComplete="new-password" {...field} />
                     </FormControl>
@@ -117,7 +116,7 @@ export default function SignUpPage() {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm password</FormLabel>
+                    <FormLabel>{t('auth.confirmPassword')}</FormLabel>
                     <FormControl>
                       <Input type="password" autoComplete="new-password" {...field} />
                     </FormControl>
@@ -126,14 +125,14 @@ export default function SignUpPage() {
                 )}
               />
               <Button type="submit" className="w-full" disabled={authBusy}>
-                {submitting ? 'Creating account…' : 'Sign up'}
+                {submitting ? t('auth.signUpSubmitting') : t('auth.signUp')}
               </Button>
             </form>
           </Form>
           <p className="mt-stack text-center text-body-sm text-muted-foreground">
-            Already have an account?{' '}
+            {t('auth.hasAccount')}{' '}
             <Link to={APP_ROUTE.login} className="font-medium text-primary underline-offset-4 hover:underline">
-              Sign in
+              {t('auth.signIn')}
             </Link>
           </p>
         </CardContent>

@@ -1,4 +1,5 @@
 import { BarChart3, ClipboardList, Home, LayoutTemplate, Settings, Users } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 
 import { APP_ROUTE } from '@/shared/constants/routes.constants'
@@ -13,12 +14,12 @@ import {
 } from './MainNav.styles'
 
 const LINKS = [
-  { to: APP_ROUTE.home, label: 'Dashboard', icon: Home },
-  { to: APP_ROUTE.athletes, label: 'Athletes', icon: Users },
-  { to: APP_ROUTE.workoutTemplates, label: 'Templates', icon: LayoutTemplate },
-  { to: APP_ROUTE.assignmentsNew, label: 'Assign', icon: ClipboardList },
-  { to: APP_ROUTE.statistics, label: 'Statistics', icon: BarChart3 },
-  { to: APP_ROUTE.settings, label: 'Settings', icon: Settings },
+  { to: APP_ROUTE.home, labelKey: 'nav.dashboard' as const, icon: Home },
+  { to: APP_ROUTE.athletes, labelKey: 'nav.athletes' as const, icon: Users },
+  { to: APP_ROUTE.workoutTemplates, labelKey: 'nav.templates' as const, icon: LayoutTemplate },
+  { to: APP_ROUTE.assignmentsNew, labelKey: 'nav.assign' as const, icon: ClipboardList },
+  { to: APP_ROUTE.statistics, labelKey: 'nav.statistics' as const, icon: BarChart3 },
+  { to: APP_ROUTE.settings, labelKey: 'nav.settings' as const, icon: Settings },
 ] as const
 
 type MainNavProps = {
@@ -36,6 +37,7 @@ export default function MainNav({
   mode = 'sidebar',
   onNavigate,
 }: MainNavProps) {
+  const { t } = useTranslation()
   const isDrawer = mode === 'drawer'
 
   function handleNavigate() {
@@ -55,29 +57,32 @@ export default function MainNav({
     <nav
       id={id}
       className={cn(mainNavRootVariants({ mode, collapsed: isDrawer ? false : collapsed }), className)}
-      aria-label="Main navigation"
+      aria-label={t('nav.mainNav')}
     >
-      {LINKS.map(({ to, label, icon: Icon }) => (
-        <NavLink
-          key={to}
-          to={to}
-          end={to === APP_ROUTE.home}
-          title={!isDrawer && collapsed ? label : undefined}
-          aria-label={label}
-          onClick={handleNavigate}
-          className={({ isActive }) =>
-            isDrawer
-              ? mainNavDrawerLinkVariants({ active: isActive })
-              : mainNavLinkVariants({ active: isActive, collapsed })
-          }
-        >
-          <Icon
-            className={isDrawer ? mainNavDrawerIconVariants() : mainNavIconVariants({ collapsed })}
-            aria-hidden
-          />
-          {isDrawer || !collapsed ? <span>{label}</span> : null}
-        </NavLink>
-      ))}
+      {LINKS.map(({ to, labelKey, icon: Icon }) => {
+        const label = t(labelKey)
+        return (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === APP_ROUTE.home}
+            title={!isDrawer && collapsed ? label : undefined}
+            aria-label={label}
+            onClick={handleNavigate}
+            className={({ isActive }) =>
+              isDrawer
+                ? mainNavDrawerLinkVariants({ active: isActive })
+                : mainNavLinkVariants({ active: isActive, collapsed })
+            }
+          >
+            <Icon
+              className={isDrawer ? mainNavDrawerIconVariants() : mainNavIconVariants({ collapsed })}
+              aria-hidden
+            />
+            {isDrawer || !collapsed ? <span>{label}</span> : null}
+          </NavLink>
+        )
+      })}
     </nav>
   )
 }
