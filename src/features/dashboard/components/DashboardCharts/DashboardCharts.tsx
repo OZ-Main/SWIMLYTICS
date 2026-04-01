@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { useTranslation } from 'react-i18next'
 import { createSearchParams, useNavigate } from 'react-router-dom'
 import { format, parseISO } from 'date-fns'
 import {
@@ -23,13 +24,13 @@ import ChartCard from '@/components/charts/ChartCard'
 import ChartTooltipContent from '@/components/charts/ChartTooltipContent'
 import { useChartTheme } from '@/lib/charts/useChartTheme'
 import { useResponsiveChartLayout } from '@/lib/charts/useResponsiveChartLayout'
-import { CHART_DATA_KEY, CHART_SERIES_NAME } from '@/shared/constants/chartData.constants'
-import { DATE_FORMAT, PACE_AXIS_LABEL } from '@/shared/constants/dateDisplay.constants'
+import { CHART_DATA_KEY } from '@/shared/constants/chartData.constants'
+import { DATE_FORMAT } from '@/shared/constants/dateDisplay.constants'
 import { APP_ROUTE, athleteDetailPath } from '@/shared/constants/routes.constants'
 import { STATISTICS_SEARCH_PARAMS } from '@/shared/constants/statisticsUrlSearch.constants'
-import { STROKE_LABELS } from '@/shared/constants/strokeLabels'
 import { WORKOUTS_SEARCH_PARAMS } from '@/shared/constants/workoutsUrlSearch.constants'
 import { AthleteTrainingType } from '@/shared/domain'
+import { translateStroke } from '@/shared/helpers/i18nLabels.helpers'
 import type { NamedChartPoint, StrokeSlice, TimeSeriesPoint } from '@/shared/types/domain.types'
 import { cn } from '@/shared/utils/cn'
 
@@ -39,6 +40,7 @@ type PaceSessionDotProps = {
   payload?: { date: string; pace: number }
   fill: string
   onActivate: (isoDate: string) => void
+  openSessionsAriaLabel: (isoDate: string) => string
   r?: number
 }
 
@@ -48,7 +50,15 @@ type PaceLineDotRenderProps = {
   payload?: { date: string; pace: number }
 }
 
-function PaceSessionDot({ cx, cy, payload, fill, onActivate, r }: PaceSessionDotProps) {
+function PaceSessionDot({
+  cx,
+  cy,
+  payload,
+  fill,
+  onActivate,
+  openSessionsAriaLabel,
+  r,
+}: PaceSessionDotProps) {
   const radius = r ?? 3
   if (cx == null || cy == null || !payload?.date) {
     return null
@@ -64,7 +74,7 @@ function PaceSessionDot({ cx, cy, payload, fill, onActivate, r }: PaceSessionDot
       fill={fill}
       className="cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
       tabIndex={0}
-      aria-label={`Open sessions on ${date}`}
+      aria-label={openSessionsAriaLabel(date)}
       onClick={(pointerEvent) => {
         pointerEvent.stopPropagation()
         onActivate(date)
@@ -89,14 +99,6 @@ type DashboardChartsProps = {
   drillDown: SwimChartsDrillDown
 }
 
-function chartEmptyMessage(className?: string) {
-  return (
-    <div role="status" className={cn('chart-empty-state', className)}>
-      No distance logged in this window.
-    </div>
-  )
-}
-
 export default function DashboardCharts({
   weeklyDistance,
   monthlyVolume,
@@ -104,6 +106,7 @@ export default function DashboardCharts({
   paceTrend,
   drillDown,
 }: DashboardChartsProps) {
+  const { t } = useTranslation()
   const chart = useChartTheme()
   const navigate = useNavigate()
   const volumeGradientId = useId().replace(/:/g, '')
@@ -111,10 +114,28 @@ export default function DashboardCharts({
     useResponsiveChartLayout()
 
   const pieData = strokeSlices.map((strokeSlice) => ({
-    name: STROKE_LABELS[strokeSlice.stroke],
+    name: translateStroke(t, strokeSlice.stroke),
     value: strokeSlice.distanceMeters,
     strokeKey: strokeSlice.stroke,
   }))
+
+  function chartEmptyMessage(className?: string) {
+    return (
+      <div role="status" className={cn('chart-empty-state', className)}>
+        {t('charts.emptyNoDistance')}
+      </div>
+    )
+  }
+
+  function openSessionsAriaLabel(isoDate: string) {
+    try {
+      return t('charts.openSessionsOnDate', {
+        date: format(parseISO(isoDate), DATE_FORMAT.LIST_ROW),
+      })
+    } catch {
+      return t('charts.openSessionsOnDate', { date: isoDate })
+    }
+  }
 
   const paceChartData = paceTrend.map((pacePoint) => ({
     date: pacePoint.date,
@@ -187,8 +208,8 @@ export default function DashboardCharts({
   return (
     <div className="analytics-chart-grid">
       <ChartCard
-        title="Weekly distance"
-        description="Meters logged per ISO week (Mon–Sun). Click a bar for Statistics."
+        title={t('charts.weeklyDistanceTitle')}
+        description={t('charts.weeklyDistanceDesc')}
       >
         <div className="chart-surface-flush-left">
           {!weekHasVolume ? (
@@ -215,7 +236,7 @@ export default function DashboardCharts({
                 />
                 <Bar
                   dataKey={CHART_DATA_KEY.VALUE}
-                  name={CHART_SERIES_NAME.METERS}
+                  name={t('charts.series.meters')}
                   fill={chart.chart1}
                   radius={[4, 4, 0, 0]}
                   cursor="pointer"
@@ -228,8 +249,8 @@ export default function DashboardCharts({
       </ChartCard>
 
       <ChartCard
-        title="Monthly training volume"
-        description="Total meters by calendar month. Click the area for Statistics."
+        title={t('charts.monthlyVolumeTitle')}
+        description={t('charts.monthlyVolumeDesc')}
       >
         <div className="chart-surface-flush-left">
           {!monthHasVolume ? (
@@ -260,7 +281,7 @@ export default function DashboardCharts({
                 <Area
                   type="monotone"
                   dataKey={CHART_DATA_KEY.VALUE}
-                  name={CHART_SERIES_NAME.METERS}
+                  name={t('charts.series.meters')}
                   stroke={chart.chart2}
                   fill={`url(#${volumeGradientId})`}
                   strokeWidth={2}
@@ -276,13 +297,13 @@ export default function DashboardCharts({
       <ChartCard
         rootClassName="flex min-h-0 flex-col md:h-full"
         contentClassName="flex min-h-0 flex-1 flex-col"
-        title="Volume by stroke"
-        description="Share of total meters. Click a slice to filter sessions by stroke."
+        title={t('charts.volumeByStrokeTitle')}
+        description={t('charts.volumeByStrokeDesc')}
       >
         <div className="chart-surface-pie">
           {pieData.length === 0 ? (
             <div role="status" className="chart-empty-state">
-              No stroke mix yet — log pool sessions with different strokes to see this chart.
+              {t('charts.strokeMixEmptyLong')}
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%" className="min-h-0 flex-1">
@@ -320,8 +341,8 @@ export default function DashboardCharts({
       </ChartCard>
 
       <ChartCard
-        title="Average pace trend"
-        description="Seconds per 100 m by session date (lower is faster). Click a point to open that day in Statistics."
+        title={t('charts.avgPaceTitle')}
+        description={t('charts.avgPaceDesc')}
       >
         <div className="chart-surface-flush-left">
           {paceChartData.length === 0 ? (
@@ -351,7 +372,7 @@ export default function DashboardCharts({
                   label={
                     isSmUp
                       ? {
-                          value: PACE_AXIS_LABEL,
+                          value: t('charts.paceAxis'),
                           angle: -90,
                           position: 'insideLeft',
                           fill: chart.axis,
@@ -363,7 +384,7 @@ export default function DashboardCharts({
                 <Line
                   type="monotone"
                   dataKey={CHART_DATA_KEY.PACE}
-                  name={CHART_SERIES_NAME.PACE}
+                  name={t('charts.series.pace')}
                   stroke={chart.chart1}
                   strokeWidth={2}
                   dot={(props: PaceLineDotRenderProps) => (
@@ -373,6 +394,7 @@ export default function DashboardCharts({
                       payload={props.payload}
                       fill={chart.chart1}
                       onActivate={goWorkoutsForDay}
+                      openSessionsAriaLabel={openSessionsAriaLabel}
                     />
                   )}
                   activeDot={(props: PaceLineDotRenderProps) => (
@@ -383,6 +405,7 @@ export default function DashboardCharts({
                       fill={chart.chart1}
                       r={4}
                       onActivate={goWorkoutsForDay}
+                      openSessionsAriaLabel={openSessionsAriaLabel}
                     />
                   )}
                 />

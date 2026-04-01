@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import {
   formatChartTooltipLabel,
   formatChartTooltipValue,
@@ -26,6 +28,8 @@ export default function ChartTooltipContent({
   label,
   className,
 }: ChartTooltipContentProps) {
+  const { t } = useTranslation()
+
   if (!active || !payload?.length) {
     return null
   }
@@ -41,7 +45,9 @@ export default function ChartTooltipContent({
             key={`${String(entry.dataKey)}-${String(entry.name)}-${index}`}
             className={chartTooltipListItemVariants()}
           >
-            <span className={chartTooltipSeriesNameVariants()}>{entry.name ?? 'Value'}</span>
+            <span className={chartTooltipSeriesNameVariants()}>
+              {entry.name ?? t('charts.tooltipValueFallback')}
+            </span>
             {': '}
             {formatChartTooltipValue(entry)}
           </li>

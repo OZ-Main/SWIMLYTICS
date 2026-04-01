@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
@@ -31,6 +32,7 @@ import { AthleteTrainingType, PoolLength } from '@/shared/domain'
 import type { GymTrainingSession, TrainingSession } from '@/shared/types/domain.types'
 
 export default function WorkoutTemplateNewPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const addWorkoutTemplate = useWorkoutTemplateStore(
     (workoutTemplateStore) => workoutTemplateStore.addWorkoutTemplate,
@@ -106,7 +108,7 @@ export default function WorkoutTemplateNewPage() {
   return (
     <div className="page-stack">
       <PageHeader
-        title="New workout template"
+        title={t('titles.newWorkoutTemplate')}
         description="Define structure once. You will pick athletes and a date when you bulk-assign."
         actions={
           <Button type="button" variant="outline" onClick={() => navigate(APP_ROUTE.workoutTemplates)}>

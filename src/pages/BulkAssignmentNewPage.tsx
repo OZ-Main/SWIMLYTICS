@@ -1,5 +1,6 @@
 import { ClipboardList, Users } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 
@@ -36,14 +37,15 @@ import { createTrainingSessionsFromWorkoutTemplate } from '@/features/workout-te
 import { validateWorkoutTemplateForPersistence } from '@/features/workout-templates/helpers/workoutTemplatePersistenceValidation.helpers'
 import { workoutTemplateBlockCount } from '@/features/workout-templates/helpers/workoutTemplateSummary.helpers'
 import { coachFirestoreErrorMessage } from '@/lib/firebase/coachFirestoreErrorMessage.helpers'
-import { ATHLETE_TRAINING_TYPE_LABELS } from '@/shared/constants/athleteTrainingTypeLabels'
 import { APP_ROUTE } from '@/shared/constants/routes.constants'
 import { WORKOUT_FILTER_ALL } from '@/shared/constants/workoutFilter.constants'
 import { AthleteTrainingType } from '@/shared/domain'
-import { isValidIsoCalendarDateString } from '@/shared/helpers/isoCalendarDate.helpers'
 import { athleteGroupDisplayLabel } from '@/shared/helpers/athleteGroupDisplay.helpers'
+import { translateTrainingType } from '@/shared/helpers/i18nLabels.helpers'
+import { isValidIsoCalendarDateString } from '@/shared/helpers/isoCalendarDate.helpers'
 
 export default function BulkAssignmentNewPage() {
+  const { t } = useTranslation()
   const athletes = useAthleteStore((athleteStore) => athleteStore.athletes)
   const workoutTemplates = useWorkoutTemplateStore(
     (workoutTemplateStore) => workoutTemplateStore.workoutTemplates,
@@ -109,22 +111,22 @@ export default function BulkAssignmentNewPage() {
 
   async function handleBulkAssign() {
     if (!selectedTemplate) {
-      toast.error('Choose a workout template.')
+      toast.error(t('assignments.pickTemplateToast'))
       return
     }
 
     if (assignmentCalendarDate.trim().length === 0) {
-      toast.error('Choose an assignment date.')
+      toast.error(t('assignments.pickDateToast'))
       return
     }
 
     if (!isValidIsoCalendarDateString(assignmentCalendarDate)) {
-      toast.error('Choose a valid assignment date.')
+      toast.error(t('assignments.invalidDateToast'))
       return
     }
 
     if (workoutTemplateBlockCount(selectedTemplate) === 0) {
-      toast.error('This template has no blocks. Edit the template first.')
+      toast.error(t('assignments.noBlocksToast'))
       return
     }
 
@@ -136,7 +138,7 @@ export default function BulkAssignmentNewPage() {
 
     const athleteIds = [...selectedAthleteIds]
     if (athleteIds.length === 0) {
-      toast.error('Select at least one athlete.')
+      toast.error(t('assignments.pickAthletesToast'))
       return
     }
 
@@ -156,31 +158,31 @@ export default function BulkAssignmentNewPage() {
 
     try {
       await bulkAddTrainingSessions(sessions)
-      toast.success(`Assigned ${sessions.length} session${sessions.length === 1 ? '' : 's'}`)
+      toast.success(t('assignments.successToast', { count: sessions.length }))
       setSelectedAthleteIds(new Set())
     } catch (error) {
-      toast.error(coachFirestoreErrorMessage(error, 'Could not assign sessions.'))
+      toast.error(coachFirestoreErrorMessage(error, t('assignments.assignFailFallback')))
     }
   }
 
   return (
     <div className="page-stack">
       <PageHeader
-        title="Bulk assign workout"
-        description="Pick a template and date, filter your roster, then create real sessions for every selected athlete."
+        title={t('assignments.title')}
+        description={t('assignments.description')}
         actions={
           <Button variant="outline" asChild>
-            <Link to={APP_ROUTE.workoutTemplates}>Workout templates</Link>
+            <Link to={APP_ROUTE.workoutTemplates}>{t('assignments.backToTemplates')}</Link>
           </Button>
         }
       />
 
       <div className={bulkAssignmentToolbarClassName}>
         <div className="min-w-[12rem] flex-1 space-y-tight">
-          <Label htmlFor="bulk-template">Workout template</Label>
+          <Label htmlFor="bulk-template">{t('assignments.templateLabel')}</Label>
           <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
             <SelectTrigger id="bulk-template">
-              <SelectValue placeholder="Select a template" />
+              <SelectValue placeholder={t('assignments.templatePlaceholder')} />
             </SelectTrigger>
             <SelectContent>
               {sortedTemplates.map((workoutTemplate) => (
@@ -193,7 +195,7 @@ export default function BulkAssignmentNewPage() {
         </div>
 
         <div className="min-w-[10rem] space-y-tight">
-          <Label htmlFor="bulk-date">Session date</Label>
+          <Label htmlFor="bulk-date">{t('assignments.sessionDate')}</Label>
           <Input
             id="bulk-date"
             type="date"
@@ -203,7 +205,7 @@ export default function BulkAssignmentNewPage() {
         </div>
 
         <div className="min-w-[10rem] flex-1 space-y-tight">
-          <Label htmlFor="bulk-training-type">Training type filter</Label>
+          <Label htmlFor="bulk-training-type">{t('assignments.trainingTypeFilter')}</Label>
           <Select
             value={trainingTypeFilter}
             disabled={!selectedTemplate}
@@ -214,14 +216,14 @@ export default function BulkAssignmentNewPage() {
             }
           >
             <SelectTrigger id="bulk-training-type">
-              <SelectValue placeholder="All" />
+              <SelectValue placeholder={t('assignments.allPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={WORKOUT_FILTER_ALL}>All</SelectItem>
+              <SelectItem value={WORKOUT_FILTER_ALL}>{t('assignments.allPlaceholder')}</SelectItem>
               {(Object.values(AthleteTrainingType) as AthleteTrainingType[]).map(
                 (trainingTypeOption) => (
                   <SelectItem key={trainingTypeOption} value={trainingTypeOption}>
-                    {ATHLETE_TRAINING_TYPE_LABELS[trainingTypeOption]}
+                    {translateTrainingType(t, trainingTypeOption)}
                   </SelectItem>
                 ),
               )}
@@ -230,23 +232,23 @@ export default function BulkAssignmentNewPage() {
         </div>
 
         <div className="min-w-[10rem] flex-1 space-y-tight">
-          <Label htmlFor="bulk-group">Group contains</Label>
+          <Label htmlFor="bulk-group">{t('assignments.groupContains')}</Label>
           <Input
             id="bulk-group"
             value={groupQuery}
             onChange={(changeEvent) => setGroupQuery(changeEvent.target.value)}
-            placeholder="Filter group…"
+            placeholder={t('assignments.filterGroupPlaceholderShort')}
             disabled={!selectedTemplate}
           />
         </div>
 
         <div className="min-w-[10rem] flex-1 space-y-tight">
-          <Label htmlFor="bulk-name">Name contains</Label>
+          <Label htmlFor="bulk-name">{t('assignments.nameContains')}</Label>
           <Input
             id="bulk-name"
             value={nameQuery}
             onChange={(changeEvent) => setNameQuery(changeEvent.target.value)}
-            placeholder="Search name…"
+            placeholder={t('assignments.searchNamePlaceholder')}
             disabled={!selectedTemplate}
           />
         </div>
@@ -255,21 +257,23 @@ export default function BulkAssignmentNewPage() {
       {!selectedTemplate ? (
         <EmptyState
           icon={ClipboardList}
-          title="Choose a template"
-          description="Templates are limited to athletes with the same training type (pool vs gym)."
+          title={t('assignments.emptyChooseTemplateTitle')}
+          description={t('assignments.emptyChooseTemplateDescription')}
         />
       ) : eligibleAthletes.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="No eligible athletes"
-          description={`Add or update athletes to ${ATHLETE_TRAINING_TYPE_LABELS[selectedTemplate.trainingType].toLowerCase()} to assign this template.`}
+          title={t('assignments.emptyNoEligibleTitle')}
+          description={t('assignments.emptyNoEligibleDescription', {
+            trainingType: translateTrainingType(t, selectedTemplate.trainingType),
+          })}
         />
       ) : (
         <>
           <div className="flex flex-wrap items-center justify-between gap-tight">
             <p className="text-body-sm text-muted-foreground">
-              {filteredAthletes.length} athlete{filteredAthletes.length === 1 ? '' : 's'} shown ·{' '}
-              {selectedAthleteIds.size} selected
+              {t('assignments.athletesShown', { count: filteredAthletes.length })} ·{' '}
+              {t('assignments.selectedCount', { count: selectedAthleteIds.size })}
             </p>
             <div className="flex flex-wrap gap-tight">
               <Button
@@ -285,10 +289,12 @@ export default function BulkAssignmentNewPage() {
                   )
                 }
               >
-                {allFilteredSelected ? 'Clear filtered selection' : 'Select all filtered'}
+                {allFilteredSelected
+                  ? t('assignments.clearFilteredSelection')
+                  : t('assignments.selectAllFiltered')}
               </Button>
               <Button type="button" size="sm" onClick={handleBulkAssign}>
-                Assign to selected
+                {t('assignments.assignButton')}
               </Button>
             </div>
           </div>
@@ -297,12 +303,12 @@ export default function BulkAssignmentNewPage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-10">
-                  <span className="sr-only">Select</span>
+                  <span className="sr-only">{t('assignments.tableSelectSr')}</span>
                 </TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Group</TableHead>
-                <TableHead>Training type</TableHead>
-                <TableHead>Notes</TableHead>
+                <TableHead>{t('assignments.tableName')}</TableHead>
+                <TableHead>{t('assignments.tableGroup')}</TableHead>
+                <TableHead>{t('assignments.tableTrainingType')}</TableHead>
+                <TableHead>{t('assignments.tableNotes')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -325,7 +331,9 @@ export default function BulkAssignmentNewPage() {
                           return next
                         })
                       }}
-                      aria-label={`Select ${rosterAthlete.fullName}`}
+                      aria-label={t('assignments.selectAthleteAria', {
+                        name: rosterAthlete.fullName,
+                      })}
                     />
                   </TableCell>
                   <TableCell className="font-medium">{rosterAthlete.fullName}</TableCell>
@@ -333,10 +341,10 @@ export default function BulkAssignmentNewPage() {
                     {athleteGroupDisplayLabel(rosterAthlete.group)}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {ATHLETE_TRAINING_TYPE_LABELS[rosterAthlete.trainingType]}
+                    {translateTrainingType(t, rosterAthlete.trainingType)}
                   </TableCell>
                   <TableCell className="max-w-xs truncate text-muted-foreground">
-                    {rosterAthlete.notes.trim() || '—'}
+                    {rosterAthlete.notes.trim() || t('dashboard.dash')}
                   </TableCell>
                 </TableRow>
               ))}
