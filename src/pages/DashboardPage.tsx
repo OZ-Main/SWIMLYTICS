@@ -1,5 +1,6 @@
 import { format, parseISO } from 'date-fns'
 import { Activity, Clock, Gauge, Route, Timer, Users, Waves } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { createSearchParams, Link } from 'react-router-dom'
 
 import { useAthleteStore } from '@/app/store/athleteStore'
@@ -41,6 +42,7 @@ import {
 } from '@/shared/helpers/sessionType.helpers'
 
 export default function DashboardPage() {
+  const { t } = useTranslation()
   const coach = useCoachStore((coachStore) => coachStore.coach)
   const athletes = useAthleteStore((athleteStore) => athleteStore.athletes)
   const trainingSessions = useTrainingSessionStore(
@@ -84,7 +86,7 @@ export default function DashboardPage() {
   if (!coach) {
     return (
       <div className="page-stack">
-        <PageHeader title="Coach dashboard" description="Loading your workspace…" />
+        <PageHeader title={t('dashboard.coachDashboard')} description={t('dashboard.loading')} />
       </div>
     )
   }
@@ -93,21 +95,21 @@ export default function DashboardPage() {
     return (
       <div className="page-stack">
         <PageHeader
-          title="Coach dashboard"
-          description={`Hi ${coach.displayName} — add athletes and log sessions to unlock roster-wide trends.`}
+          title={t('dashboard.coachDashboard')}
+          description={t('dashboard.emptyDescription', { name: coach.displayName })}
         />
         <EmptyState
           icon={Users}
-          title="No data yet"
-          description="Create athlete profiles, then log pool or gym sessions. New accounts include sample data you can edit or remove."
+          title={t('dashboard.noDataTitle')}
+          description={t('dashboard.noDataDescription')}
           action={
             <Button asChild>
-              <Link to={APP_ROUTE.athleteNew}>Add athlete</Link>
+              <Link to={APP_ROUTE.athleteNew}>{t('dashboard.addAthlete')}</Link>
             </Button>
           }
           secondaryAction={
             <Button asChild variant="outline">
-              <Link to={APP_ROUTE.settings}>Settings</Link>
+              <Link to={APP_ROUTE.settings}>{t('dashboard.settings')}</Link>
             </Button>
           }
         />
@@ -115,30 +117,37 @@ export default function DashboardPage() {
     )
   }
 
+  const athleteLabel =
+    athletes.length === 1 ? t('dashboard.athleteSingular') : t('dashboard.athletePlural')
+
   return (
     <div className="page-stack">
       <PageHeader
-        title="Coach dashboard"
-        description={`Overview for ${coach.displayName} — ${athletes.length} athlete${athletes.length === 1 ? '' : 's'} on file.`}
+        title={t('dashboard.coachDashboard')}
+        description={t('dashboard.overviewDescription', {
+          name: coach.displayName,
+          count: athletes.length,
+          athleteLabel,
+        })}
         actions={
           <Button asChild variant="secondary">
-            <Link to={APP_ROUTE.athleteNew}>Add athlete</Link>
+            <Link to={APP_ROUTE.athleteNew}>{t('dashboard.addAthlete')}</Link>
           </Button>
         }
       />
 
       <div>
-        <p className="section-label mb-stack">Roster overview</p>
+        <p className="section-label mb-stack">{t('dashboard.rosterOverview')}</p>
         <div className="analytics-kpi-grid">
           <StatCard
-            title="Athletes"
+            title={t('dashboard.statAthletes')}
             value={String(athletes.length)}
             icon={Users}
             to={APP_ROUTE.athletes}
-            ariaLabel={`${athletes.length} athletes. Open roster.`}
+            ariaLabel={t('dashboard.ariaAthletes', { count: athletes.length })}
           />
           <StatCard
-            title="Pool sessions"
+            title={t('dashboard.statPoolSessions')}
             value={String(swimSummary.totalSessions)}
             icon={Waves}
             metric={MetricType.WorkoutCount}
@@ -147,7 +156,7 @@ export default function DashboardPage() {
             }).toString()}`}
           />
           <StatCard
-            title="Gym sessions"
+            title={t('dashboard.statGymSessions')}
             value={String(gymSummary.sessionCount)}
             icon={Activity}
             to={`${APP_ROUTE.statistics}?${createSearchParams({
@@ -155,14 +164,14 @@ export default function DashboardPage() {
             }).toString()}`}
           />
           <StatCard
-            title="Total pool distance"
+            title={t('dashboard.statTotalPoolDistance')}
             value={formatDistanceMeters(swimSummary.totalDistanceMeters)}
             icon={Route}
             metric={MetricType.TotalDistance}
             to={APP_ROUTE.statistics}
           />
           <StatCard
-            title="Combined duration"
+            title={t('dashboard.statCombinedDuration')}
             value={formatDurationSeconds(
               swimSummary.totalDurationSeconds + gymSummary.totalDurationSeconds,
             )}
@@ -171,32 +180,34 @@ export default function DashboardPage() {
             to={APP_ROUTE.statistics}
           />
           <StatCard
-            title="Avg pace (pool)"
+            title={t('dashboard.statAvgPace')}
             value={
               swimSummary.averagePacePer100Seconds !== null
                 ? formatPacePer100(swimSummary.averagePacePer100Seconds)
-                : '—'
+                : t('dashboard.dash')
             }
-            hint="Session-weighted"
+            hint={t('dashboard.paceHint')}
             icon={Gauge}
             metric={MetricType.AveragePace}
             to={APP_ROUTE.statistics}
           />
           <StatCard
-            title="Pool volume this week"
+            title={t('dashboard.statWeekVolume')}
             value={formatDistanceMeters(swimSummary.currentWeekDistanceMeters)}
-            hint="Mon–Sun"
+            hint={t('dashboard.weekHint')}
             icon={Timer}
             metric={MetricType.WeekDistance}
             to={thisWeekPoolHref}
-            ariaLabel={`Pool distance this week Mon to Sun, ${formatDistanceMeters(swimSummary.currentWeekDistanceMeters)}.`}
+            ariaLabel={t('dashboard.ariaWeekPool', {
+              distance: formatDistanceMeters(swimSummary.currentWeekDistanceMeters),
+            })}
           />
         </div>
       </div>
 
       {swimSessions.length > 0 ? (
         <div>
-          <p className="section-label mb-stack">Pool trends (all athletes)</p>
+          <p className="section-label mb-stack">{t('dashboard.poolTrends')}</p>
           <DashboardCharts
             weeklyDistance={weeklyDistance}
             monthlyVolume={monthlyVolume}
@@ -209,7 +220,7 @@ export default function DashboardPage() {
 
       {gymSessions.length > 0 ? (
         <div>
-          <p className="section-label mb-stack">Gym time (all athletes)</p>
+          <p className="section-label mb-stack">{t('dashboard.gymTime')}</p>
           <GymDashboardCharts
             weeklyDuration={weeklyGymDur}
             monthlyDuration={monthlyGymDur}
@@ -219,24 +230,24 @@ export default function DashboardPage() {
       ) : null}
 
       <div>
-        <p className="section-label mb-stack">Recent sessions</p>
+        <p className="section-label mb-stack">{t('dashboard.recentSessions')}</p>
         <Card className="overflow-hidden">
           <CardHeader className="page-section-header">
-            <CardTitle className="page-section-title">Latest activity</CardTitle>
+            <CardTitle className="page-section-title">{t('dashboard.latestActivity')}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <StaggerList className="divide-y divide-border px-3 sm:px-card">
               {recent.map((recentSession) => {
                 const rosterAthlete = athleteById.get(recentSession.athleteId)
-                const athleteDisplayName = rosterAthlete?.fullName ?? 'Unknown athlete'
+                const athleteDisplayName = rosterAthlete?.fullName ?? t('dashboard.unknownAthlete')
 
                 let sessionSummary = ''
 
                 if (recentSession.trainingType === AthleteTrainingType.Swimming) {
                   const summary = buildSwimmingSessionSummary(recentSession, 2)
-                  sessionSummary = `${summary.primaryStrokeLabel ?? 'Pool'} · ${formatDistanceMeters(summary.totalDistanceMeters)} · ${formatDurationSeconds(summary.totalDurationSeconds)}`
+                  sessionSummary = `${summary.primaryStrokeLabel ?? t('dashboard.pool')} · ${formatDistanceMeters(summary.totalDistanceMeters)} · ${formatDurationSeconds(summary.totalDurationSeconds)}`
                 } else {
-                  sessionSummary = `${recentSession.sessionTitle || recentSession.blocks[0]?.title || 'Gym'} · ${formatDurationSeconds(getGymSessionTotalDurationSeconds(recentSession))}`
+                  sessionSummary = `${recentSession.sessionTitle || recentSession.blocks[0]?.title || t('dashboard.gym')} · ${formatDurationSeconds(getGymSessionTotalDurationSeconds(recentSession))}`
                 }
 
                 return (
@@ -250,7 +261,7 @@ export default function DashboardPage() {
                     </div>
                     <Button variant="ghost" asChild className="min-h-10 w-full touch-manipulation sm:h-9 sm:min-h-0 sm:w-auto">
                       <Link to={sessionDetailPath(recentSession.athleteId, recentSession.id)}>
-                        View
+                        {t('dashboard.view')}
                       </Link>
                     </Button>
                   </StaggerItem>

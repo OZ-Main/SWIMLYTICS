@@ -5,7 +5,8 @@ import { getFirestoreDb } from '@/lib/firebase/firestoreDb'
 import { FIRESTORE_USERS_COLLECTION } from '@/lib/firebase/firestorePaths'
 import type { FirestoreUserProfileFields } from '@/lib/firebase/userProfile.types'
 import { stripUndefinedDeep } from '@/lib/firebase/stripUndefinedDeep'
-import { ThemeMode } from '@/shared/domain'
+import { AppLanguage, ThemeMode } from '@/shared/domain'
+import { parseAppLanguage } from '@/shared/helpers/appLanguage.helpers'
 import type { Coach } from '@/shared/types/domain.types'
 
 export function userProfileDocumentRef(db: Firestore, uid: string) {
@@ -28,6 +29,7 @@ export function defaultUserProfileFields(
     displayName,
     createdAt: new Date().toISOString(),
     theme: ThemeMode.System,
+    language: AppLanguage.English,
     initialSampleApplied: false,
   }
   if (email != null && email.trim() !== '') {
@@ -83,7 +85,7 @@ export async function updateUserProfileFields(
 export function parseUserProfileSnapshot(
   uid: string,
   raw: Record<string, unknown>,
-): { coach: Coach; theme: ThemeMode; initialSampleApplied: boolean } {
+): { coach: Coach; theme: ThemeMode; language: AppLanguage; initialSampleApplied: boolean } {
   const displayName =
     typeof raw.displayName === 'string' && raw.displayName.length > 0 ? raw.displayName : 'Coach'
   const createdAt =
@@ -95,6 +97,7 @@ export function parseUserProfileSnapshot(
     themeRaw === ThemeMode.Light || themeRaw === ThemeMode.Dark || themeRaw === ThemeMode.System
       ? themeRaw
       : ThemeMode.System
+  const language = parseAppLanguage(raw.language)
   const initialSampleApplied = raw.initialSampleApplied === true
   const email =
     typeof raw.email === 'string' && raw.email.trim().length > 0 ? raw.email.trim() : undefined
@@ -102,12 +105,14 @@ export function parseUserProfileSnapshot(
     displayName,
     createdAt,
     theme,
+    language,
     initialSampleApplied,
     ...(email != null ? { email } : {}),
   }
   return {
     coach: coachFromUserProfile(uid, profile),
     theme,
+    language,
     initialSampleApplied,
   }
 }

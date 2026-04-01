@@ -1,5 +1,6 @@
 import { ChevronsLeft, ChevronsRight, LogOut, Menu } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 
@@ -46,6 +47,7 @@ import {
 import { useSidebarExpanded } from './useSidebarExpanded'
 
 export default function AppShell() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const signOutUser = useAuthStore((authStore) => authStore.signOutUser)
   const { expanded, toggle } = useSidebarExpanded()
@@ -82,10 +84,10 @@ export default function AppShell() {
   async function handleSignOut() {
     try {
       await signOutUser()
-      toast.success('Signed out')
+      toast.success(t('shell.signedOut'))
       navigate(APP_ROUTE.login, { replace: true })
     } catch {
-      toast.error('Could not sign out.')
+      toast.error(t('shell.signOutError'))
     }
   }
 
@@ -106,9 +108,7 @@ export default function AppShell() {
               className={appShellSidebarToggleButtonVariants()}
               aria-expanded={expanded}
               aria-controls="desktop-main-nav"
-              aria-label={
-                expanded ? 'Collapse navigation sidebar' : 'Expand navigation sidebar'
-              }
+              aria-label={expanded ? t('shell.collapseSidebar') : t('shell.expandSidebar')}
               onClick={toggle}
             >
               {expanded ? (
@@ -138,7 +138,7 @@ export default function AppShell() {
                 onClick={() => void handleSignOut()}
               >
                 <LogOut className="h-4 w-4 shrink-0" aria-hidden />
-                Sign out
+                {t('shell.signOut')}
               </Button>
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function AppShell() {
               aria-expanded={mobileNavOpen}
               aria-controls="mobile-main-nav"
               aria-haspopup="dialog"
-              aria-label="Open navigation menu"
+              aria-label={t('shell.openMenu')}
               onClick={handleOpenMobileNav}
             >
               <Menu className="h-5 w-5" aria-hidden />
@@ -167,12 +167,10 @@ export default function AppShell() {
               className={appShellMobileNavSheetContentVariants()}
               onCloseAutoFocus={handleMobileSheetCloseAutoFocus}
             >
-              <SheetDescription className="sr-only">
-                Application sections: dashboard, athletes, statistics, and settings.
-              </SheetDescription>
+              <SheetDescription className="sr-only">{t('shell.menuDescription')}</SheetDescription>
               <div className={appShellMobileNavSheetHeaderVariants()}>
-                <SheetTitle className={appShellMobileNavSheetTitleVariants()}>Menu</SheetTitle>
-                <SheetCloseButton label="Close navigation menu" />
+                <SheetTitle className={appShellMobileNavSheetTitleVariants()}>{t('shell.menu')}</SheetTitle>
+                <SheetCloseButton label={t('shell.closeNavMenu')} />
               </div>
               <MainNav
                 id="mobile-main-nav"
@@ -183,7 +181,7 @@ export default function AppShell() {
             </SheetContent>
           </Sheet>
           <a href="#main-content" className={appShellSkipLinkVariants()}>
-            Skip to main content
+            {t('shell.skipToContent')}
           </a>
           <main id="main-content" tabIndex={-1} className={appShellMainContentVariants()}>
             <div className={appShellMainWidthCapVariants()}>

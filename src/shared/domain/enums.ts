@@ -40,6 +40,13 @@ export enum ThemeMode {
   System = 'system',
 }
 
+/** UI locale; values are BCP 47 language codes stored in coach profile + localStorage. */
+export enum AppLanguage {
+  English = 'en',
+  Romanian = 'ro',
+  Russian = 'ru',
+}
+
 export enum ResolvedTheme {
   Light = 'light',
   Dark = 'dark',

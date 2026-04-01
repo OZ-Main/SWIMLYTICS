@@ -1,4 +1,5 @@
 export {
+  AppLanguage,
   AthleteTrainingType,
   DataExportVersion,
   DrillType,

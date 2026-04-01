@@ -81,6 +81,10 @@ export function subscribeCoachFirestore(firebaseUser: User): Unsubscribe {
         settingsState.setInitialSampleApplied(parsed.initialSampleApplied)
       }
 
+      if (settingsState.language !== parsed.language) {
+        settingsState.setLanguage(parsed.language)
+      }
+
       useCoachStore.getState().setProfileReady(true)
     }),
   )
